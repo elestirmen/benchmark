@@ -15,8 +15,12 @@ ayrı tutulur.
 Varsayılan olarak aynı sorgu merkezleri iki ayrı koşulda ölçülür:
 
 - `clean`: özgün, temiz ortomozaik parçası;
-- `hard_v1`: geometriyi değiştirmeden deterministik pozlama/gamma değişimi,
-  bulanıklık, sensör gürültüsü ve JPEG bozulması uygulanmış parça.
+- `hard_v1`: geometriyi değiştirmeden orta-kuvvetli deterministik pozlama/gamma
+  değişimi, bulanıklık, sensör gürültüsü ve JPEG bozulması uygulanmış parça.
+
+`hard_v1` profil aralıkları: gain `0.70-1.30`, bias `-24..24`, gamma
+`0.70-1.40`, Gaussian blur sigma `0.80-2.20`, gürültü standart sapması
+`3-9` ve JPEG kalitesi `40-75`.
 
 Rotasyon, ölçek ve perspektif `hard_v1` içinde kullanılmaz; bunlar sinir ağı
 temsilinden çok NCC eşleştiricisinin geometrik toleransını ölçebileceği için ayrı

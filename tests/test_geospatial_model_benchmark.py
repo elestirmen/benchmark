@@ -252,7 +252,10 @@ class ManifestTests(unittest.TestCase):
         self.assertNotIn("scale", first_params)
         self.assertNotIn("perspective_x_per_px", first_params)
         self.assertEqual(first.shape, image.shape)
-        self.assertGreater(float(np.mean(np.abs(first.astype(float) - image.astype(float)))), 5.0)
+        self.assertGreater(float(np.mean(np.abs(first.astype(float) - image.astype(float)))), 10.0)
+        self.assertGreaterEqual(first_params["blur_sigma"], 0.80)
+        self.assertGreaterEqual(first_params["noise_std"], 3.0)
+        self.assertLessEqual(first_params["jpeg_quality"], 75)
 
     def _write_raster(self, path: Path, seed: int) -> None:
         rng = np.random.default_rng(seed)

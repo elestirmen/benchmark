@@ -64,12 +64,12 @@ DEFAULT_SEARCH_MODE_ORDER = {
 }
 QUERY_VARIANT_ORDER = {"clean": 0, "hard_v1": 1}
 HARD_V1_PROFILE = {
-    "gain": [0.80, 1.20],
-    "bias": [-12.0, 12.0],
-    "gamma": [0.85, 1.20],
-    "blur_sigma": [0.30, 1.50],
-    "noise_std": [1.0, 5.0],
-    "jpeg_quality": [60, 90],
+    "gain": [0.70, 1.30],
+    "bias": [-24.0, 24.0],
+    "gamma": [0.70, 1.40],
+    "blur_sigma": [0.80, 2.20],
+    "noise_std": [3.0, 9.0],
+    "jpeg_quality": [40, 75],
 }
 
 LOG = logging.getLogger("geospatial_benchmark")
