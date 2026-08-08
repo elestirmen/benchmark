@@ -132,12 +132,18 @@ const config = await readJson(path.join(runDir, "run_config.json"), {});
 const summaryRows = await readJson(path.join(runDir, "summary.json"), []);
 const resultRows = await readJsonl(path.join(runDir, "results.jsonl"));
 const errorRows = await readJsonl(path.join(runDir, "model_errors.jsonl"));
-const manifestFiles = await findFiles(runDir, "query_manifest.json");
+const manifestFiles = [
+  ...(await findFiles(runDir, "query_manifest.json")),
+  ...(await findFiles(runDir, "query_variant_manifest.json")),
+].sort();
 const queryRows = [];
 for (const manifestPath of manifestFiles) {
   const manifest = await readJson(manifestPath, {});
-  const direction = path.basename(path.dirname(path.dirname(manifestPath)));
-  for (const query of manifest.queries ?? []) queryRows.push({ direction, ...query });
+  const direction = path.relative(runDir, manifestPath).split(path.sep)[0] ?? "unknown";
+  const queryVariant = manifest.query_variant ?? "clean";
+  for (const query of manifest.queries ?? []) {
+    queryRows.push({ direction, query_variant: queryVariant, ...query });
+  }
 }
 
 const workbook = Workbook.create();
@@ -176,7 +182,7 @@ dashboard.getRange("B4:B8").format = {
 };
 dashboard.getRange("A10:H11").merge();
 dashboard.getRange("A10").values = [[
-  "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına uygulanır. Ana başarı ölçütü tüm sorgular üzerinden 30 m içinde konumlamadır; tüm-hata ortalaması yalnız tanısaldır.",
+  "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına uygulanır. clean ve hard_v1 koşulları ayrı raporlanır; ana başarı ölçütü tüm sorgular üzerinden 30 m içinde konumlamadır.",
 ]];
 dashboard.getRange("A10:H11").format = {
   fill: "#F3F4F6",
@@ -200,7 +206,7 @@ dashboard.getRange("A15:D29").values = Array.from({ length: 15 }, (_, index) => 
   const row = ranked[index];
   return row
     ? [
-        `${row.model_id} [${row.search_mode ?? "global"}]`,
+        `${row.model_id} [${row.query_variant ?? "clean"} | ${row.search_mode ?? "global"}]`,
         row.success_30m,
         row.median_error_under_30m,
         row.auc_30m,
@@ -233,7 +239,7 @@ dashboard.getRange("E1:M31").format.columnWidth = 12;
 
 // Model summary sheet
 const summaryColumns = [
-  "direction", "search_mode", "model_id", "total_queries", "ok_queries", "rejected_queries",
+  "direction", "query_variant", "search_mode", "model_id", "total_queries", "ok_queries", "rejected_queries",
   "error_queries", "coverage", "success_30m_queries", "success_30m",
   "success_30m_ci95_low", "success_30m_ci95_high", "success_30m_failure_rate",
   "auc_30m", "mean_error_under_30m", "median_error_under_30m",
@@ -259,9 +265,9 @@ numberFormatColumns(summarySheet, summaryColumns, {
   total_search_seconds: "0.0",
 }, 1, summaryRows.length);
 summarySheet.getRangeByIndexes(0, 0, summaryRows.length + 1, 1).format.columnWidth = 36;
-summarySheet.getRangeByIndexes(0, 1, summaryRows.length + 1, 1).format.columnWidth = 18;
-summarySheet.getRangeByIndexes(0, 2, summaryRows.length + 1, 1).format.columnWidth = 48;
-summarySheet.getRangeByIndexes(0, 3, summaryRows.length + 1, summaryColumns.length - 3).format.columnWidth = 16;
+summarySheet.getRangeByIndexes(0, 1, summaryRows.length + 1, 2).format.columnWidth = 18;
+summarySheet.getRangeByIndexes(0, 3, summaryRows.length + 1, 1).format.columnWidth = 48;
+summarySheet.getRangeByIndexes(0, 4, summaryRows.length + 1, summaryColumns.length - 4).format.columnWidth = 16;
 
 // Raw results sheet
 const resultColumns = resultRows.length > 0 ? Object.keys(resultRows[0]) : ["run_id", "status"];
@@ -303,7 +309,7 @@ for (let chunkIndex = 1; chunkIndex < rawChunks.length; chunkIndex += 1) {
 
 // Query manifest
 const queryColumns = [
-  "direction", "query_id", "block_id", "center_easting_m", "center_northing_m",
+  "direction", "query_variant", "query_id", "block_id", "center_easting_m", "center_northing_m",
   "source_row", "source_col", "query_std", "query_entropy", "dark_fraction", "raw_tile_file",
 ];
 const queryMatrix = matrixFromRows(queryRows, queryColumns);
@@ -314,9 +320,9 @@ numberFormatColumns(querySheet, queryColumns, {
   query_entropy: "0.00", dark_fraction: "0.0%",
 }, 1, queryRows.length);
 querySheet.getRangeByIndexes(0, 0, queryRows.length + 1, 1).format.columnWidth = 36;
-querySheet.getRangeByIndexes(0, 1, queryRows.length + 1, 2).format.columnWidth = 16;
-querySheet.getRangeByIndexes(0, 3, queryRows.length + 1, 7).format.columnWidth = 16;
-querySheet.getRangeByIndexes(0, 10, queryRows.length + 1, 1).format.columnWidth = 54;
+querySheet.getRangeByIndexes(0, 1, queryRows.length + 1, 3).format.columnWidth = 16;
+querySheet.getRangeByIndexes(0, 4, queryRows.length + 1, 7).format.columnWidth = 16;
+querySheet.getRangeByIndexes(0, 11, queryRows.length + 1, 1).format.columnWidth = 54;
 
 // Configuration
 const configRows = Object.entries(config).map(([key, value]) => [

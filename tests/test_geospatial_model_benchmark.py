@@ -21,10 +21,12 @@ if str(BENCHMARK_DIR) not in sys.path:
 
 from geospatial_model_benchmark import (  # noqa: E402
     aggregate_results,
+    augment_hard_v1,
     build_parser,
     build_pyramid,
     coarse_to_fine_search,
     generate_query_manifest,
+    prepare_query_variants,
     refresh_excel_after_model,
     search_in_mode,
 )
@@ -59,6 +61,14 @@ class ExcelCheckpointTests(unittest.TestCase):
 
 
 class DefaultBenchmarkModeTests(unittest.TestCase):
+    def test_clean_and_hard_v1_are_enabled_by_default(self) -> None:
+        parser = build_parser()
+        self.assertEqual(parser.parse_args([]).query_variants, ("clean", "hard_v1"))
+        self.assertEqual(
+            parser.parse_args(["--query-variants", "clean"]).query_variants,
+            ("clean",),
+        )
+
     def test_default_sampling_targets_300_queries_per_direction(self) -> None:
         args = build_parser().parse_args([])
         self.assertEqual(args.samples_per_block, 5)
@@ -128,6 +138,25 @@ class CoarseToFineSearchTests(unittest.TestCase):
 
 
 class AggregateTests(unittest.TestCase):
+    def test_clean_and_hard_results_are_aggregated_separately(self) -> None:
+        rows = [
+            {
+                "direction": "A",
+                "query_variant": variant,
+                "search_mode": "global",
+                "model_id": "M",
+                "status": "ok",
+                "error_m": error,
+                "search_seconds": 1.0,
+                "top1_score": 0.8,
+            }
+            for variant, error in (("clean", 2.0), ("hard_v1", 50.0))
+        ]
+        summary = aggregate_results(rows, bootstrap_iterations=0)
+        self.assertEqual([row["query_variant"] for row in summary], ["clean", "hard_v1"])
+        self.assertEqual(summary[0]["success_30m"], 1.0)
+        self.assertEqual(summary[1]["success_30m"], 0.0)
+
     def test_summary_order_is_roi_small_to_global_within_each_model(self) -> None:
         rows = []
         for mode in ("global", "roi_8000m", "roi_500m", "roi_2000m", "roi_1000m"):
@@ -212,6 +241,19 @@ class AggregateTests(unittest.TestCase):
 
 
 class ManifestTests(unittest.TestCase):
+    def test_hard_v1_augmentation_is_deterministic_and_changes_pixels(self) -> None:
+        rng = np.random.default_rng(123)
+        image = rng.integers(0, 256, size=(128, 128, 3), dtype=np.uint8)
+        first, first_params = augment_hard_v1(image, seed=99)
+        second, second_params = augment_hard_v1(image, seed=99)
+        self.assertTrue(np.array_equal(first, second))
+        self.assertEqual(first_params, second_params)
+        self.assertNotIn("rotation_deg", first_params)
+        self.assertNotIn("scale", first_params)
+        self.assertNotIn("perspective_x_per_px", first_params)
+        self.assertEqual(first.shape, image.shape)
+        self.assertGreater(float(np.mean(np.abs(first.astype(float) - image.astype(float)))), 5.0)
+
     def _write_raster(self, path: Path, seed: int) -> None:
         rng = np.random.default_rng(seed)
         data = rng.integers(20, 235, size=(3, 640, 768), dtype=np.uint8)

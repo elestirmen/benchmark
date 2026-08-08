@@ -12,6 +12,18 @@ Ardından model sorgusu, aynı modelin ürettiği haritada çok adaylı kaba-inc
 `TM_CCOEFF_NORMED` ile aranır. Ham görüntü eşleştirmesi `RAW_BASELINE` olarak
 ayrı tutulur.
 
+Varsayılan olarak aynı sorgu merkezleri iki ayrı koşulda ölçülür:
+
+- `clean`: özgün, temiz ortomozaik parçası;
+- `hard_v1`: geometriyi değiştirmeden deterministik pozlama/gamma değişimi,
+  bulanıklık, sensör gürültüsü ve JPEG bozulması uygulanmış parça.
+
+Rotasyon, ölçek ve perspektif `hard_v1` içinde kullanılmaz; bunlar sinir ağı
+temsilinden çok NCC eşleştiricisinin geometrik toleransını ölçebileceği için ayrı
+bir geometrik deney konusu olarak bırakılmıştır. Yalnız temiz benchmark için
+`--query-variants clean`; yalnız zorlaştırılmış kanal için
+`--query-variants hard_v1` kullanılabilir.
+
 Varsayılan olarak altı bağımsız benchmark senaryosu şu sırayla raporlanır:
 `roi_500m`, `roi_1000m`, `roi_2000m`, `roi_4000m`, `roi_8000m` ve `global`.
 Bunlar progressive fallback değildir; her mod aynı sorgular üzerinde bağımsız
@@ -23,6 +35,8 @@ liste için örneğin `--search-modes roi500,roi2000,global` kullanılabilir.
 - Sorgular raster sırasına göre değil, iki rasterın ortak UTM alanından seçilir.
 - Ortak alan 1 km bloklara ayrılır; sabit seed ile bloklu örnekleme yapılır.
 - Bütün modeller aynı `query_manifest.json` sorgularını kullanır.
+- `clean` ve `hard_v1` aynı sorgu merkezlerini kullanır ve Excel'de ayrı
+  `query_variant` satırları olarak raporlanır.
 - Varsayılan örnekleme her 1 km bloktan en fazla 5 sorgu alır ve yön başına
   toplam 300 sorguda durur.
 - Her model iki tarafta da aynı kanal, normalizasyon, karo ve kırpma ayarını kullanır.
@@ -101,6 +115,10 @@ python geospatial_model_benchmark.py `
   --run-id urgup_tum_modeller_300
 ```
 
+Varsayılan `clean,hard_v1` seçimi sorgu eşleştirme ve sorgu-inference yükünü
+yaklaşık iki katına çıkarır; model haritası her model ve yön için yine yalnız bir
+kez üretilir.
+
 İki sağlayıcı yönü varsayılan olarak birlikte ölçülür: önce Google sorgusu Bing
 haritasında, ardından Bing sorgusu Google haritasında aranır. Yalnızca ilk yönü
 çalıştırmak için `--no-bidirectional` kullanın. Varsayılan iki yönlü çalışma,
@@ -117,7 +135,7 @@ python geospatial_model_benchmark.py `
   --samples-per-block 5
 ```
 
-Tamamlanmış `direction + search_mode + model + query_id` kayıtları atlanır. Doğrulanmış model
+Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Doğrulanmış model
 GeoTIFF'leri ve sorgu çıktıları yeniden kullanılır.
 
 ## Canlı bilgilendirme

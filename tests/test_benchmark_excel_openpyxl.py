@@ -24,6 +24,7 @@ class OpenpyxlReportTests(unittest.TestCase):
             summary = [
                 {
                     "direction": "A__TO__B",
+                    "query_variant": "hard_v1",
                     "search_mode": "global",
                     "model_id": "RAW_BASELINE",
                     "total_queries": 1,
@@ -47,6 +48,7 @@ class OpenpyxlReportTests(unittest.TestCase):
                 "run_id": "unit_excel",
                 "status": "ok",
                 "direction": "A__TO__B",
+                "query_variant": "hard_v1",
                 "search_mode": "global",
                 "model_id": "RAW_BASELINE",
                 "query_id": "Q00001",

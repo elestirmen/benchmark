@@ -62,26 +62,43 @@ DEFAULT_SEARCH_MODE_ORDER = {
     "roi_8000m": 4,
     "global": 5,
 }
+QUERY_VARIANT_ORDER = {"clean": 0, "hard_v1": 1}
+HARD_V1_PROFILE = {
+    "gain": [0.80, 1.20],
+    "bias": [-12.0, 12.0],
+    "gamma": [0.85, 1.20],
+    "blur_sigma": [0.30, 1.50],
+    "noise_std": [1.0, 5.0],
+    "jpeg_quality": [60, 90],
+}
 
 LOG = logging.getLogger("geospatial_benchmark")
 _AUTO_EXCEL_ENGINE: str | None = None
 
 
 def result_group_sort_key(
-    item: tuple[tuple[str, str, str], Any],
-) -> tuple[str, str, int, float, str]:
+    item: tuple[tuple[str, str, str, str], Any],
+) -> tuple[str, int, str, int, float, str]:
     """Keep summaries in model order and ROI-small-to-global order."""
-    (direction, search_mode, model_id), _ = item
+    (direction, query_variant, search_mode, model_id), _ = item
     explicit_order = DEFAULT_SEARCH_MODE_ORDER.get(search_mode)
     match = re.fullmatch(r"roi_(\d+(?:\.\d+)?)m", search_mode)
     numeric_radius = float(match.group(1)) if match else math.inf
     mode_rank = explicit_order if explicit_order is not None else 4
-    return direction, model_id, mode_rank, numeric_radius, search_mode
+    return (
+        direction,
+        QUERY_VARIANT_ORDER.get(query_variant, 99),
+        model_id,
+        mode_rank,
+        numeric_radius,
+        search_mode,
+    )
 
 
 RESULT_COLUMNS = [
     "run_id",
     "direction",
+    "query_variant",
     "search_mode",
     "roi_radius_m",
     "model_id",
@@ -273,6 +290,28 @@ def parse_search_modes(value: str) -> tuple[tuple[str, float | None], ...]:
             modes.append((name, radius))
             seen.add(name)
     return tuple(modes)
+
+
+def parse_query_variants(value: str) -> tuple[str, ...]:
+    aliases = {
+        "clean": "clean",
+        "temiz": "clean",
+        "hard": "hard_v1",
+        "hard_v1": "hard_v1",
+        "zor": "hard_v1",
+    }
+    variants: list[str] = []
+    for token in value.split(","):
+        normalized = aliases.get(token.strip().lower())
+        if normalized is None:
+            raise argparse.ArgumentTypeError(
+                f"Bilinmeyen sorgu varyantı: {token}. Geçerli değerler: clean, hard_v1"
+            )
+        if normalized not in variants:
+            variants.append(normalized)
+    if not variants:
+        raise argparse.ArgumentTypeError("En az bir sorgu varyantı seçilmelidir.")
+    return tuple(variants)
 
 
 def select_models(model_dir: Path, patterns: Sequence[str], max_models: int | None) -> list[Path]:
@@ -580,6 +619,165 @@ def generate_query_manifest(
     csv_write(manifest_csv, [asdict(record) for record in records], MANIFEST_COLUMNS)
     LOG.info("Sorgu manifesti üretildi: %d sorgu | %s", len(records), manifest_json)
     return records
+
+
+def hard_v1_seed(seed: int, query_id: str) -> int:
+    digest = hashlib.sha256(f"{seed}|hard_v1|{query_id}".encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big")
+
+
+def augment_hard_v1(image_rgb: np.ndarray, *, seed: int) -> tuple[np.ndarray, dict[str, Any]]:
+    """Apply deterministic sensor/radiometric degradation without geometry changes."""
+    rng = np.random.default_rng(seed)
+    transformed = image_rgb.copy()
+
+    gain = float(rng.uniform(*HARD_V1_PROFILE["gain"]))
+    bias = float(rng.uniform(*HARD_V1_PROFILE["bias"]))
+    gamma = float(rng.uniform(*HARD_V1_PROFILE["gamma"]))
+    adjusted = np.clip(transformed.astype(np.float32) / 255.0, 0.0, 1.0)
+    adjusted = np.clip(adjusted * gain + bias / 255.0, 0.0, 1.0)
+    adjusted = np.power(adjusted, gamma)
+    transformed = np.clip(adjusted * 255.0, 0.0, 255.0).astype(np.uint8)
+
+    blur_sigma = float(rng.uniform(*HARD_V1_PROFILE["blur_sigma"]))
+    transformed = cv2.GaussianBlur(
+        transformed,
+        (0, 0),
+        sigmaX=blur_sigma,
+        sigmaY=blur_sigma,
+        borderType=cv2.BORDER_REFLECT_101,
+    )
+    noise_std = float(rng.uniform(*HARD_V1_PROFILE["noise_std"]))
+    noise = rng.normal(0.0, noise_std, transformed.shape).astype(np.float32)
+    transformed = np.clip(transformed.astype(np.float32) + noise, 0.0, 255.0).astype(np.uint8)
+
+    jpeg_quality = int(rng.integers(HARD_V1_PROFILE["jpeg_quality"][0], HARD_V1_PROFILE["jpeg_quality"][1] + 1))
+    bgr = cv2.cvtColor(transformed, cv2.COLOR_RGB2BGR)
+    encoded, buffer = cv2.imencode(".jpg", bgr, [cv2.IMWRITE_JPEG_QUALITY, jpeg_quality])
+    if not encoded:
+        raise RuntimeError("hard_v1 JPEG bozulması üretilemedi.")
+    decoded_bgr = cv2.imdecode(buffer, cv2.IMREAD_COLOR)
+    if decoded_bgr is None:
+        raise RuntimeError("hard_v1 JPEG bozulması okunamadı.")
+    transformed = cv2.cvtColor(decoded_bgr, cv2.COLOR_BGR2RGB)
+    parameters = {
+        "seed": seed,
+        "gain": gain,
+        "bias": bias,
+        "gamma": gamma,
+        "blur_sigma": blur_sigma,
+        "noise_std": noise_std,
+        "jpeg_quality": jpeg_quality,
+    }
+    return transformed, parameters
+
+
+def prepare_query_variants(
+    queries: Sequence[QueryRecord],
+    queries_dir: Path,
+    *,
+    variants: Sequence[str],
+    seed: int,
+    force: bool,
+) -> dict[str, list[QueryRecord]]:
+    prepared: dict[str, list[QueryRecord]] = {}
+    for variant in variants:
+        if variant == "clean":
+            prepared[variant] = list(queries)
+            continue
+        if variant != "hard_v1":
+            raise ValueError(f"Desteklenmeyen sorgu varyantı: {variant}")
+
+        variant_dir = queries_dir / "variants" / variant
+        raw_dir = variant_dir / "raw_tiles"
+        manifest_path = variant_dir / "query_variant_manifest.json"
+        expected_ids = [record.query_id for record in queries]
+        if manifest_path.is_file() and not force:
+            payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            rows_by_id = {
+                str(row.get("query_id")): row
+                for row in payload.get("queries", [])
+                if isinstance(row, dict)
+            }
+            cache_valid = (
+                payload.get("schema_version") == 1
+                and payload.get("query_variant") == variant
+                and payload.get("profile") == HARD_V1_PROFILE
+                and int(payload.get("seed", -1)) == int(seed)
+                and list(rows_by_id) == expected_ids
+                and all(Path(rows_by_id[item]["raw_tile_file"]).is_file() for item in expected_ids)
+            )
+            if cache_valid:
+                cached: list[QueryRecord] = []
+                for base in queries:
+                    row = rows_by_id[base.query_id]
+                    cached.append(
+                        QueryRecord(
+                            query_id=base.query_id,
+                            block_id=base.block_id,
+                            center_easting_m=base.center_easting_m,
+                            center_northing_m=base.center_northing_m,
+                            source_row=base.source_row,
+                            source_col=base.source_col,
+                            query_std=float(row["query_std"]),
+                            query_entropy=float(row["query_entropy"]),
+                            dark_fraction=float(row["dark_fraction"]),
+                            raw_tile_file=str(row["raw_tile_file"]),
+                        )
+                    )
+                LOG.info("Sorgu varyantı yeniden kullanılıyor | varyant=%s | adet=%d", variant, len(cached))
+                prepared[variant] = cached
+                continue
+
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        for old in raw_dir.glob("Q*.png"):
+            old.unlink()
+        variant_records: list[QueryRecord] = []
+        manifest_rows: list[dict[str, Any]] = []
+        for base in queries:
+            source_bgr = cv2.imread(base.raw_tile_file, cv2.IMREAD_COLOR)
+            if source_bgr is None:
+                raise FileNotFoundError(f"Ham sorgu okunamadı: {base.raw_tile_file}")
+            source_rgb = cv2.cvtColor(source_bgr, cv2.COLOR_BGR2RGB)
+            augmented, parameters = augment_hard_v1(
+                source_rgb,
+                seed=hard_v1_seed(seed, base.query_id),
+            )
+            target = raw_dir / f"{base.query_id}.png"
+            write_png(target, augmented)
+            std, entropy, dark_fraction = tile_quality(to_gray(augmented))
+            record = QueryRecord(
+                query_id=base.query_id,
+                block_id=base.block_id,
+                center_easting_m=base.center_easting_m,
+                center_northing_m=base.center_northing_m,
+                source_row=base.source_row,
+                source_col=base.source_col,
+                query_std=std,
+                query_entropy=entropy,
+                dark_fraction=dark_fraction,
+                raw_tile_file=str(target.resolve()),
+            )
+            variant_records.append(record)
+            manifest_rows.append({**asdict(record), "augmentation": parameters})
+        manifest_path.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "created_at_utc": utc_now_iso(),
+                    "query_variant": variant,
+                    "seed": seed,
+                    "profile": HARD_V1_PROFILE,
+                    "queries": manifest_rows,
+                },
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        LOG.info("Sorgu varyantı üretildi | varyant=%s | adet=%d | %s", variant, len(variant_records), variant_dir)
+        prepared[variant] = variant_records
+    return prepared
 
 
 def import_image_processor() -> Any:
@@ -992,10 +1190,11 @@ def model_query_template(path: Path, crop_border: int) -> np.ndarray:
     return image[crop_border:-crop_border, crop_border:-crop_border]
 
 
-def completed_keys(rows: Sequence[dict[str, Any]]) -> set[tuple[str, str, str, str]]:
+def completed_keys(rows: Sequence[dict[str, Any]]) -> set[tuple[str, str, str, str, str]]:
     return {
         (
             str(row.get("direction")),
+            str(row.get("query_variant", "clean")),
             str(row.get("search_mode", "global")),
             str(row.get("model_id")),
             str(row.get("query_id")),
@@ -1067,6 +1266,7 @@ def run_searches_for_representation(
     *,
     run_id: str,
     direction: str,
+    query_variant: str,
     model_id: str,
     model_file: str,
     model_sha256: str,
@@ -1086,7 +1286,7 @@ def run_searches_for_representation(
     source_map_raster: Path,
     results_csv: Path,
     results_jsonl: Path,
-    done: set[tuple[str, str, str, str]],
+    done: set[tuple[str, str, str, str, str]],
 ) -> None:
     LOG.info("Harita belleğe alınıyor | model=%s | path=%s", model_id, map_path)
     map_gray, map_transform, _ = read_map_gray(map_path)
@@ -1106,12 +1306,18 @@ def run_searches_for_representation(
         (query, mode_name, radius)
         for query in queries
         for mode_name, radius in search_modes
-        if (direction, mode_name, model_id, query.query_id) not in done
+        if (direction, query_variant, mode_name, model_id, query.query_id) not in done
     ]
     total = len(pending)
     per_query_inference = query_inference_total_seconds / max(1, len(queries))
     started = time.perf_counter()
-    LOG.info("ARAMA BAŞLADI | model=%s | bekleyen=%d | toplam=%d", model_id, total, len(queries))
+    LOG.info(
+        "ARAMA BAŞLADI | model=%s | varyant=%s | bekleyen=%d | toplam=%d",
+        model_id,
+        query_variant,
+        total,
+        len(queries),
+    )
     for index, (record, mode_name, roi_radius_m) in enumerate(pending, start=1):
         row_started = time.perf_counter()
         status = "ok"
@@ -1119,6 +1325,7 @@ def run_searches_for_representation(
         result: dict[str, Any] = {
             "run_id": run_id,
             "direction": direction,
+            "query_variant": query_variant,
             "search_mode": mode_name,
             "roi_radius_m": roi_radius_m,
             "model_id": model_id,
@@ -1212,7 +1419,7 @@ def run_searches_for_representation(
             result.setdefault(column, None)
         csv_append(results_csv, result, RESULT_COLUMNS)
         jsonl_append(results_jsonl, result)
-        done.add((direction, mode_name, model_id, record.query_id))
+        done.add((direction, query_variant, mode_name, model_id, record.query_id))
 
         elapsed = time.perf_counter() - started
         rate = index / max(elapsed, 1e-9)
@@ -1223,8 +1430,9 @@ def run_searches_for_representation(
             else f"durum={status} neden={reason}"
         )
         LOG.info(
-            "İLERLEME | model=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
+            "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
             model_id,
+            query_variant,
             mode_name,
             index,
             total,
@@ -1233,7 +1441,12 @@ def run_searches_for_representation(
             error_text,
             eta / 60.0,
         )
-    LOG.info("ARAMA TAMAMLANDI | model=%s | süre=%.2f dk", model_id, (time.perf_counter() - started) / 60.0)
+    LOG.info(
+        "ARAMA TAMAMLANDI | model=%s | varyant=%s | süre=%.2f dk",
+        model_id,
+        query_variant,
+        (time.perf_counter() - started) / 60.0,
+    )
     if pyramid is not None:
         del pyramid
     del map_gray
@@ -1341,18 +1554,19 @@ def block_bootstrap_intervals(
 def aggregate_results(
     rows: Sequence[dict[str, Any]], *, bootstrap_iterations: int = 1000, seed: int = 42
 ) -> list[dict[str, Any]]:
-    groups: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    groups: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
     for row in rows:
         groups.setdefault(
             (
                 str(row["direction"]),
+                str(row.get("query_variant", "clean")),
                 str(row.get("search_mode", "global")),
                 str(row["model_id"]),
             ),
             [],
         ).append(row)
     summary: list[dict[str, Any]] = []
-    for (direction, search_mode, model_id), group in sorted(
+    for (direction, query_variant, search_mode, model_id), group in sorted(
         groups.items(), key=result_group_sort_key
     ):
         ok = [row for row in group if row.get("status") == "ok" and row.get("error_m") is not None]
@@ -1366,7 +1580,9 @@ def aggregate_results(
             dtype=np.float64,
         )
         stable_group_seed = int.from_bytes(
-            hashlib.sha256(f"{direction}|{search_mode}|{model_id}".encode("utf-8")).digest()[:8],
+            hashlib.sha256(
+                f"{direction}|{query_variant}|{search_mode}|{model_id}".encode("utf-8")
+            ).digest()[:8],
             "big",
         ) ^ int(seed)
         confidence_intervals = block_bootstrap_intervals(
@@ -1387,6 +1603,7 @@ def aggregate_results(
         summary.append(
             {
                 "direction": direction,
+                "query_variant": query_variant,
                 "search_mode": search_mode,
                 "model_id": model_id,
                 "total_queries": len(group),
@@ -1433,7 +1650,7 @@ def write_summary_files(run_dir: Path) -> tuple[Path, Path]:
     bootstrap_iterations = int(config.get("bootstrap_iterations", 1000))
     seed = int(config.get("seed", 42))
     current_metadata = {
-        "schema_version": 2,
+        "schema_version": 3,
         "bootstrap_iterations": bootstrap_iterations,
         "seed": seed,
     }
@@ -1455,21 +1672,23 @@ def write_summary_files(run_dir: Path) -> tuple[Path, Path]:
         except (OSError, json.JSONDecodeError):
             LOG.warning("Önceki summary_metadata.json okunamadı; özetler yeniden hesaplanacak.")
 
-    previous_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
+    previous_by_key: dict[tuple[str, str, str, str], dict[str, Any]] = {}
     if previous_metadata == current_metadata:
         previous_by_key = {
             (
                 str(row.get("direction", "")),
+                str(row.get("query_variant", "clean")),
                 str(row.get("search_mode", "global")),
                 str(row.get("model_id", "")),
             ): row
             for row in previous_summary
         }
 
-    grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    grouped: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
     for row in result_rows:
         key = (
             str(row.get("direction", "")),
+            str(row.get("query_variant", "clean")),
             str(row.get("search_mode", "global")),
             str(row.get("model_id", "")),
         )
@@ -1511,7 +1730,11 @@ def write_summary_files(run_dir: Path) -> tuple[Path, Path]:
         recomputed_groups,
     )
     summary_json.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
-    columns = list(summary[0].keys()) if summary else ["direction", "search_mode", "model_id"]
+    columns = (
+        list(summary[0].keys())
+        if summary
+        else ["direction", "query_variant", "search_mode", "model_id"]
+    )
     csv_write(summary_csv, summary, columns)
     summary_metadata_path.write_text(
         json.dumps(current_metadata, indent=2, ensure_ascii=False), encoding="utf-8"
@@ -1703,6 +1926,13 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
         edge_buffer_m=args.query_edge_buffer_m,
         force=args.force_queries,
     )
+    query_variants = prepare_query_variants(
+        queries,
+        direction_dir / "queries",
+        variants=args.query_variants,
+        seed=args.seed,
+        force=args.force_queries,
+    )
 
     shared_tiles = direction_dir / "map_shared_tiles"
     metadata: dict[str, Any] | None = None
@@ -1721,30 +1951,32 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
     done = completed_keys(existing_rows)
 
     if args.include_raw:
-        run_searches_for_representation(
-            run_id=args.run_id,
-            direction=direction,
-            model_id=RAW_MODEL_ID,
-            model_file="",
-            model_sha256="",
-            map_path=map_raster,
-            map_build_seconds=0.0,
-            queries=queries,
-            query_paths=None,
-            query_inference_total_seconds=0.0,
-            crop_border=args.crop_border,
-            search_modes=args.search_modes,
-            factors=args.pyramid_factors,
-            top_k=args.top_k,
-            refine_radius_px=args.refine_radius_px,
-            nms_radius_px=args.nms_radius_px,
-            normalization="RAW",
-            source_query_raster=query_raster,
-            source_map_raster=map_raster,
-            results_csv=results_csv,
-            results_jsonl=results_jsonl,
-            done=done,
-        )
+        for query_variant, variant_queries in query_variants.items():
+            run_searches_for_representation(
+                run_id=args.run_id,
+                direction=direction,
+                query_variant=query_variant,
+                model_id=RAW_MODEL_ID,
+                model_file="",
+                model_sha256="",
+                map_path=map_raster,
+                map_build_seconds=0.0,
+                queries=variant_queries,
+                query_paths=None,
+                query_inference_total_seconds=0.0,
+                crop_border=args.crop_border,
+                search_modes=args.search_modes,
+                factors=args.pyramid_factors,
+                top_k=args.top_k,
+                refine_radius_px=args.refine_radius_px,
+                nms_radius_px=args.nms_radius_px,
+                normalization="RAW",
+                source_query_raster=query_raster,
+                source_map_raster=map_raster,
+                results_csv=results_csv,
+                results_jsonl=results_jsonl,
+                done=done,
+            )
 
     if not args.include_models:
         return
@@ -1773,40 +2005,42 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                 force=args.force_maps,
                 keep_intermediate=args.keep_intermediate,
             )
-            query_paths, query_seconds = build_model_queries(
-                model_path,
-                queries,
-                model_root / "query_model_tiles",
-                tile_size=args.tile_size,
-                batch_size=args.batch_size,
-                normalization=args.normalization,
-                enhancement=args.enhancement,
-                force=args.force_queries,
-            )
-            run_searches_for_representation(
-                run_id=args.run_id,
-                direction=direction,
-                model_id=model_id,
-                model_file=str(model_path.resolve()),
-                model_sha256=model_sha,
-                map_path=model_map,
-                map_build_seconds=map_seconds,
-                queries=queries,
-                query_paths=query_paths,
-                query_inference_total_seconds=query_seconds,
-                crop_border=args.crop_border,
-                search_modes=args.search_modes,
-                factors=args.pyramid_factors,
-                top_k=args.top_k,
-                refine_radius_px=args.refine_radius_px,
-                nms_radius_px=args.nms_radius_px,
-                normalization=args.normalization,
-                source_query_raster=query_raster,
-                source_map_raster=map_raster,
-                results_csv=results_csv,
-                results_jsonl=results_jsonl,
-                done=done,
-            )
+            for query_variant, variant_queries in query_variants.items():
+                query_paths, query_seconds = build_model_queries(
+                    model_path,
+                    variant_queries,
+                    model_root / "query_model_tiles" / query_variant,
+                    tile_size=args.tile_size,
+                    batch_size=args.batch_size,
+                    normalization=args.normalization,
+                    enhancement=args.enhancement,
+                    force=args.force_queries,
+                )
+                run_searches_for_representation(
+                    run_id=args.run_id,
+                    direction=direction,
+                    query_variant=query_variant,
+                    model_id=model_id,
+                    model_file=str(model_path.resolve()),
+                    model_sha256=model_sha,
+                    map_path=model_map,
+                    map_build_seconds=map_seconds,
+                    queries=variant_queries,
+                    query_paths=query_paths,
+                    query_inference_total_seconds=query_seconds,
+                    crop_border=args.crop_border,
+                    search_modes=args.search_modes,
+                    factors=args.pyramid_factors,
+                    top_k=args.top_k,
+                    refine_radius_px=args.refine_radius_px,
+                    nms_radius_px=args.nms_radius_px,
+                    normalization=args.normalization,
+                    source_query_raster=query_raster,
+                    source_map_raster=map_raster,
+                    results_csv=results_csv,
+                    results_jsonl=results_jsonl,
+                    done=done,
+                )
         except Exception as exc:
             LOG.error("MODEL BAŞARISIZ | %s | %s", model_path.name, exc)
             LOG.debug("Model traceback:\n%s", traceback.format_exc())
@@ -1867,6 +2101,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--include-raw", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--include-models", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--query-variants",
+        type=parse_query_variants,
+        default=("clean", "hard_v1"),
+        help=(
+            "Virgülle ayrılmış sorgu koşulları. clean mevcut benchmarkı korur; "
+            "hard_v1 geometriyi koruyan deterministik sensör/görüntü bozulmaları ekler."
+        ),
+    )
     parser.add_argument("--tile-size", type=int, default=544)
     parser.add_argument("--overlap", type=int, default=32)
     parser.add_argument("--crop-border", type=int, default=16)

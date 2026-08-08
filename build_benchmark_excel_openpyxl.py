@@ -48,6 +48,7 @@ SUBTLE_BORDER = Border(bottom=Side(style="thin", color=LIGHT))
 
 SUMMARY_COLUMNS = [
     "direction",
+    "query_variant",
     "search_mode",
     "model_id",
     "total_queries",
@@ -82,6 +83,7 @@ SUMMARY_COLUMNS = [
 
 QUERY_COLUMNS = [
     "direction",
+    "query_variant",
     "query_id",
     "block_id",
     "center_easting_m",
@@ -212,15 +214,24 @@ def ordered_columns(rows: Sequence[dict[str, Any]], fallback: Sequence[str]) -> 
 
 def find_query_rows(run_dir: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for manifest_path in sorted(run_dir.rglob("query_manifest.json")):
+    manifest_paths = sorted(run_dir.rglob("query_manifest.json")) + sorted(
+        run_dir.rglob("query_variant_manifest.json")
+    )
+    for manifest_path in manifest_paths:
         manifest = read_json(manifest_path, {})
         try:
-            direction = manifest_path.parents[1].name
+            direction = manifest_path.relative_to(run_dir).parts[0]
         except IndexError:
             direction = "unknown"
+        query_variant = str(manifest.get("query_variant", "clean"))
         for query in manifest.get("queries", []):
             if isinstance(query, dict):
-                rows.append({"direction": direction, **query})
+                row = {"direction": direction, "query_variant": query_variant, **query}
+                if isinstance(row.get("augmentation"), dict):
+                    row["augmentation"] = json.dumps(
+                        row["augmentation"], ensure_ascii=False, sort_keys=True
+                    )
+                rows.append(row)
     return rows
 
 
@@ -398,7 +409,7 @@ def write_dashboard(
     ws["A10"] = (
         "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına "
         "uygulanır. Ana başarı ölçütü tüm sorgular üzerinden 30 m içinde konumlamadır; "
-        "tüm-hata ortalaması yalnız tanısaldır."
+        "clean ve hard_v1 koşulları ayrı raporlanır; tüm-hata ortalaması yalnız tanısaldır."
     )
     ws["A10"].fill = PatternFill("solid", fgColor="F3F4F6")
     ws["A10"].font = Font(name="Aptos", italic=True, color="4B5563")
@@ -438,13 +449,18 @@ def write_dashboard(
         name: get_column_letter(index + 1) for index, name in enumerate(SUMMARY_COLUMNS)
     }
     for offset, (source_row, _) in enumerate(summary_positions, start=15):
+        model_letter = summary_column_letters["model_id"]
+        variant_letter = summary_column_letters["query_variant"]
+        mode_letter = summary_column_letters["search_mode"]
         ws.cell(
             row=offset,
             column=1,
             value=(
-                f"=IF(LEN('Model Özeti'!C{source_row})>28,"
-                f"LEFT('Model Özeti'!C{source_row},28)&\"...\","
-                f"'Model Özeti'!C{source_row})&\" [\"&'Model Özeti'!B{source_row}&\"]\""
+                f"=IF(LEN('Model Özeti'!{model_letter}{source_row})>24,"
+                f"LEFT('Model Özeti'!{model_letter}{source_row},24)&\"...\","
+                f"'Model Özeti'!{model_letter}{source_row})&\" [\"&"
+                f"'Model Özeti'!{variant_letter}{source_row}&\" | \"&"
+                f"'Model Özeti'!{mode_letter}{source_row}&\"]\""
             ),
         )
         ws.cell(
@@ -552,7 +568,7 @@ def build_workbook(run_dir: Path, output_path: Path) -> dict[str, Any]:
     set_widths(
         summary_ws,
         summary_columns,
-        overrides={"direction": 38, "search_mode": 18, "model_id": 48},
+        overrides={"direction": 38, "query_variant": 16, "search_mode": 18, "model_id": 48},
     )
     if summary_ws.max_row >= 2 and "coverage" in summary_columns:
         coverage_letter = get_column_letter(summary_columns.index("coverage") + 1)
