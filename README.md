@@ -15,12 +15,15 @@ ayrı tutulur.
 Varsayılan olarak aynı sorgu merkezleri iki ayrı koşulda ölçülür:
 
 - `clean`: özgün, temiz ortomozaik parçası;
-- `hard_v1`: geometriyi değiştirmeden orta-kuvvetli deterministik pozlama/gamma
-  değişimi, bulanıklık, sensör gürültüsü ve JPEG bozulması uygulanmış parça.
+- `hard_v1`: geometriyi değiştirmeden deterministik fakat olasılıksal bir İHA
+  kamera profili uygulanmış parça. Her sorgu için ana senaryo ayrı seçilir:
+  `%20` temiz-hafif, `%25` pus, `%20` hareket bulanıklığı, `%15` odak
+  bulanıklığı, `%10` düşük kontrast ve `%10` güçlü sıkıştırma/gürültü.
 
-`hard_v1` profil aralıkları: gain `0.70-1.30`, bias `-24..24`, gamma
-`0.70-1.40`, Gaussian blur sigma `0.80-2.20`, gürültü standart sapması
-`3-9` ve JPEG kalitesi `40-75`.
+Ana senaryolar birbirini gereksiz yere yığmaz. Pozlama, gamma, beyaz dengesi,
+doygunluk, sensör gürültüsü ve JPEG kalitesi her görüntüde kontrollü olarak
+değişir; düşük olasılıkla vinyet uygulanır. Seçilen senaryo ve bütün rastgele
+parametreler `query_variant_manifest.json` içinde kaydedilir.
 
 Rotasyon, ölçek ve perspektif `hard_v1` içinde kullanılmaz; bunlar sinir ağı
 temsilinden çok NCC eşleştiricisinin geometrik toleransını ölçebileceği için ayrı
@@ -141,6 +144,11 @@ python geospatial_model_benchmark.py `
 
 Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Doğrulanmış model
 GeoTIFF'leri ve sorgu çıktıları yeniden kullanılır.
+
+`hard_v1` profil tanımı `run_config.json` içinde saklanır. Farklı bir İHA
+bozulma profiliyle üretilmiş sonuçların bulunduğu koşu klasörüne devam edilmeye
+çalışılırsa benchmark eski ve yeni sonuçları karıştırmak yerine yeni bir
+`--run-id` ister.
 
 ## Canlı bilgilendirme
 

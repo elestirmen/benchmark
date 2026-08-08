@@ -64,12 +64,31 @@ DEFAULT_SEARCH_MODE_ORDER = {
 }
 QUERY_VARIANT_ORDER = {"clean": 0, "hard_v1": 1}
 HARD_V1_PROFILE = {
-    "gain": [0.70, 1.30],
-    "bias": [-24.0, 24.0],
-    "gamma": [0.70, 1.40],
-    "blur_sigma": [0.80, 2.20],
-    "noise_std": [3.0, 9.0],
-    "jpeg_quality": [40, 75],
+    "profile_revision": "uav_camera_v1",
+    "scenarios": {
+        "clear_light": 0.20,
+        "haze": 0.25,
+        "motion_blur": 0.20,
+        "defocus_blur": 0.15,
+        "low_contrast": 0.10,
+        "compression_noise": 0.10,
+    },
+    "gain": [0.82, 1.18],
+    "bias": [-14.0, 14.0],
+    "gamma": [0.82, 1.22],
+    "white_balance_gain": [0.90, 1.10],
+    "saturation": [0.78, 1.22],
+    "haze_alpha": [0.12, 0.32],
+    "haze_airlight": [225.0, 255.0],
+    "motion_blur_length_px": [5, 17],
+    "defocus_sigma": [1.00, 2.60],
+    "low_contrast_factor": [0.55, 0.80],
+    "noise_std": [0.8, 4.0],
+    "compression_noise_std": [5.0, 10.0],
+    "jpeg_quality": [65, 92],
+    "compression_jpeg_quality": [35, 60],
+    "vignette_probability": 0.18,
+    "vignette_strength": [0.08, 0.22],
 }
 
 LOG = logging.getLogger("geospatial_benchmark")
@@ -627,31 +646,118 @@ def hard_v1_seed(seed: int, query_id: str) -> int:
 
 
 def augment_hard_v1(image_rgb: np.ndarray, *, seed: int) -> tuple[np.ndarray, dict[str, Any]]:
-    """Apply deterministic sensor/radiometric degradation without geometry changes."""
+    """Apply a deterministic, probabilistic UAV-camera profile without geometry changes."""
     rng = np.random.default_rng(seed)
-    transformed = image_rgb.copy()
+    transformed = image_rgb.astype(np.float32) / 255.0
+
+    scenario_names = list(HARD_V1_PROFILE["scenarios"])
+    scenario_probabilities = np.asarray(
+        list(HARD_V1_PROFILE["scenarios"].values()), dtype=np.float64
+    )
+    scenario_probabilities /= scenario_probabilities.sum()
+    scenario = str(rng.choice(scenario_names, p=scenario_probabilities))
 
     gain = float(rng.uniform(*HARD_V1_PROFILE["gain"]))
     bias = float(rng.uniform(*HARD_V1_PROFILE["bias"]))
     gamma = float(rng.uniform(*HARD_V1_PROFILE["gamma"]))
-    adjusted = np.clip(transformed.astype(np.float32) / 255.0, 0.0, 1.0)
-    adjusted = np.clip(adjusted * gain + bias / 255.0, 0.0, 1.0)
-    adjusted = np.power(adjusted, gamma)
-    transformed = np.clip(adjusted * 255.0, 0.0, 255.0).astype(np.uint8)
-
-    blur_sigma = float(rng.uniform(*HARD_V1_PROFILE["blur_sigma"]))
-    transformed = cv2.GaussianBlur(
-        transformed,
-        (0, 0),
-        sigmaX=blur_sigma,
-        sigmaY=blur_sigma,
-        borderType=cv2.BORDER_REFLECT_101,
+    white_balance = rng.uniform(
+        *HARD_V1_PROFILE["white_balance_gain"], size=3
+    ).astype(np.float32)
+    saturation = float(rng.uniform(*HARD_V1_PROFILE["saturation"]))
+    transformed = np.clip(
+        transformed * gain * white_balance.reshape(1, 1, 3) + bias / 255.0,
+        0.0,
+        1.0,
     )
-    noise_std = float(rng.uniform(*HARD_V1_PROFILE["noise_std"]))
+    transformed = np.power(transformed, gamma)
+    luminance = np.sum(
+        transformed * np.asarray([0.2126, 0.7152, 0.0722], dtype=np.float32),
+        axis=2,
+        keepdims=True,
+    )
+    transformed = np.clip(luminance + saturation * (transformed - luminance), 0.0, 1.0)
+    transformed = np.clip(transformed * 255.0, 0.0, 255.0).astype(np.uint8)
+
+    effect_parameters: dict[str, Any] = {}
+    if scenario == "haze":
+        haze_alpha = float(rng.uniform(*HARD_V1_PROFILE["haze_alpha"]))
+        airlight = rng.uniform(*HARD_V1_PROFILE["haze_airlight"], size=3).astype(np.float32)
+        transformed = np.clip(
+            transformed.astype(np.float32) * (1.0 - haze_alpha)
+            + airlight.reshape(1, 1, 3) * haze_alpha,
+            0.0,
+            255.0,
+        ).astype(np.uint8)
+        effect_parameters.update(
+            haze_alpha=haze_alpha,
+            haze_airlight_rgb=[float(value) for value in airlight],
+        )
+    elif scenario == "motion_blur":
+        minimum, maximum = HARD_V1_PROFILE["motion_blur_length_px"]
+        valid_lengths = np.arange(int(minimum) | 1, int(maximum) + 1, 2)
+        motion_length = int(rng.choice(valid_lengths))
+        motion_angle = float(rng.uniform(0.0, 180.0))
+        kernel = np.zeros((motion_length, motion_length), dtype=np.float32)
+        kernel[motion_length // 2, :] = 1.0
+        rotation = cv2.getRotationMatrix2D(
+            (motion_length / 2.0 - 0.5, motion_length / 2.0 - 0.5),
+            motion_angle,
+            1.0,
+        )
+        kernel = cv2.warpAffine(kernel, rotation, (motion_length, motion_length))
+        kernel /= max(float(kernel.sum()), 1e-8)
+        transformed = cv2.filter2D(
+            transformed, -1, kernel, borderType=cv2.BORDER_REFLECT_101
+        )
+        effect_parameters.update(
+            motion_blur_length_px=motion_length,
+            motion_blur_angle_deg=motion_angle,
+        )
+    elif scenario == "defocus_blur":
+        defocus_sigma = float(rng.uniform(*HARD_V1_PROFILE["defocus_sigma"]))
+        transformed = cv2.GaussianBlur(
+            transformed,
+            (0, 0),
+            sigmaX=defocus_sigma,
+            sigmaY=defocus_sigma,
+            borderType=cv2.BORDER_REFLECT_101,
+        )
+        effect_parameters["defocus_sigma"] = defocus_sigma
+    elif scenario == "low_contrast":
+        contrast_factor = float(rng.uniform(*HARD_V1_PROFILE["low_contrast_factor"]))
+        channel_mean = transformed.astype(np.float32).mean(axis=(0, 1), keepdims=True)
+        transformed = np.clip(
+            channel_mean + contrast_factor * (transformed.astype(np.float32) - channel_mean),
+            0.0,
+            255.0,
+        ).astype(np.uint8)
+        effect_parameters["low_contrast_factor"] = contrast_factor
+
+    vignette_applied = bool(rng.random() < HARD_V1_PROFILE["vignette_probability"])
+    vignette_strength = 0.0
+    if vignette_applied:
+        vignette_strength = float(rng.uniform(*HARD_V1_PROFILE["vignette_strength"]))
+        height, width = transformed.shape[:2]
+        yy, xx = np.ogrid[-1.0:1.0:complex(height), -1.0:1.0:complex(width)]
+        radial = np.clip(xx * xx + yy * yy, 0.0, 1.0).astype(np.float32)
+        vignette = 1.0 - vignette_strength * radial
+        transformed = np.clip(
+            transformed.astype(np.float32) * vignette[..., None], 0.0, 255.0
+        ).astype(np.uint8)
+
+    if scenario == "compression_noise":
+        noise_std = float(rng.uniform(*HARD_V1_PROFILE["compression_noise_std"]))
+        jpeg_range = HARD_V1_PROFILE["compression_jpeg_quality"]
+    elif scenario == "clear_light":
+        noise_std = float(rng.uniform(0.5, 1.5))
+        jpeg_range = [82, 95]
+    else:
+        noise_std = float(rng.uniform(*HARD_V1_PROFILE["noise_std"]))
+        jpeg_range = HARD_V1_PROFILE["jpeg_quality"]
     noise = rng.normal(0.0, noise_std, transformed.shape).astype(np.float32)
     transformed = np.clip(transformed.astype(np.float32) + noise, 0.0, 255.0).astype(np.uint8)
 
-    jpeg_quality = int(rng.integers(HARD_V1_PROFILE["jpeg_quality"][0], HARD_V1_PROFILE["jpeg_quality"][1] + 1))
+    jpeg_quality = int(rng.integers(jpeg_range[0], jpeg_range[1] + 1))
     bgr = cv2.cvtColor(transformed, cv2.COLOR_RGB2BGR)
     encoded, buffer = cv2.imencode(".jpg", bgr, [cv2.IMWRITE_JPEG_QUALITY, jpeg_quality])
     if not encoded:
@@ -662,12 +768,18 @@ def augment_hard_v1(image_rgb: np.ndarray, *, seed: int) -> tuple[np.ndarray, di
     transformed = cv2.cvtColor(decoded_bgr, cv2.COLOR_BGR2RGB)
     parameters = {
         "seed": seed,
+        "profile_revision": HARD_V1_PROFILE["profile_revision"],
+        "scenario": scenario,
         "gain": gain,
         "bias": bias,
         "gamma": gamma,
-        "blur_sigma": blur_sigma,
+        "white_balance_rgb": [float(value) for value in white_balance],
+        "saturation": saturation,
+        "vignette_applied": vignette_applied,
+        "vignette_strength": vignette_strength,
         "noise_std": noise_std,
         "jpeg_quality": jpeg_quality,
+        **effect_parameters,
     }
     return transformed, parameters
 
@@ -2218,6 +2330,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     LOG.info("Log: %s", log_path)
     LOG.info("Sistem: %s", json.dumps(system_info(), ensure_ascii=False))
 
+    config_path = run_dir / "run_config.json"
+    results_path = run_dir / "results.jsonl"
+    if config_path.is_file() and results_path.is_file() and "hard_v1" in args.query_variants:
+        previous_config = json.loads(config_path.read_text(encoding="utf-8"))
+        if previous_config.get("hard_v1_profile") != HARD_V1_PROFILE:
+            raise RuntimeError(
+                "Bu koşu klasöründeki hard_v1 sonuçları farklı bir bozulma profiliyle "
+                "üretilmiş. Bilimsel sonuçların karışmaması için yeni bir --run-id kullanın."
+            )
+
     config = vars(args).copy()
     config["query_raster"] = str(args.query_raster)
     config["map_raster"] = str(args.map_raster)
@@ -2228,9 +2350,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     config["search_modes"] = [
         {"name": name, "roi_radius_m": radius} for name, radius in args.search_modes
     ]
+    config["hard_v1_profile"] = HARD_V1_PROFILE
     config["created_at_utc"] = utc_now_iso()
     config["system"] = system_info()
-    (run_dir / "run_config.json").write_text(
+    config_path.write_text(
         json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 

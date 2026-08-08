@@ -20,6 +20,7 @@ if str(BENCHMARK_DIR) not in sys.path:
     sys.path.insert(0, str(BENCHMARK_DIR))
 
 from geospatial_model_benchmark import (  # noqa: E402
+    HARD_V1_PROFILE,
     aggregate_results,
     augment_hard_v1,
     build_parser,
@@ -252,10 +253,20 @@ class ManifestTests(unittest.TestCase):
         self.assertNotIn("scale", first_params)
         self.assertNotIn("perspective_x_per_px", first_params)
         self.assertEqual(first.shape, image.shape)
-        self.assertGreater(float(np.mean(np.abs(first.astype(float) - image.astype(float)))), 10.0)
-        self.assertGreaterEqual(first_params["blur_sigma"], 0.80)
-        self.assertGreaterEqual(first_params["noise_std"], 3.0)
-        self.assertLessEqual(first_params["jpeg_quality"], 75)
+        self.assertGreater(float(np.mean(np.abs(first.astype(float) - image.astype(float)))), 1.0)
+        self.assertIn(first_params["scenario"], HARD_V1_PROFILE["scenarios"])
+        self.assertEqual(first_params["profile_revision"], "uav_camera_v1")
+
+    def test_hard_v1_uav_scenarios_are_represented_without_geometry(self) -> None:
+        image = np.full((32, 32, 3), 128, dtype=np.uint8)
+        outputs = [augment_hard_v1(image, seed=seed)[1] for seed in range(100)]
+        scenarios = {row["scenario"] for row in outputs}
+        self.assertEqual(scenarios, set(HARD_V1_PROFILE["scenarios"]))
+        self.assertAlmostEqual(sum(HARD_V1_PROFILE["scenarios"].values()), 1.0)
+        for row in outputs:
+            self.assertNotIn("rotation_deg", row)
+            self.assertNotIn("scale", row)
+            self.assertNotIn("perspective_x_per_px", row)
 
     def _write_raster(self, path: Path, seed: int) -> None:
         rng = np.random.default_rng(seed)
