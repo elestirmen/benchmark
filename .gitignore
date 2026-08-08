@@ -1,0 +1,36 @@
+# Large geospatial inputs and sidecars
+*.tif
+*.tiff
+*.vrt
+*.ovr
+*.aux.xml
+*.hlg
+
+# Trained model weights are local runtime assets
+models/*
+!models/README.md
+
+# Generated benchmark artifacts
+outputs/
+*.xlsx
+*.xls
+*.csv
+*.jsonl
+benchmark.log
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node dependencies and editor/OS files
+node_modules/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
