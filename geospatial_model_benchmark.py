@@ -1871,7 +1871,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--overlap", type=int, default=32)
     parser.add_argument("--crop-border", type=int, default=16)
     parser.add_argument("--block-size-m", type=float, default=1000.0)
-    parser.add_argument("--samples-per-block", type=int, default=2)
+    parser.add_argument("--samples-per-block", type=int, default=5)
     parser.add_argument("--max-queries", type=int, default=300)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--min-query-std", type=float, default=12.0)

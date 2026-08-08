@@ -59,6 +59,11 @@ class ExcelCheckpointTests(unittest.TestCase):
 
 
 class DefaultBenchmarkModeTests(unittest.TestCase):
+    def test_default_sampling_targets_300_queries_per_direction(self) -> None:
+        args = build_parser().parse_args([])
+        self.assertEqual(args.samples_per_block, 5)
+        self.assertEqual(args.max_queries, 300)
+
     def test_bidirectional_is_enabled_by_default_and_can_be_disabled(self) -> None:
         parser = build_parser()
         self.assertTrue(parser.parse_args([]).bidirectional)

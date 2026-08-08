@@ -23,6 +23,8 @@ liste için örneğin `--search-modes roi500,roi2000,global` kullanılabilir.
 - Sorgular raster sırasına göre değil, iki rasterın ortak UTM alanından seçilir.
 - Ortak alan 1 km bloklara ayrılır; sabit seed ile bloklu örnekleme yapılır.
 - Bütün modeller aynı `query_manifest.json` sorgularını kullanır.
+- Varsayılan örnekleme her 1 km bloktan en fazla 5 sorgu alır ve yön başına
+  toplam 300 sorguda durur.
 - Her model iki tarafta da aynı kanal, normalizasyon, karo ve kırpma ayarını kullanır.
 - Birinci aday yanında ikinci bağımsız aday, peak margin ve PSR kaydedilir.
 - Gerçek konum ve tahmin GeoTIFF transformundan UTM metreye çevrilir.
