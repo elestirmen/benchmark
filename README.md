@@ -8,7 +8,7 @@ model(tam arama rasterı) → örtüşmeli mozaik → jeoreferanslı GeoTIFF
 şablon → çok adaylı kaba–ince TM_CCOEFF_NORMED → UTM hata (m)
 ```
 
-Ham eşleştirme `RAW_BASELINE` olarak ayrı tutulur. Bu klasör harici projeye bağlı değildir; `goruntu_islemleri.py` burada kopyalıdır.
+Ham eşleştirme `RAW_BASELINE` olarak ayrı tutulur. Model benchmarkları GPU zorunlu çalışır; TensorFlow GPU görmüyorsa CPU'ya sessiz geçiş yapılmaz. Bu klasör harici projeye bağlı değildir; `goruntu_islemleri.py` burada kopyalıdır.
 
 ## İçindekiler
 
@@ -32,7 +32,9 @@ benchmark/
 ├── geospatial_model_benchmark.py   # ana CLI
 ├── goruntu_islemleri.py            # karo / inference / mozaik / jeoreferans
 ├── build_benchmark_excel_openpyxl.py
-├── environment.yml
+├── environment.yml                 # Windows / Conda / TensorFlow 2.10 CUDA
+├── requirements_wsl.txt            # WSL2 / güncel TensorFlow CUDA
+├── gpu_test.py                     # TensorFlow GPU erişim kontrolü
 ├── DATA.md                         # raster gereksinimleri
 ├── PROVENANCE.md                   # kod/model kökeni
 ├── models/                         # .h5 / .keras (Git dışı)
@@ -44,15 +46,38 @@ Varsayılan rasterlar (Git dışı): `urgup_30_cm_yeni_gmaps_utm.tif`, `urgup_bi
 
 ## Ortam
 
+### Windows + Conda
+
 ```powershell
 conda env create -f environment.yml
 conda activate visual_navigation_cuda
 cd C:\d_surucusu\visual_navigation\benchmark
+python gpu_test.py
 ```
 
-PowerShell’de ortamı etkinleştirip doğrudan `python` kullanın. `conda run` bazı Windows kod sayfalarında Türkçe loglarda kodlama hatası verebilir.
+`environment.yml`, native Windows CUDA desteği için Python 3.10, TensorFlow 2.10.1, CUDA Toolkit 11.2, cuDNN 8.1 ve `.h5` yükleme için h5py 3.10 kurar. Var olan ortamı güncellemek için:
 
-Excel yedek motoru için (ortamda yoksa):
+```powershell
+conda env update -n visual_navigation_cuda -f environment.yml --prune
+```
+
+PowerShell'de ortamı etkinleştirip doğrudan `python` kullanın. `conda run` bazı Windows kod sayfalarında Türkçe loglarda kodlama hatası verebilir.
+
+### WSL2 alternatifi
+
+```bash
+python3 -m venv .venv_wsl
+source .venv_wsl/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements_wsl.txt
+python gpu_test.py
+```
+
+Model içeren bir koşudan önce `gpu_test.py` çıktısında en az bir GPU görünmelidir. Benchmark, model haritası ve model sorgusu çıkarımlarında GPU'yu zorunlu kılar; GPU yoksa ilgili model `model_errors.jsonl` dosyasına hata olarak yazılır. Yalnız `RAW_BASELINE` çalıştıran `--no-include-models` koşusu model çıkarımı yapmaz.
+
+RTX 50 serisinde `gpu_test.py` içindeki ilk matris işlemi ve ilk model çıkarımı PTX derlemesi nedeniyle 30 dakika veya daha uzun sürebilir. Compute Capability 12.0 için görülen JIT uyarısı bu durumda beklenir. Derlenen kernel'ler varsayılan olarak `outputs/cuda_cache/` altında, en çok 4 GiB olacak şekilde saklanır; mevcut `CUDA_CACHE_PATH` ve `CUDA_CACHE_MAXSIZE` ortam değişkenleri varsa korunur.
+
+Excel yedek motoru olan openpyxl her iki kurulum dosyasında da bulunur. Gerekirse tek başına şu komutla kurulabilir:
 
 ```powershell
 python -m pip install openpyxl==3.1.5
@@ -104,6 +129,8 @@ Varsayılan `--bidirectional`: Google→Bing, sonra Bing→Google. Tek yön içi
 
 ## Çalıştırma
 
+Model içeren 2–4 numaralı örneklerden önce `python gpu_test.py` ile GPU erişimini doğrulayın. Varsayılan koşu hem RAW hem model kanallarını çalıştırır.
+
 ### 1. RAW smoke testi
 
 ```powershell
@@ -148,6 +175,8 @@ python geospatial_model_benchmark.py `
 
 Arama varsayılanı `--search-workers 8` (güvenli aralık 1–8). İşçiler harita ve piramitleri salt-okunur paylaşır; checkpoint tek koordinatörde yazılır. Seri referans için `--search-workers 1`. Ürgüp’te 6 mod / 48 görev ölçümünde ~2.5× hızlanma görülmüş; konum/NCC/başarı alanları seri ile birebir aynı kalmıştır.
 
+Bir model yüklenemezse veya GPU çıkarımı başarısız olursa hata `model_errors.jsonl` içine kaydedilir ve varsayılan olarak sonraki modele geçilir. İlk model hatasında koşuyu durdurmak için `--fail-fast` kullanın. Model başarıyla yüklenmeden boş model çıktı klasörleri oluşturulmaz.
+
 ## Devam ettirme
 
 ```powershell
@@ -170,13 +199,17 @@ benchmark.log
 run_config.json
 results.jsonl / results.csv
 summary.json / summary.csv
-model_errors.jsonl
+summary_metadata.json
+model_errors.jsonl              # yalnız model hatası oluşursa
 benchmark_results.xlsx
 excel_validation.json
+excel_latest.json               # kilitli Excel kopyası kullanılırsa
 excel_previews\*.png          # yalnız Artifact motoru
 <direction>\queries\          # manifest + ham sorgular
 <direction>\models\           # model GeoTIFF + sorgu çıktıları
 ```
+
+Paylaşılan CUDA derleme önbelleği koşu klasörünün dışında `outputs/cuda_cache/` altında tutulur.
 
 Excel sayfaları: `Özet`, `Model Özeti`, `Ham Sonuçlar`, `Sorgu Manifesti`, `Yapılandırma`, `Hatalar`.
 
@@ -209,17 +242,18 @@ Sorgu başına ayrıca: UTM/piksel hata, Top-1/Top-2 NCC, peak margin, PSR, sür
 
 ```text
 --query-raster / --map-raster / --model-dir / --models
---run-id / --resume-run / --output-root
+--max-models / --run-id / --resume-run / --output-root
 --bidirectional / --no-bidirectional
 --include-raw / --no-include-raw
 --include-models / --no-include-models
 --query-variants clean,hard_v1
 --search-modes roi500,roi1000,...,global
 --max-queries / --samples-per-block / --block-size-m / --seed
+--min-query-std / --min-query-entropy / --max-dark-fraction / --query-edge-buffer-m
 --tile-size 544 / --overlap 32 / --crop-border 16
 --search-workers 8 / --batch-size / --pyramid-factors
 --normalization minus1_1 / --enhancement none
---excel-engine auto / --excel-update model / --strict-excel
+--excel-engine auto / --excel-update model / --strict-excel / --no-strict-excel
 --force-queries / --force-maps / --keep-intermediate / --fail-fast / --verbose
 ```
 
