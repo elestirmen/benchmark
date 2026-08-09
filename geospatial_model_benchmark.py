@@ -33,6 +33,7 @@ import subprocess
 import sys
 import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -203,6 +204,13 @@ class SearchOutcome:
     top2_score: float
     peak_margin: float
     psr: float
+
+
+@dataclass(frozen=True)
+class PreparedSearchMap:
+    gray: np.ndarray
+    transform: Affine
+    pyramid: dict[int, np.ndarray] | None
 
 
 class StageTimer:
@@ -500,13 +508,27 @@ def generate_query_manifest(
     effective_edge_buffer_m = (
         float(edge_buffer_m) if edge_buffer_m is not None else tile_size * max_pixel_size_m
     )
+    selection_config = {
+        "query_raster": str(query_raster.resolve()),
+        "map_raster": str(map_raster.resolve()),
+        "tile_size": tile_size,
+        "samples_per_block": samples_per_block,
+        "block_size_m": block_size_m,
+        "max_queries": max_queries,
+        "seed": seed,
+        "min_std": min_std,
+        "min_entropy": min_entropy,
+        "max_dark_fraction": max_dark_fraction,
+        "effective_edge_buffer_m": effective_edge_buffer_m,
+    }
     if manifest_json.exists() and not force:
         payload = json.loads(manifest_json.read_text(encoding="utf-8"))
         previous_edge_buffer_m = payload.get("effective_edge_buffer_m")
         edge_buffer_matches = previous_edge_buffer_m is not None and math.isclose(
             float(previous_edge_buffer_m), effective_edge_buffer_m, rel_tol=0.0, abs_tol=1e-6
         )
-        if edge_buffer_matches:
+        selection_matches = payload.get("selection_config") == selection_config
+        if edge_buffer_matches and selection_matches:
             records = [QueryRecord(**row) for row in payload["queries"]]
             missing = [
                 record.raw_tile_file
@@ -524,17 +546,19 @@ def generate_query_manifest(
                 "Manifestte %d ham sorgu dosyası eksik; manifest yeniden üretilecek.",
                 len(missing),
             )
-        else:
+        elif not edge_buffer_matches:
             LOG.info(
                 "Manifest kenar tamponu değişti (eski=%s, yeni=%.2f m); yeniden üretilecek.",
                 previous_edge_buffer_m,
                 effective_edge_buffer_m,
             )
+        else:
+            LOG.info("Sorgu örnekleme ayarları değişti; manifest yeniden üretilecek.")
 
     if force and output_dir.exists():
         LOG.info("Sorgu manifesti --force nedeniyle yeniden üretilecek: %s", output_dir)
     raw_dir.mkdir(parents=True, exist_ok=True)
-    for old in raw_dir.glob("query_*.png"):
+    for old in raw_dir.glob("Q*.png"):
         old.unlink()
 
     rng = np.random.default_rng(seed)
@@ -632,6 +656,7 @@ def generate_query_manifest(
         "samples_per_block": samples_per_block,
         "edge_buffer_m_requested": edge_buffer_m,
         "effective_edge_buffer_m": effective_edge_buffer_m,
+        "selection_config": selection_config,
         "queries": [asdict(record) for record in records],
     }
     manifest_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -1211,12 +1236,17 @@ def coarse_to_fine_search(
     top_k: int,
     refine_radius_full_px: int,
     nms_radius_full_px: int,
+    template_pyramid: dict[int, np.ndarray] | None = None,
 ) -> SearchOutcome:
     if float(np.std(template)) < 1e-6:
         raise ValueError("Sorgu şablonu sabit/düşük varyanslı.")
     first_factor = factors[0]
     coarse_map = map_pyramid[first_factor]
-    coarse_template = resize_template(template, first_factor)
+    coarse_template = (
+        template_pyramid[first_factor]
+        if template_pyramid is not None
+        else resize_template(template, first_factor)
+    )
     if coarse_template.shape[0] > coarse_map.shape[0] or coarse_template.shape[1] > coarse_map.shape[1]:
         raise ValueError("Sorgu şablonu kaba haritadan büyük.")
     response = cv2.matchTemplate(coarse_map, coarse_template, cv2.TM_CCOEFF_NORMED)
@@ -1228,7 +1258,11 @@ def coarse_to_fine_search(
     previous_factor = first_factor
     for factor in factors[1:]:
         current_map = map_pyramid[factor]
-        current_template = resize_template(template, factor)
+        current_template = (
+            template_pyramid[factor]
+            if template_pyramid is not None
+            else resize_template(template, factor)
+        )
         scale = previous_factor / float(factor)
         radius = max(2, int(math.ceil(refine_radius_full_px / factor)))
         refined: list[Candidate] = []
@@ -1316,6 +1350,22 @@ def completed_keys(rows: Sequence[dict[str, Any]]) -> set[tuple[str, str, str, s
     }
 
 
+def has_pending_searches(
+    *,
+    direction: str,
+    query_variant: str,
+    model_id: str,
+    queries: Sequence[QueryRecord],
+    search_modes: Sequence[tuple[str, float | None]],
+    done: set[tuple[str, str, str, str, str]],
+) -> bool:
+    return any(
+        (direction, query_variant, mode_name, model_id, query.query_id) not in done
+        for query in queries
+        for mode_name, _ in search_modes
+    )
+
+
 def search_in_mode(
     *,
     map_gray: np.ndarray,
@@ -1330,6 +1380,7 @@ def search_in_mode(
     top_k: int,
     refine_radius_px: int,
     nms_radius_px: int,
+    template_pyramid: dict[int, np.ndarray] | None = None,
 ) -> SearchOutcome:
     if mode_name == "global":
         if global_pyramid is None:
@@ -1341,6 +1392,7 @@ def search_in_mode(
             top_k=top_k,
             refine_radius_full_px=refine_radius_px,
             nms_radius_full_px=nms_radius_px,
+            template_pyramid=template_pyramid,
         )
     if roi_radius_m is None:
         raise ValueError(f"ROI yarıçapı eksik: {mode_name}")
@@ -1363,6 +1415,7 @@ def search_in_mode(
         top_k=top_k,
         refine_radius_full_px=refine_radius_px,
         nms_radius_full_px=nms_radius_px,
+        template_pyramid=template_pyramid,
     )
     return SearchOutcome(
         x=local.x + x0,
@@ -1374,6 +1427,30 @@ def search_in_mode(
     )
 
 
+def prepare_search_map(
+    map_path: Path,
+    *,
+    model_id: str,
+    factors: Sequence[int],
+    search_modes: Sequence[tuple[str, float | None]],
+) -> PreparedSearchMap:
+    """Load one read-only search map shared by all variants and workers."""
+    LOG.info("Harita belleğe alınıyor | model=%s | path=%s", model_id, map_path)
+    map_gray, map_transform, _ = read_map_gray(map_path)
+    LOG.info(
+        "Harita hazır | shape=%dx%d | bellek=%.1f MiB | piramit=%s",
+        map_gray.shape[0],
+        map_gray.shape[1],
+        map_gray.nbytes / (1024 * 1024),
+        ",".join(str(item) for item in factors),
+    )
+    pyramid: dict[int, np.ndarray] | None = None
+    if any(mode_name == "global" for mode_name, _ in search_modes):
+        with StageTimer(f"Harita piramidi | {model_id}"):
+            pyramid = build_pyramid(map_gray, factors)
+    return PreparedSearchMap(map_gray, map_transform, pyramid)
+
+
 def run_searches_for_representation(
     *,
     run_id: str,
@@ -1383,6 +1460,7 @@ def run_searches_for_representation(
     model_file: str,
     model_sha256: str,
     map_path: Path,
+    prepared_map: PreparedSearchMap,
     map_build_seconds: float,
     queries: Sequence[QueryRecord],
     query_paths: dict[str, Path] | None,
@@ -1399,20 +1477,11 @@ def run_searches_for_representation(
     results_csv: Path,
     results_jsonl: Path,
     done: set[tuple[str, str, str, str, str]],
+    search_workers: int,
 ) -> None:
-    LOG.info("Harita belleğe alınıyor | model=%s | path=%s", model_id, map_path)
-    map_gray, map_transform, _ = read_map_gray(map_path)
-    LOG.info(
-        "Harita hazır | shape=%dx%d | bellek=%.1f MiB | piramit=%s",
-        map_gray.shape[0],
-        map_gray.shape[1],
-        map_gray.nbytes / (1024 * 1024),
-        ",".join(str(item) for item in factors),
-    )
-    pyramid: dict[int, np.ndarray] | None = None
-    if any(mode_name == "global" for mode_name, _ in search_modes):
-        with StageTimer(f"Harita piramidi | {model_id}"):
-            pyramid = build_pyramid(map_gray, factors)
+    map_gray = prepared_map.gray
+    map_transform = prepared_map.transform
+    pyramid = prepared_map.pyramid
 
     pending = [
         (query, mode_name, radius)
@@ -1423,14 +1492,59 @@ def run_searches_for_representation(
     total = len(pending)
     per_query_inference = query_inference_total_seconds / max(1, len(queries))
     started = time.perf_counter()
+    template_cache: dict[
+        str, tuple[np.ndarray, float, dict[int, np.ndarray]]
+    ] = {}
+    unique_pending = {record.query_id: record for record, _, _ in pending}
+    cache_bytes = 0
+    for record in unique_pending.values():
+        try:
+            if model_id == RAW_MODEL_ID:
+                template = raw_query_template(record, crop_border)
+            else:
+                if query_paths is None or record.query_id not in query_paths:
+                    continue
+                template = model_query_template(query_paths[record.query_id], crop_border)
+            template = np.ascontiguousarray(template)
+            template_std = float(np.std(template))
+            if template_std < 2.0:
+                continue
+            template_levels = {
+                factor: resize_template(template, factor) for factor in factors
+            }
+            template_cache[record.query_id] = (
+                template,
+                template_std,
+                template_levels,
+            )
+            cache_bytes += sum(level.nbytes for level in template_levels.values())
+        except Exception:
+            # Preserve the existing per-task error/rejection behavior below.
+            LOG.debug(
+                "Şablon önbelleğe alınamadı | %s | %s",
+                record.query_id,
+                traceback.format_exc(),
+            )
     LOG.info(
-        "ARAMA BAŞLADI | model=%s | varyant=%s | bekleyen=%d | toplam=%d",
+        "ŞABLON ÖNBELLEĞİ | model=%s | varyant=%s | %d/%d sorgu | %.1f MiB",
+        model_id,
+        query_variant,
+        len(template_cache),
+        len(unique_pending),
+        cache_bytes / (1024 * 1024),
+    )
+    LOG.info(
+        "ARAMA BAŞLADI | model=%s | varyant=%s | bekleyen=%d | toplam=%d | workers=%d",
         model_id,
         query_variant,
         total,
         len(queries),
+        search_workers,
     )
-    for index, (record, mode_name, roi_radius_m) in enumerate(pending, start=1):
+    def evaluate_task(
+        task: tuple[QueryRecord, str, float | None],
+    ) -> tuple[QueryRecord, str, dict[str, Any]]:
+        record, mode_name, roi_radius_m = task
         row_started = time.perf_counter()
         status = "ok"
         reason = "ok"
@@ -1463,14 +1577,22 @@ def run_searches_for_representation(
             "created_at_utc": utc_now_iso(),
         }
         try:
-            if model_id == RAW_MODEL_ID:
-                template = raw_query_template(record, crop_border)
+            cached_template = template_cache.get(record.query_id)
+            if cached_template is not None:
+                template, template_std, template_levels = cached_template
             else:
-                if query_paths is None or record.query_id not in query_paths:
-                    raise FileNotFoundError(f"Model sorgusu bulunamadı: {record.query_id}")
-                template = model_query_template(query_paths[record.query_id], crop_border)
+                if model_id == RAW_MODEL_ID:
+                    template = raw_query_template(record, crop_border)
+                else:
+                    if query_paths is None or record.query_id not in query_paths:
+                        raise FileNotFoundError(f"Model sorgusu bulunamadı: {record.query_id}")
+                    template = model_query_template(query_paths[record.query_id], crop_border)
+                template = np.ascontiguousarray(template)
+                template_std = float(np.std(template))
+                template_levels = {
+                    factor: resize_template(template, factor) for factor in factors
+                }
             result["template_size_px"] = int(template.shape[0])
-            template_std = float(np.std(template))
             if template_std < 2.0:
                 status = "rejected"
                 reason = "low_model_template_variance"
@@ -1488,6 +1610,7 @@ def run_searches_for_representation(
                 top_k=top_k,
                 refine_radius_px=refine_radius_px,
                 nms_radius_px=nms_radius_px,
+                template_pyramid=template_levels,
             )
             predicted_center_x = outcome.x + template.shape[1] / 2.0
             predicted_center_y = outcome.y + template.shape[0] / 2.0
@@ -1529,39 +1652,59 @@ def run_searches_for_representation(
         result["search_seconds"] = time.perf_counter() - row_started
         for column in RESULT_COLUMNS:
             result.setdefault(column, None)
-        csv_append(results_csv, result, RESULT_COLUMNS)
-        jsonl_append(results_jsonl, result)
-        done.add((direction, query_variant, mode_name, model_id, record.query_id))
+        return record, mode_name, result
 
-        elapsed = time.perf_counter() - started
-        rate = index / max(elapsed, 1e-9)
-        eta = (total - index) / max(rate, 1e-9)
-        error_text = (
-            f"hata={result['error_m']:.2f} m skor={result['top1_score']:.4f}"
-            if result.get("error_m") is not None
-            else f"durum={status} neden={reason}"
+    executor: ThreadPoolExecutor | None = None
+    if search_workers == 1:
+        evaluated = map(evaluate_task, pending)
+    else:
+        executor = ThreadPoolExecutor(
+            max_workers=search_workers,
+            thread_name_prefix=f"search-{model_id[:24]}",
         )
-        LOG.info(
-            "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
-            model_id,
-            query_variant,
-            mode_name,
-            index,
-            total,
-            100.0 * index / max(total, 1),
-            record.query_id,
-            error_text,
-            eta / 60.0,
-        )
+        # executor.map computes concurrently but yields in input order. Numeric
+        # result/checkpoint ordering therefore stays identical to serial mode.
+        evaluated = executor.map(evaluate_task, pending)
+
+    try:
+        for index, (record, mode_name, result) in enumerate(evaluated, start=1):
+            status = str(result["status"])
+            reason = str(result["reason"])
+            # Only this coordinator thread writes checkpoints; worker threads
+            # share read-only map arrays and never write CSV/JSONL.
+            csv_append(results_csv, result, RESULT_COLUMNS)
+            jsonl_append(results_jsonl, result)
+            done.add((direction, query_variant, mode_name, model_id, record.query_id))
+
+            elapsed = time.perf_counter() - started
+            rate = index / max(elapsed, 1e-9)
+            eta = (total - index) / max(rate, 1e-9)
+            error_text = (
+                f"hata={result['error_m']:.2f} m skor={result['top1_score']:.4f}"
+                if result.get("error_m") is not None
+                else f"durum={status} neden={reason}"
+            )
+            LOG.info(
+                "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
+                model_id,
+                query_variant,
+                mode_name,
+                index,
+                total,
+                100.0 * index / max(total, 1),
+                record.query_id,
+                error_text,
+                eta / 60.0,
+            )
+    finally:
+        if executor is not None:
+            executor.shutdown(wait=True, cancel_futures=False)
     LOG.info(
         "ARAMA TAMAMLANDI | model=%s | varyant=%s | süre=%.2f dk",
         model_id,
         query_variant,
         (time.perf_counter() - started) / 60.0,
     )
-    if pyramid is not None:
-        del pyramid
-    del map_gray
 
 
 def percentile(values: np.ndarray, q: float) -> float | None:
@@ -1854,7 +1997,14 @@ def write_summary_files(run_dir: Path) -> tuple[Path, Path]:
     return summary_json, summary_csv
 
 
-def invoke_excel_report(run_dir: Path, strict: bool, engine: str = "auto") -> Path | None:
+def invoke_excel_report(
+    run_dir: Path,
+    strict: bool,
+    engine: str = "auto",
+    *,
+    incremental: bool = False,
+    validation_mode: str = "deep",
+) -> Path | None:
     global _AUTO_EXCEL_ENGINE
 
     artifact_builder = SCRIPT_DIR / "build_benchmark_excel.mjs"
@@ -1862,11 +2012,17 @@ def invoke_excel_report(run_dir: Path, strict: bool, engine: str = "auto") -> Pa
     output = run_dir / "benchmark_results.xlsx"
     failures: list[str] = []
     requested_engine = engine
+    if incremental:
+        if engine == "artifact":
+            LOG.info(
+                "Model checkpointinde gerçek artımlı güncelleme için openpyxl motoru kullanılacak."
+            )
+        engine = "openpyxl"
     if engine == "auto" and _AUTO_EXCEL_ENGINE is not None:
         engine = _AUTO_EXCEL_ENGINE
         LOG.info("Excel auto motoru yeniden kullanılıyor: %s", engine)
 
-    def run_reporter(label: str, command: list[str]) -> bool:
+    def run_reporter(label: str, command: list[str]) -> Path | None:
         LOG.info("Excel motoru deneniyor | motor=%s | çıktı=%s", label, output)
         child_env = os.environ.copy()
         child_env["PYTHONIOENCODING"] = "utf-8"
@@ -1879,9 +2035,18 @@ def invoke_excel_report(run_dir: Path, strict: bool, engine: str = "auto") -> Pa
             errors="replace",
             env=child_env,
         )
+        actual_output: Path | None = None
         for line in completed.stdout.splitlines():
             if line.strip():
                 LOG.info("Excel/%s | %s", label, line.strip())
+            if line.startswith("WORKBOOK_READY_JSON: "):
+                try:
+                    payload = json.loads(line.removeprefix("WORKBOOK_READY_JSON: "))
+                    candidate = Path(payload["path"]).resolve()
+                    if candidate.is_file() and candidate.suffix.lower() == ".xlsx":
+                        actual_output = candidate
+                except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+                    LOG.warning("Excel/%s | çıktı yolu işaretçisi okunamadı.", label)
         if (
             label == "artifact"
             and completed.returncode != 0
@@ -1894,35 +2059,57 @@ def invoke_excel_report(run_dir: Path, strict: bool, engine: str = "auto") -> Pa
                 if line.strip():
                     log_method = LOG.warning if completed.returncode != 0 else LOG.info
                     log_method("Excel/%s | %s", label, line.strip())
-        if completed.returncode == 0 and output.is_file() and output.stat().st_size > 0:
-            LOG.info("Excel raporu hazır | motor=%s | dosya=%s", label, output)
-            return True
+        if completed.returncode == 0:
+            actual_output = actual_output or output
+        if (
+            completed.returncode == 0
+            and actual_output.is_file()
+            and actual_output.stat().st_size > 0
+        ):
+            LOG.info("Excel raporu hazır | motor=%s | dosya=%s", label, actual_output)
+            return actual_output
         failures.append(f"{label}: exit={completed.returncode}")
-        return False
+        return None
 
+    artifact_result: Path | None = None
     if engine in {"auto", "artifact"}:
         node = shutil.which("node")
         if node is None:
             failures.append("artifact: Node.js bulunamadı")
             LOG.warning("Artifact Excel motoru atlandı: Node.js bulunamadı.")
-        elif run_reporter(
-            "artifact",
-            [node, str(artifact_builder), "--run-dir", str(run_dir), "--output", str(output)],
-        ):
+        else:
+            artifact_result = run_reporter(
+                "artifact",
+                [node, str(artifact_builder), "--run-dir", str(run_dir), "--output", str(output)],
+            )
+        if node is not None and artifact_result is not None:
             if requested_engine == "auto":
                 _AUTO_EXCEL_ENGINE = "artifact"
-            return output
+            return artifact_result
         if engine == "auto":
             LOG.warning("Artifact motoru kullanılamadı; onaylı openpyxl yedeğine geçiliyor.")
 
-    if engine in {"auto", "openpyxl"}:
-        if run_reporter(
+    if engine in {"auto", "openpyxl"} or (engine == "artifact" and failures):
+        command = [
+            sys.executable,
+            str(openpyxl_builder),
+            "--run-dir",
+            str(run_dir),
+            "--output",
+            str(output),
+            "--validation-mode",
+            validation_mode,
+        ]
+        if incremental:
+            command.append("--incremental")
+        openpyxl_result = run_reporter(
             "openpyxl",
-            [sys.executable, str(openpyxl_builder), "--run-dir", str(run_dir), "--output", str(output)],
-        ):
+            command,
+        )
+        if openpyxl_result is not None:
             if requested_engine == "auto":
                 _AUTO_EXCEL_ENGINE = "openpyxl"
-            return output
+            return openpyxl_result
 
     message = "Excel raporu üretilemedi | " + " | ".join(failures)
     if strict:
@@ -1957,6 +2144,8 @@ def refresh_excel_after_model(
             run_dir,
             strict=False,
             engine=args.excel_engine,
+            incremental=True,
+            validation_mode="checkpoint",
         )
     except Exception:
         LOG.exception(
@@ -2063,32 +2252,58 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
     done = completed_keys(existing_rows)
 
     if args.include_raw:
-        for query_variant, variant_queries in query_variants.items():
-            run_searches_for_representation(
-                run_id=args.run_id,
+        pending_raw_variants = [
+            (query_variant, variant_queries)
+            for query_variant, variant_queries in query_variants.items()
+            if has_pending_searches(
                 direction=direction,
                 query_variant=query_variant,
                 model_id=RAW_MODEL_ID,
-                model_file="",
-                model_sha256="",
-                map_path=map_raster,
-                map_build_seconds=0.0,
                 queries=variant_queries,
-                query_paths=None,
-                query_inference_total_seconds=0.0,
-                crop_border=args.crop_border,
                 search_modes=args.search_modes,
-                factors=args.pyramid_factors,
-                top_k=args.top_k,
-                refine_radius_px=args.refine_radius_px,
-                nms_radius_px=args.nms_radius_px,
-                normalization="RAW",
-                source_query_raster=query_raster,
-                source_map_raster=map_raster,
-                results_csv=results_csv,
-                results_jsonl=results_jsonl,
                 done=done,
             )
+        ]
+        if not pending_raw_variants:
+            LOG.info("RAW CHECKPOINT TAMAM | yön=%s | harita yüklenmeden atlandı", direction)
+        else:
+            raw_search_map = prepare_search_map(
+                map_raster,
+                model_id=RAW_MODEL_ID,
+                factors=args.pyramid_factors,
+                search_modes=args.search_modes,
+            )
+            try:
+                for query_variant, variant_queries in pending_raw_variants:
+                    run_searches_for_representation(
+                        run_id=args.run_id,
+                        direction=direction,
+                        query_variant=query_variant,
+                        model_id=RAW_MODEL_ID,
+                        model_file="",
+                        model_sha256="",
+                        map_path=map_raster,
+                        prepared_map=raw_search_map,
+                        map_build_seconds=0.0,
+                        queries=variant_queries,
+                        query_paths=None,
+                        query_inference_total_seconds=0.0,
+                        crop_border=args.crop_border,
+                        search_modes=args.search_modes,
+                        factors=args.pyramid_factors,
+                        top_k=args.top_k,
+                        refine_radius_px=args.refine_radius_px,
+                        nms_radius_px=args.nms_radius_px,
+                        normalization="RAW",
+                        source_query_raster=query_raster,
+                        source_map_raster=map_raster,
+                        results_csv=results_csv,
+                        results_jsonl=results_jsonl,
+                        done=done,
+                        search_workers=args.search_workers,
+                    )
+            finally:
+                del raw_search_map
 
     if not args.include_models:
         return
@@ -2101,8 +2316,43 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
         model_status = "başarısız"
         LOG.info("MODEL BAŞLIYOR | %d/%d | %s", position, len(models), model_path.name)
         model_sha = sha256_file(model_path)
+        previous_model_shas = {
+            str(row.get("model_sha256"))
+            for row in existing_rows
+            if row.get("direction") == direction
+            and row.get("model_id") == model_id
+            and row.get("model_sha256")
+        }
+        if previous_model_shas and previous_model_shas != {model_sha}:
+            raise RuntimeError(
+                f"Model dosyası önceki checkpointten sonra değişmiş: {model_path.name}. "
+                "Sonuçların karışmaması için yeni bir --run-id kullanın."
+            )
         model_root = direction_dir / "models" / model_id
+        excel_refresh_needed = True
         try:
+            pending_model_variants = [
+                (query_variant, variant_queries)
+                for query_variant, variant_queries in query_variants.items()
+                if has_pending_searches(
+                    direction=direction,
+                    query_variant=query_variant,
+                    model_id=model_id,
+                    queries=variant_queries,
+                    search_modes=args.search_modes,
+                    done=done,
+                )
+            ]
+            if not pending_model_variants:
+                model_status = "checkpoint tamam"
+                excel_refresh_needed = False
+                LOG.info(
+                    "MODEL CHECKPOINT TAMAM | %d/%d | %s | inference ve harita yükleme atlandı",
+                    position,
+                    len(models),
+                    model_path.name,
+                )
+                continue
             model_map, map_seconds = build_model_map(
                 model_path,
                 model_root,
@@ -2117,42 +2367,53 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                 force=args.force_maps,
                 keep_intermediate=args.keep_intermediate,
             )
-            for query_variant, variant_queries in query_variants.items():
-                query_paths, query_seconds = build_model_queries(
-                    model_path,
-                    variant_queries,
-                    model_root / "query_model_tiles" / query_variant,
-                    tile_size=args.tile_size,
-                    batch_size=args.batch_size,
-                    normalization=args.normalization,
-                    enhancement=args.enhancement,
-                    force=args.force_queries,
-                )
-                run_searches_for_representation(
-                    run_id=args.run_id,
-                    direction=direction,
-                    query_variant=query_variant,
-                    model_id=model_id,
-                    model_file=str(model_path.resolve()),
-                    model_sha256=model_sha,
-                    map_path=model_map,
-                    map_build_seconds=map_seconds,
-                    queries=variant_queries,
-                    query_paths=query_paths,
-                    query_inference_total_seconds=query_seconds,
-                    crop_border=args.crop_border,
-                    search_modes=args.search_modes,
-                    factors=args.pyramid_factors,
-                    top_k=args.top_k,
-                    refine_radius_px=args.refine_radius_px,
-                    nms_radius_px=args.nms_radius_px,
-                    normalization=args.normalization,
-                    source_query_raster=query_raster,
-                    source_map_raster=map_raster,
-                    results_csv=results_csv,
-                    results_jsonl=results_jsonl,
-                    done=done,
-                )
+            model_search_map = prepare_search_map(
+                model_map,
+                model_id=model_id,
+                factors=args.pyramid_factors,
+                search_modes=args.search_modes,
+            )
+            try:
+                for query_variant, variant_queries in pending_model_variants:
+                    query_paths, query_seconds = build_model_queries(
+                        model_path,
+                        variant_queries,
+                        model_root / "query_model_tiles" / query_variant,
+                        tile_size=args.tile_size,
+                        batch_size=args.batch_size,
+                        normalization=args.normalization,
+                        enhancement=args.enhancement,
+                        force=args.force_queries,
+                    )
+                    run_searches_for_representation(
+                        run_id=args.run_id,
+                        direction=direction,
+                        query_variant=query_variant,
+                        model_id=model_id,
+                        model_file=str(model_path.resolve()),
+                        model_sha256=model_sha,
+                        map_path=model_map,
+                        prepared_map=model_search_map,
+                        map_build_seconds=map_seconds,
+                        queries=variant_queries,
+                        query_paths=query_paths,
+                        query_inference_total_seconds=query_seconds,
+                        crop_border=args.crop_border,
+                        search_modes=args.search_modes,
+                        factors=args.pyramid_factors,
+                        top_k=args.top_k,
+                        refine_radius_px=args.refine_radius_px,
+                        nms_radius_px=args.nms_radius_px,
+                        normalization=args.normalization,
+                        source_query_raster=query_raster,
+                        source_map_raster=map_raster,
+                        results_csv=results_csv,
+                        results_jsonl=results_jsonl,
+                        done=done,
+                        search_workers=args.search_workers,
+                    )
+            finally:
+                del model_search_map
         except Exception as exc:
             LOG.error("MODEL BAŞARISIZ | %s | %s", model_path.name, exc)
             LOG.debug("Model traceback:\n%s", traceback.format_exc())
@@ -2173,14 +2434,22 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
             model_status = "tamamlandı"
             LOG.info("MODEL TAMAMLANDI | %d/%d | %s", position, len(models), model_path.name)
         finally:
-            refresh_excel_after_model(
-                run_dir,
-                args,
-                position=position,
-                total=len(models),
-                model_name=model_path.name,
-                model_status=model_status,
-            )
+            if excel_refresh_needed:
+                refresh_excel_after_model(
+                    run_dir,
+                    args,
+                    position=position,
+                    total=len(models),
+                    model_name=model_path.name,
+                    model_status=model_status,
+                )
+            else:
+                LOG.info(
+                    "ARA EXCEL ATLANDI | model=%d/%d | checkpoint zaten güncel | %s",
+                    position,
+                    len(models),
+                    model_path.name,
+                )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -2259,6 +2528,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--refine-radius-px", type=int, default=160)
     parser.add_argument("--nms-radius-px", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument(
+        "--search-workers",
+        type=int,
+        default=8,
+        help=(
+            "Aynı haritayı salt-okunur paylaşan paralel arama işçisi. "
+            "Kalite karşılaştırması/seri çalışma için 1 kullanın."
+        ),
+    )
     parser.add_argument("--bootstrap-iterations", type=int, default=1000)
     parser.add_argument(
         "--normalization",
@@ -2302,10 +2580,64 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("Belirsizlik ölçümü için top-k en az 2 olmalıdır.")
     if args.bootstrap_iterations < 0:
         raise ValueError("bootstrap-iterations negatif olamaz.")
+    if args.search_workers < 1 or args.search_workers > 8:
+        raise ValueError("search-workers 1 ile 8 arasında olmalıdır.")
     if args.query_edge_buffer_m is not None and args.query_edge_buffer_m < 0:
         raise ValueError("query-edge-buffer-m negatif olamaz.")
     if not args.include_raw and not args.include_models:
         raise ValueError("En az RAW veya model kanalı etkin olmalıdır.")
+
+
+def resume_signature_payload(args: argparse.Namespace) -> dict[str, Any]:
+    """Return only settings that can change scientific benchmark results."""
+
+    def raster_identity(path: Path) -> dict[str, Any]:
+        stat = path.stat()
+        return {
+            "path": str(path.resolve()),
+            "size_bytes": stat.st_size,
+            "mtime_ns": stat.st_mtime_ns,
+        }
+
+    return {
+        "schema_version": 1,
+        "query_raster": raster_identity(args.query_raster),
+        "map_raster": raster_identity(args.map_raster),
+        "model_dir": str(args.model_dir.resolve()),
+        "models": list(args.models or []),
+        "max_models": args.max_models,
+        "bidirectional": args.bidirectional,
+        "include_raw": args.include_raw,
+        "include_models": args.include_models,
+        "query_variants": list(args.query_variants),
+        "tile_size": args.tile_size,
+        "overlap": args.overlap,
+        "crop_border": args.crop_border,
+        "block_size_m": args.block_size_m,
+        "samples_per_block": args.samples_per_block,
+        "max_queries": args.max_queries,
+        "seed": args.seed,
+        "min_query_std": args.min_query_std,
+        "min_query_entropy": args.min_query_entropy,
+        "max_dark_fraction": args.max_dark_fraction,
+        "query_edge_buffer_m": args.query_edge_buffer_m,
+        "search_modes": [
+            {"name": name, "roi_radius_m": radius} for name, radius in args.search_modes
+        ],
+        "pyramid_factors": list(args.pyramid_factors),
+        "top_k": args.top_k,
+        "refine_radius_px": args.refine_radius_px,
+        "nms_radius_px": args.nms_radius_px,
+        "batch_size": args.batch_size,
+        "normalization": args.normalization,
+        "enhancement": args.enhancement,
+        "hard_v1_profile": HARD_V1_PROFILE if "hard_v1" in args.query_variants else None,
+    }
+
+
+def signature_sha256(payload: dict[str, Any]) -> str:
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -2332,12 +2664,29 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     config_path = run_dir / "run_config.json"
     results_path = run_dir / "results.jsonl"
-    if config_path.is_file() and results_path.is_file() and "hard_v1" in args.query_variants:
+    resume_payload = resume_signature_payload(args)
+    resume_signature = signature_sha256(resume_payload)
+    if config_path.is_file() and results_path.is_file():
         previous_config = json.loads(config_path.read_text(encoding="utf-8"))
-        if previous_config.get("hard_v1_profile") != HARD_V1_PROFILE:
+        previous_signature = previous_config.get("resume_signature")
+        if previous_signature is not None and previous_signature != resume_signature:
             raise RuntimeError(
-                "Bu koşu klasöründeki hard_v1 sonuçları farklı bir bozulma profiliyle "
-                "üretilmiş. Bilimsel sonuçların karışmaması için yeni bir --run-id kullanın."
+                "Bu koşu klasöründeki bilimsel ayarlar/raster kimliği mevcut komutla "
+                "uyuşmuyor. Eski ve yeni sonuçların karışmaması için aynı ayarları "
+                "kullanın veya yeni bir --run-id verin."
+            )
+        if (
+            previous_signature is None
+            and "hard_v1" in args.query_variants
+            and previous_config.get("hard_v1_profile") != HARD_V1_PROFILE
+        ):
+            raise RuntimeError(
+                "Bu eski koşudaki hard_v1 profili mevcut İHA profiliyle uyuşmuyor. "
+                "Bilimsel sonuçların karışmaması için yeni bir --run-id kullanın."
+            )
+        if previous_signature is None:
+            LOG.warning(
+                "Eski koşuda resume_signature yok; mevcut uyumlu ayarlar yeni imzayla kaydedilecek."
             )
 
     config = vars(args).copy()
@@ -2351,6 +2700,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         {"name": name, "roi_radius_m": radius} for name, radius in args.search_modes
     ]
     config["hard_v1_profile"] = HARD_V1_PROFILE
+    config["resume_signature_payload"] = resume_payload
+    config["resume_signature"] = resume_signature
     config["created_at_utc"] = utc_now_iso()
     config["system"] = system_info()
     config_path.write_text(
@@ -2377,10 +2728,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     except KeyboardInterrupt:
         LOG.warning("Kullanıcı tarafından durduruldu. Checkpointler korundu; --resume-run ile devam edilebilir.")
         write_summary_files(run_dir)
-        try:
-            invoke_excel_report(run_dir, strict=False, engine=args.excel_engine)
-        except Exception:
-            LOG.exception("Kesinti sonrası Excel raporu üretilemedi.")
+        if args.excel_update == "end":
+            try:
+                invoke_excel_report(run_dir, strict=False, engine=args.excel_engine)
+            except Exception:
+                LOG.exception("Kesinti sonrası Excel raporu üretilemedi.")
+        else:
+            LOG.info(
+                "KESİNTİ EXCEL | model checkpoint Excel'i korunuyor; ikinci tam export atlandı."
+            )
         return 130
     except Exception:
         LOG.exception("BENCHMARK BAŞARISIZ. Mevcut checkpointler korunmuştur.")

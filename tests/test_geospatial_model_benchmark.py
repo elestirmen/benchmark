@@ -5,6 +5,7 @@ import argparse
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import cv2
@@ -21,14 +22,18 @@ if str(BENCHMARK_DIR) not in sys.path:
 
 from geospatial_model_benchmark import (  # noqa: E402
     HARD_V1_PROFILE,
+    PreparedSearchMap,
+    QueryRecord,
     aggregate_results,
     augment_hard_v1,
     build_parser,
     build_pyramid,
     coarse_to_fine_search,
     generate_query_manifest,
+    invoke_excel_report,
     prepare_query_variants,
     refresh_excel_after_model,
+    run_searches_for_representation,
     search_in_mode,
 )
 
@@ -36,6 +41,9 @@ from geospatial_model_benchmark import (  # noqa: E402
 class ExcelCheckpointTests(unittest.TestCase):
     def test_model_is_the_default_excel_update_boundary(self) -> None:
         self.assertEqual(build_parser().parse_args([]).excel_update, "model")
+
+    def test_eight_search_workers_are_enabled_by_default(self) -> None:
+        self.assertEqual(build_parser().parse_args([]).search_workers, 8)
 
     def test_model_checkpoint_is_non_strict_and_refreshes_summary_first(self) -> None:
         args = argparse.Namespace(excel_update="model", excel_engine="openpyxl")
@@ -58,7 +66,39 @@ class ExcelCheckpointTests(unittest.TestCase):
                 )
         self.assertEqual(result, workbook)
         write_summary.assert_called_once_with(run_dir)
-        invoke_excel.assert_called_once_with(run_dir, strict=False, engine="openpyxl")
+        invoke_excel.assert_called_once_with(
+            run_dir,
+            strict=False,
+            engine="openpyxl",
+            incremental=True,
+            validation_mode="checkpoint",
+        )
+
+    def test_incremental_report_returns_actual_locked_copy_path_from_reporter(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            alternate = run_dir / "benchmark_results_20260809_120000_kilitli_kopya.xlsx"
+            alternate.write_bytes(b"xlsx")
+            marker = json.dumps({"path": str(alternate), "report": {}})
+            completed = SimpleNamespace(
+                returncode=0,
+                stdout=f"WORKBOOK_READY_JSON: {marker}\n",
+                stderr="",
+            )
+            with patch(
+                "geospatial_model_benchmark.subprocess.run", return_value=completed
+            ) as run:
+                result = invoke_excel_report(
+                    run_dir,
+                    strict=False,
+                    engine="openpyxl",
+                    incremental=True,
+                    validation_mode="checkpoint",
+                )
+            self.assertEqual(result, alternate.resolve())
+            command = run.call_args.args[0]
+            self.assertIn("--incremental", command)
+            self.assertEqual(command[command.index("--validation-mode") + 1], "checkpoint")
 
 
 class DefaultBenchmarkModeTests(unittest.TestCase):
@@ -241,6 +281,76 @@ class AggregateTests(unittest.TestCase):
         self.assertEqual(summary["success_30m_ci95_high"], 0.0)
 
 
+class ParallelSearchTests(unittest.TestCase):
+    def test_parallel_search_matches_serial_numeric_results(self) -> None:
+        rng = np.random.default_rng(90210)
+        map_gray = rng.integers(0, 256, size=(384, 448), dtype=np.uint8)
+        transform = Affine(0.3, 0, 600000, 0, -0.3, 4200000)
+        factors = (4, 2, 1)
+        prepared = PreparedSearchMap(map_gray, transform, build_pyramid(map_gray, factors))
+        locations = [(45, 55), (90, 210), (205, 120), (280, 340)]
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            queries: list[QueryRecord] = []
+            for index, (row, col) in enumerate(locations, start=1):
+                tile = map_gray[row : row + 64, col : col + 64]
+                tile_path = root / f"Q{index:05d}.png"
+                self.assertTrue(cv2.imwrite(str(tile_path), tile))
+                queries.append(
+                    QueryRecord(
+                        query_id=f"Q{index:05d}",
+                        block_id="B00_00",
+                        center_easting_m=600000 + (col + 32) * 0.3,
+                        center_northing_m=4200000 - (row + 32) * 0.3,
+                        source_row=row + 32,
+                        source_col=col + 32,
+                        query_std=float(np.std(tile)),
+                        query_entropy=7.0,
+                        dark_fraction=0.0,
+                        raw_tile_file=str(tile_path),
+                    )
+                )
+
+            outputs: dict[int, list[dict[str, object]]] = {}
+            for workers in (1, 2):
+                result_dir = root / f"workers_{workers}"
+                jsonl = result_dir / "results.jsonl"
+                run_searches_for_representation(
+                    run_id="parallel_equality",
+                    direction="synthetic",
+                    query_variant="clean",
+                    model_id="RAW_BASELINE",
+                    model_file="",
+                    model_sha256="",
+                    map_path=root / "map.tif",
+                    prepared_map=prepared,
+                    map_build_seconds=0.0,
+                    queries=queries,
+                    query_paths=None,
+                    query_inference_total_seconds=0.0,
+                    crop_border=0,
+                    search_modes=(("global", None),),
+                    factors=factors,
+                    top_k=5,
+                    refine_radius_px=32,
+                    nms_radius_px=16,
+                    normalization="RAW",
+                    source_query_raster=root / "query.tif",
+                    source_map_raster=root / "map.tif",
+                    results_csv=result_dir / "results.csv",
+                    results_jsonl=jsonl,
+                    done=set(),
+                    search_workers=workers,
+                )
+                outputs[workers] = [json.loads(line) for line in jsonl.read_text().splitlines()]
+
+            ignored = {"created_at_utc", "search_seconds"}
+            serial = [{k: v for k, v in row.items() if k not in ignored} for row in outputs[1]]
+            parallel = [{k: v for k, v in row.items() if k not in ignored} for row in outputs[2]]
+            self.assertEqual(serial, parallel)
+
+
 class ManifestTests(unittest.TestCase):
     def test_hard_v1_augmentation_is_deterministic_and_changes_pixels(self) -> None:
         rng = np.random.default_rng(123)
@@ -312,6 +422,33 @@ class ManifestTests(unittest.TestCase):
             self.assertEqual(payload["seed"], 42)
             self.assertAlmostEqual(payload["effective_edge_buffer_m"], 64 * 0.3)
             self.assertEqual(len(payload["queries"]), 6)
+
+    def test_manifest_regenerates_when_max_queries_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            query = root / "query.tif"
+            map_path = root / "map.tif"
+            self._write_raster(query, 5)
+            self._write_raster(map_path, 6)
+            common = dict(
+                tile_size=64,
+                samples_per_block=2,
+                block_size_m=60.0,
+                seed=42,
+                min_std=1.0,
+                min_entropy=1.0,
+                max_dark_fraction=1.0,
+                edge_buffer_m=None,
+                force=False,
+            )
+            first = generate_query_manifest(
+                query, map_path, root / "queries", max_queries=2, **common
+            )
+            second = generate_query_manifest(
+                query, map_path, root / "queries", max_queries=4, **common
+            )
+            self.assertEqual(len(first), 2)
+            self.assertEqual(len(second), 4)
 
     def test_explicit_edge_buffer_keeps_query_centres_away_from_bounds(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

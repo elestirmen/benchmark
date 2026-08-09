@@ -1,87 +1,110 @@
 # Jeoreferanslı Ortak-Temsil Benchmarkı
 
-Bu benchmark, aynı sinir ağını hem anlık sorgu parçasına hem de büyük arama
-haritasına uygular:
+Aynı sinir ağını hem sorgu parçasına hem arama haritasına uygulayıp, metre cinsinden konum başarısını ölçer:
 
 ```text
-model(anlık 544x544 parça) -> 16 px kenar kırpma -> 512x512 şablon
-model(tam arama rasterı)   -> örtüşmeli mozaik -> jeoreferanslı GeoTIFF
+model(query 544×544)  → 16 px kenar kırpma → 512×512 şablon
+model(tam arama rasterı) → örtüşmeli mozaik → jeoreferanslı GeoTIFF
+şablon → çok adaylı kaba–ince TM_CCOEFF_NORMED → UTM hata (m)
 ```
 
-Ardından model sorgusu, aynı modelin ürettiği haritada çok adaylı kaba-ince
-`TM_CCOEFF_NORMED` ile aranır. Ham görüntü eşleştirmesi `RAW_BASELINE` olarak
-ayrı tutulur.
+Ham eşleştirme `RAW_BASELINE` olarak ayrı tutulur. Bu klasör harici projeye bağlı değildir; `goruntu_islemleri.py` burada kopyalıdır.
 
-Varsayılan olarak aynı sorgu merkezleri iki ayrı koşulda ölçülür:
+## İçindekiler
 
-- `clean`: özgün, temiz ortomozaik parçası;
-- `hard_v1`: geometriyi değiştirmeden deterministik fakat olasılıksal bir İHA
-  kamera profili uygulanmış parça. Her sorgu için ana senaryo ayrı seçilir:
-  `%20` temiz-hafif, `%25` pus, `%20` hareket bulanıklığı, `%15` odak
-  bulanıklığı, `%10` düşük kontrast ve `%10` güçlü sıkıştırma/gürültü.
+- [Klasör yapısı](#klasör-yapısı)
+- [Ortam](#ortam)
+- [Veri ve modeller](#veri-ve-modeller)
+- [Ne ölçülür](#ne-ölçülür)
+- [Bilimsel tutarlılık](#bilimsel-tutarlılık)
+- [Çalıştırma](#çalıştırma)
+- [Devam ettirme](#devam-ettirme)
+- [Çıktılar](#çıktılar)
+- [Metrikler](#metrikler)
+- [Önemli CLI bayrakları](#önemli-cli-bayrakları)
+- [Testler](#testler)
+- [Yorum sınırı](#yorum-sınırı)
 
-Ana senaryolar birbirini gereksiz yere yığmaz. Pozlama, gamma, beyaz dengesi,
-doygunluk, sensör gürültüsü ve JPEG kalitesi her görüntüde kontrollü olarak
-değişir; düşük olasılıkla vinyet uygulanır. Seçilen senaryo ve bütün rastgele
-parametreler `query_variant_manifest.json` içinde kaydedilir.
+## Klasör yapısı
 
-Rotasyon, ölçek ve perspektif `hard_v1` içinde kullanılmaz; bunlar sinir ağı
-temsilinden çok NCC eşleştiricisinin geometrik toleransını ölçebileceği için ayrı
-bir geometrik deney konusu olarak bırakılmıştır. Yalnız temiz benchmark için
-`--query-variants clean`; yalnız zorlaştırılmış kanal için
-`--query-variants hard_v1` kullanılabilir.
+```text
+benchmark/
+├── geospatial_model_benchmark.py   # ana CLI
+├── goruntu_islemleri.py            # karo / inference / mozaik / jeoreferans
+├── build_benchmark_excel_openpyxl.py
+├── environment.yml
+├── DATA.md                         # raster gereksinimleri
+├── PROVENANCE.md                   # kod/model kökeni
+├── models/                         # .h5 / .keras (Git dışı)
+├── tests/
+└── outputs/<run_id>/               # koşu çıktıları
+```
 
-Varsayılan olarak altı bağımsız benchmark senaryosu şu sırayla raporlanır:
-`roi_500m`, `roi_1000m`, `roi_2000m`, `roi_4000m`, `roi_8000m` ve `global`.
-Bunlar progressive fallback değildir; her mod aynı sorgular üzerinde bağımsız
-olarak ölçülür. Yalnız global arama için `--search-modes global`; farklı bir
-liste için örneğin `--search-modes roi500,roi2000,global` kullanılabilir.
-
-## Bilimsel tutarlılık
-
-- Sorgular raster sırasına göre değil, iki rasterın ortak UTM alanından seçilir.
-- Ortak alan 1 km bloklara ayrılır; sabit seed ile bloklu örnekleme yapılır.
-- Bütün modeller aynı `query_manifest.json` sorgularını kullanır.
-- `clean` ve `hard_v1` aynı sorgu merkezlerini kullanır ve Excel'de ayrı
-  `query_variant` satırları olarak raporlanır.
-- Varsayılan örnekleme her 1 km bloktan en fazla 5 sorgu alır ve yön başına
-  toplam 300 sorguda durur.
-- Her model iki tarafta da aynı kanal, normalizasyon, karo ve kırpma ayarını kullanır.
-- Birinci aday yanında ikinci bağımsız aday, peak margin ve PSR kaydedilir.
-- Gerçek konum ve tahmin GeoTIFF transformundan UTM metreye çevrilir.
-- Global ve ROI sonuçları aynı başarı sayısında birleştirilmez; ayrı özetlenir.
-- Her sorgu tamamlanınca `results.jsonl` checkpointi diske yazılır.
-- Her model denemesi tamamlanınca özet tablolar ve Excel çalışma kitabı güncellenir.
-- Kesilen bir koşu aynı klasörden devam ettirilebilir.
-- Sorgu merkezleri ortak alanın dış kenarlarından alınmaz. Varsayılan ek güvenlik
-  tamponu bir tam sorgu karosu genişliğidir; 544 piksel ve yaklaşık 30 cm GSD için
-  yaklaşık 162,4 metredir. Parçanın yarı genişliğiyle birlikte merkezler dış
-  sınırdan yaklaşık 244 metre içeride başlar. Gerekirse
-  `--query-edge-buffer-m 300` gibi açık bir metre değeri verilebilir.
+Varsayılan rasterlar (Git dışı): `urgup_30_cm_yeni_gmaps_utm.tif`, `urgup_bingmap_utm_30_cm.tif`.
 
 ## Ortam
 
-Repo, harici proje koduna ihtiyaç duymadan çalışır. Görüntü bölme, model
-inference, birleştirme ve jeoreferanslama işlemleri için kullanılan
-`goruntu_islemleri.py` bu depo içinde tutulur. Python ortamı
-`environment.yml` ile yeniden oluşturulabilir:
-
 ```powershell
 conda env create -f environment.yml
-```
-
-PowerShell'de ortamı önce etkinleştirin. `conda run` Türkçe canlı logları bazı
-Windows kod sayfalarında geri basarken kodlama hatası verebildiği için doğrudan
-etkin ortamdan `python` çalıştırılması önerilir.
-
-```powershell
 conda activate visual_navigation_cuda
 cd C:\d_surucusu\visual_navigation\benchmark
 ```
 
-## 1. Hızlı RAW smoke testi
+PowerShell’de ortamı etkinleştirip doğrudan `python` kullanın. `conda run` bazı Windows kod sayfalarında Türkçe loglarda kodlama hatası verebilir.
 
-Model üretmeden örnekleme, arama ve checkpoint zincirini sınar:
+Excel yedek motoru için (ortamda yoksa):
+
+```powershell
+python -m pip install openpyxl==3.1.5
+```
+
+## Veri ve modeller
+
+| Girdi | Konum / bayrak | Not |
+|---|---|---|
+| Sorgu raster | `--query-raster` (varsayılan Ürgüp Google) | UTM, metre GSD |
+| Arama raster | `--map-raster` (varsayılan Ürgüp Bing) | Aynı CRS / uyumlu çözünürlük |
+| Modeller | `models/` veya `--model-dir` | `.h5` / `.keras` / `.hdf5` |
+
+Ayrıntı: [DATA.md](DATA.md), [models/README.md](models/README.md), [PROVENANCE.md](PROVENANCE.md).
+
+## Ne ölçülür
+
+### Sorgu varyantları (varsayılan: `clean,hard_v1`)
+
+| Varyant | Açıklama |
+|---|---|
+| `clean` | Özgün ortomozaik parçası |
+| `hard_v1` | Geometriyi değiştirmeden deterministik İHA kamera bozulmaları |
+
+`hard_v1` senaryo dağılımı: %20 temiz-hafif, %25 pus, %20 hareket bulanıklığı, %15 odak bulanıklığı, %10 düşük kontrast, %10 güçlü sıkıştırma/gürültü. Pozlama, gamma, beyaz dengesi, doygunluk, sensör gürültüsü ve JPEG kalitesi kontrollü değişir; düşük olasılıkla vinyet uygulanır. Parametreler `query_variant_manifest.json` içinde saklanır.
+
+Rotasyon / ölçek / perspektif `hard_v1` içinde yoktur; bunlar NCC’nin geometrik toleransını ölçer, temsil benchmark’ından ayrı tutulur.
+
+### Arama modları (bağımsız; progressive fallback değil)
+
+Sıra: `roi_500m`, `roi_1000m`, `roi_2000m`, `roi_4000m`, `roi_8000m`, `global`.
+
+Örnek: `--search-modes global` veya `--search-modes roi500,roi2000,global`.
+
+### Yönler
+
+Varsayılan `--bidirectional`: Google→Bing, sonra Bing→Google. Tek yön için `--no-bidirectional`.
+
+## Bilimsel tutarlılık
+
+- Sorgular ortak UTM alanından seçilir; 1 km bloklara ayrılır; sabit `--seed` ile bloklu örnekleme.
+- Tüm modeller aynı `query_manifest.json` sorgularını kullanır; `clean` / `hard_v1` aynı merkezleri paylaşır.
+- Varsayılan: blok başına en fazla 5 sorgu, yön başına 300 sorgu.
+- Her model iki tarafta da aynı kanal, normalizasyon, karo ve kırpma ayarını kullanır.
+- Top-1 yanında Top-2, peak margin ve PSR kaydedilir; hata GeoTIFF transformundan UTM metreye çevrilir.
+- ROI ve global sonuçlar birleştirilmez; ayrı özetlenir.
+- Her sorgu sonrası `results.jsonl` checkpoint; her model sonunda özet + Excel güncellenir.
+- Kenar tamponu: varsayılan bir tam sorgu karosu (~162 m @ 30 cm GSD); merkezler sınırdan ~244 m içeride. Özel değer: `--query-edge-buffer-m 300`.
+
+## Çalıştırma
+
+### 1. RAW smoke testi
 
 ```powershell
 python geospatial_model_benchmark.py `
@@ -90,7 +113,7 @@ python geospatial_model_benchmark.py `
   --run-id raw_smoke
 ```
 
-## 2. Tek model pilotu
+### 2. Tek model pilotu
 
 ```powershell
 python geospatial_model_benchmark.py `
@@ -99,7 +122,7 @@ python geospatial_model_benchmark.py `
   --run-id pilot_tek_model
 ```
 
-## 3. Önerilen üç model pilotu
+### 3. Üç model pilotu
 
 ```powershell
 python geospatial_model_benchmark.py `
@@ -110,10 +133,9 @@ python geospatial_model_benchmark.py `
   --run-id pilot_uc_model
 ```
 
-## 4. Tüm modeller, 300 sorgu
+### 4. Tüm modeller, 300 sorgu
 
-`--models` verilmediğinde yerel `models` klasöründeki bütün `.h5/.keras` dosyaları
-işlenir.
+`--models` yoksa `models/` altındaki tüm uygun dosyalar işlenir.
 
 ```powershell
 python geospatial_model_benchmark.py `
@@ -122,122 +144,97 @@ python geospatial_model_benchmark.py `
   --run-id urgup_tum_modeller_300
 ```
 
-Varsayılan `clean,hard_v1` seçimi sorgu eşleştirme ve sorgu-inference yükünü
-yaklaşık iki katına çıkarır; model haritası her model ve yön için yine yalnız bir
-kez üretilir.
+`clean,hard_v1` sorgu yükünü ~2× artırır; model haritası yön×model başına bir kez üretilir. İki yönlü çalışma da maliyeti ~2× yapar.
 
-İki sağlayıcı yönü varsayılan olarak birlikte ölçülür: önce Google sorgusu Bing
-haritasında, ardından Bing sorgusu Google haritasında aranır. Yalnızca ilk yönü
-çalıştırmak için `--no-bidirectional` kullanın. Varsayılan iki yönlü çalışma,
-tek yönlü çalışmaya göre hesaplama ve disk maliyetini yaklaşık iki katına çıkarır.
+Arama varsayılanı `--search-workers 8` (güvenli aralık 1–8). İşçiler harita ve piramitleri salt-okunur paylaşır; checkpoint tek koordinatörde yazılır. Seri referans için `--search-workers 1`. Ürgüp’te 6 mod / 48 görev ölçümünde ~2.5× hızlanma görülmüş; konum/NCC/başarı alanları seri ile birebir aynı kalmıştır.
 
 ## Devam ettirme
 
-Aynı bilimsel ayarları tekrar vererek mevcut koşu klasöründen devam edin:
-
 ```powershell
 python geospatial_model_benchmark.py `
-  --resume-run benchmark\outputs\urgup_tum_modeller_300 `
+  --resume-run outputs\urgup_tum_modeller_300 `
   --max-queries 300 `
   --samples-per-block 5
 ```
 
-Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Doğrulanmış model
-GeoTIFF'leri ve sorgu çıktıları yeniden kullanılır.
+Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları kilitler; `--search-workers` imzada değildir.
 
-`hard_v1` profil tanımı `run_config.json` içinde saklanır. Farklı bir İHA
-bozulma profiliyle üretilmiş sonuçların bulunduğu koşu klasörüne devam edilmeye
-çalışılırsa benchmark eski ve yeni sonuçları karıştırmak yerine yeni bir
-`--run-id` ister.
-
-## Canlı bilgilendirme
-
-Konsol ve `benchmark.log` şunları ayrıntılı olarak bildirir:
-
-- raster CRS, çözünürlük, boyut ve ortak sınır;
-- örnekleme seed'i, blok düzeni ve kabul edilen sorgu sayısı;
-- TensorFlow sürümü, CUDA derleme durumu ve görülen GPU'lar;
-- her modelin yükleme/inference/birleştirme/jeoreferanslama aşaması;
-- sorgu bazında hata, NCC skoru, durum, yüzde ilerleme ve ETA;
-- her model sonunda ara Excel başlangıç/bitiş durumu ve raporlama süresi;
-- atlanan checkpointler ve silinen yeniden üretilebilir ara çıktılar;
-- model bazında hata tracebackleri.
+Farklı `hard_v1` profiliyle üretilmiş bir klasöre devam edilirse benchmark karıştırmamak için yeni `--run-id` ister.
 
 ## Çıktılar
 
-Her koşu `benchmark\outputs\<run_id>\` altında tutulur:
+Her koşu `outputs/<run_id>/` altındadır:
 
 ```text
-benchmark.log                 ayrıntılı çalışma günlüğü
-run_config.json               bütün parametreler ve ortam bilgisi
-results.jsonl                 sorgu bazında checkpoint kaynağı
-results.csv                   Excel/dış analiz için düz ham tablo
-summary.json / summary.csv    model/yön özetleri
-model_errors.jsonl            model düzeyindeki hatalar
-benchmark_results.xlsx        nihai çalışma kitabı
-excel_validation.json         XLSX bütünlük, sayfa, formül ve grafik doğrulaması
-excel_previews\*.png          yalnız Artifact motorunda üretilen görsel QA çıktıları
-<direction>\queries\          sabit sorgu manifesti ve ham sorgular
-<direction>\models\           model GeoTIFF'leri ve sorgu çıktıları
+benchmark.log
+run_config.json
+results.jsonl / results.csv
+summary.json / summary.csv
+model_errors.jsonl
+benchmark_results.xlsx
+excel_validation.json
+excel_previews\*.png          # yalnız Artifact motoru
+<direction>\queries\          # manifest + ham sorgular
+<direction>\models\           # model GeoTIFF + sorgu çıktıları
 ```
 
-Excel çalışma kitabı şu sayfaları içerir:
+Excel sayfaları: `Özet`, `Model Özeti`, `Ham Sonuçlar`, `Sorgu Manifesti`, `Yapılandırma`, `Hatalar`.
 
-- `Özet`
-- `Model Özeti`
-- `Ham Sonuçlar`
-- `Sorgu Manifesti`
-- `Yapılandırma`
-- `Hatalar`
+Model sonu checkpointlerinde Excel baştan kurulmaz: `results.jsonl` dosyasının daha önce raporlanmış öneki SHA-256 ile doğrulanır, yalnızca yeni `Ham Sonuçlar` satırları eklenir ve küçük özet/pano sayfaları yenilenir. Eski raporun veri veya şeması kaynakla uyuşmazsa bilimsel içeriği riske atmamak için otomatik olarak tam üretime dönülür. Benchmark finalinde tam üretim ve derin doğrulama korunur.
 
-Excel raporlayıcı varsayılan `--excel-engine auto` modunda önce
-`@oai/artifact-tool` motorunu dener. Motor çalışma ortamında yoksa kullanıcı
-onaylı `openpyxl` yedeğine otomatik geçer; seçilen motor ve bütün doğrulama
-aşamaları canlı logda belirtilir. Yalnız belirli bir motoru zorlamak için
-`--excel-engine artifact` veya `--excel-engine openpyxl` kullanılabilir.
+| Bayrak | Varsayılan | Anlamı |
+|---|---|---|
+| `--excel-engine` | `auto` | Önce Artifact, yoksa openpyxl |
+| `--excel-update` | `model` | Her model sonunda yenile; yalnız sonda için `end` |
+| `--strict-excel` | açık | Excel üretilemezse koşuyu başarısız say |
 
-`visual_navigation_cuda` ortamında yedek motor bağımlılığı bir kez kurulmalıdır:
+`benchmark_results.xlsx` Excel'de açık/kilitliyse dosya zorlanmaz ve benchmark durmaz. Güncel rapor aynı klasöre `benchmark_results_YYYYMMDD_HHMMSS_kilitli_kopya.xlsx` adıyla yazılır; gerçek son dosya `benchmark.log` ve `excel_latest.json` içinde belirtilir. Sonraki model ana dosyayı yeniden denerken en güncel kopyayı artımlı taban olarak kullanır.
+
+## Metrikler
+
+Ana ölçüt: **`success_30m`** — hata ≤ 30 m olan sorguların tüm sorgulara oranı (red/hata = başarısız).
+
+Sıralama: `success_30m` → `AUC@30m` → başarılıların medyan hatası (`median_error_under_30m`).
+
+| Metrik | Rol |
+|---|---|
+| `AUC@30m` | 0–30 m başarı CDF alanı (normalize); >30 m katkı yok |
+| `mean/median_error_under_30m` | Operasyonel başarıların hassasiyeti |
+| `success_5/10/25/50m` | İkincil, geriye dönük karşılaştırma |
+| ortalama / medyan / P90 / P95 hata | Tanısal; ana sıralamada değil |
+
+Sorgu başına ayrıca: UTM/piksel hata, Top-1/Top-2 NCC, peak margin, PSR, süreler, doku istatistikleri. `%95` CI için mekânsal blok bootstrap (varsayılan 1000; `--bootstrap-iterations`).
+
+## Önemli CLI bayrakları
+
+```text
+--query-raster / --map-raster / --model-dir / --models
+--run-id / --resume-run / --output-root
+--bidirectional / --no-bidirectional
+--include-raw / --no-include-raw
+--include-models / --no-include-models
+--query-variants clean,hard_v1
+--search-modes roi500,roi1000,...,global
+--max-queries / --samples-per-block / --block-size-m / --seed
+--tile-size 544 / --overlap 32 / --crop-border 16
+--search-workers 8 / --batch-size / --pyramid-factors
+--normalization minus1_1 / --enhancement none
+--excel-engine auto / --excel-update model / --strict-excel
+--force-queries / --force-maps / --keep-intermediate / --fail-fast / --verbose
+```
+
+Tam liste ve varsayılanlar:
 
 ```powershell
-python -m pip install openpyxl==3.1.5
+python geospatial_model_benchmark.py --help
 ```
 
-Üretim sonunda XLSX ZIP bütünlüğü, gerekli sayfalar, tablo/grafik nesneleri ve
-formül hata sabitleri denetlenir; sonuç `excel_validation.json` dosyasına yazılır.
-İki motor da kullanılamazsa JSONL/CSV checkpointleri korunur ve varsayılan
-`--strict-excel` koşuyu raporlama aşamasında başarısız işaretler.
+## Testler
 
-Varsayılan `--excel-update model`, her model başarılı veya başarısız biçimde
-sona erdiğinde `summary.json`, `summary.csv` ve `benchmark_results.xlsx`
-dosyalarını yeniler. Ara Excel yazımı başarısız olursa (örneğin dosya Excel'de
-açık ve Windows tarafından kilitliyse) benchmark sonraki modele devam eder;
-koşu sonundaki nihai Excel üretiminde `--strict-excel` yine uygulanır. Yalnız
-koşu sonunda Excel üretmek için `--excel-update end` kullanılabilir.
+```powershell
+python -m pytest tests -q
+```
 
-## Temel metrikler
+## Yorum sınırı
 
-Ana benchmark ölçütü `success_30m` değeridir: 30 metre veya daha düşük hatalı
-konumlamaların bütün sorgulara oranı. Reddedilen ve hata veren sorgular bu
-oranda başarısız sayılır. Model sıralaması önce `success_30m`, sonra `AUC@30m`,
-sonra yalnız 30 m içinde başarılı sonuçların medyan hatasıyla yapılır.
-
-`AUC@30m`, 0-30 m hata aralığındaki başarı CDF alanının normalize edilmiş
-özetidir; 30 m üzerindeki sonuçlar sıfır katkı yapar. `mean_error_under_30m` ve
-`median_error_under_30m` yalnız operasyonel olarak başarılı eşleşmelerin
-hassasiyetini gösterir. Bütün sonuçlar üzerindeki ortalama, medyan ve P90/P95
-hata değerleri tanısal amaçla korunur fakat ana model sıralamasında kullanılmaz.
-Eski `success_5m`, `success_10m`, `success_25m` ve `success_50m` oranları da
-geriye dönük karşılaştırma için korunur; bunlar yalnızca geçerli eşleşmeler
-üzerinden hesaplanan ikincil göstergelerdir.
-
-Her sorgu için ayrıca UTM/piksel hatası, Top-1/Top-2 NCC, peak margin, PSR,
-5/10/25/30/50 metre başarı bayrakları, inference/search süreleri ve sorgu doku
-istatistikleri kaydedilir. 30 m başarı oranı ve tanısal medyan hata için mekânsal
-blok bootstrap yöntemiyle %95 güven aralıkları hesaplanır (varsayılan 1.000
-tekrar; `--bootstrap-iterations` ile değiştirilebilir).
-
-## Önemli yorum sınırı
-
-Bu modeller Ürgüp/Kapadokya verileriyle ilişkili olabilir. Eğitim alanı
-çakışması kesin olarak dışlanmadıkça sonuçlar `in-domain` benchmark olarak
-raporlanmalı; dış bölge genellemesi iddia edilmemelidir.
+Modeller Ürgüp/Kapadokya verisiyle ilişkili olabilir. Eğitim alanı çakışması kesin dışlanmadıkça sonuçlar **in-domain** benchmark olarak raporlanmalı; dış bölge genellemesi iddia edilmemelidir.
