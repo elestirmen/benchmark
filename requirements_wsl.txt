@@ -1,0 +1,10 @@
+tensorflow[and-cuda]>=2.17
+numpy
+opencv-python-headless
+rasterio
+affine
+matplotlib
+natsort
+tqdm
+openpyxl
+h5py

@@ -25,7 +25,10 @@ __pycache__/
 .coverage
 htmlcov/
 .venv/
+.venv_wsl/
 venv/
+env/
+.env/
 
 # Node dependencies and editor/OS files
 node_modules/

@@ -382,13 +382,34 @@ def _build_pipeline_run_dir(output_root: str, image_name: str, run_name: Optiona
     image_folder = _safe_dir_name(image_name, fallback="girdi")
     return _unique_dir_path(os.path.join(output_root, image_folder, run_folder))
 
+# RTX 50 serisinde TensorFlow 2.10 kernel'leri ilk kullanımda PTX'ten derlenir.
+# Derlenen kernel'leri koşular arasında koru; kullanıcı tarafından verilen değer
+# varsa onu değiştirme.
+_CUDA_CACHE_DIR = Path(__file__).resolve().parent / "outputs" / "cuda_cache"
+_CUDA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("CUDA_CACHE_PATH", str(_CUDA_CACHE_DIR))
+os.environ.setdefault("CUDA_CACHE_MAXSIZE", str(4 * 1024 ** 3))
+
+# Keras ilk import sırasında h5py'yi göremezse aynı süreçte .h5 desteğini
+# kapalı tutabiliyor. Bu nedenle HDF5 desteğini TensorFlow'dan önce yükle.
+H5PY_IMPORT_ERROR = None
+try:
+    import h5py
+    H5PY_AVAILABLE = True
+except Exception as exc:
+    h5py = None
+    H5PY_AVAILABLE = False
+    H5PY_IMPORT_ERROR = exc
+
 # TensorFlow/Keras için (opsiyonel - sadece model varsa yüklenecek)
+TENSORFLOW_IMPORT_ERROR = None
 try:
     import tensorflow as tf
     from tensorflow.keras.models import load_model
     TENSORFLOW_AVAILABLE = True
-except ImportError:
+except Exception as exc:
     TENSORFLOW_AVAILABLE = False
+    TENSORFLOW_IMPORT_ERROR = exc
     logger.warning("TensorFlow bulunamadı. Model inference özelliği kullanılamayacak.")
 
 
@@ -1460,7 +1481,8 @@ class ImageProcessor:
         batch_size: int = CONFIG["pipeline"]["batch_size"],
         normalization: str = "minus1_1",
         enhancement: str = "none",
-        clahe_clip: float = 2.0
+        clahe_clip: float = 2.0,
+        require_gpu: bool = False
     ) -> List[str]:
         """
         Parçalara bölünmüş görüntüleri sinir ağı modelinden batch inference ile geçirir.
@@ -1489,27 +1511,40 @@ class ImageProcessor:
             ImportError: TensorFlow yüklü değilse
             FileNotFoundError: Model dosyası bulunamazsa
         """
+        if not H5PY_AVAILABLE:
+            raise ImportError(
+                ".h5 model desteği için h5py yüklenemedi. "
+                f"Ayrıntı: {H5PY_IMPORT_ERROR}"
+            )
         if not TENSORFLOW_AVAILABLE:
-            raise ImportError("TensorFlow yüklü değil. Model inference kullanılamaz.")
+            raise ImportError(
+                "TensorFlow yüklü değil. Model inference kullanılamaz. "
+                f"Ayrıntı: {TENSORFLOW_IMPORT_ERROR}"
+            )
+
+        physical_gpus = tf.config.list_physical_devices("GPU")
+        if require_gpu and not physical_gpus:
+            raise RuntimeError(
+                "TensorFlow GPU bulamadı; CPU'ya sessiz geçiş engellendi. "
+                "visual_navigation_cuda ortamını aktive ederek yeniden çalıştırın."
+            )
+        for gpu in physical_gpus:
+            try:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            except RuntimeError:
+                pass
+        logger.info(
+            "Model runtime | TensorFlow=%s | h5py=%s | GPU=%s",
+            tf.__version__,
+            h5py.__version__,
+            [str(gpu) for gpu in physical_gpus] or "CPU",
+        )
         
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model dosyası bulunamadı: {model_path}")
         
         if not os.path.exists(input_dir):
             raise FileNotFoundError(f"Giriş dizini bulunamadı: {input_dir}")
-        
-        # Çıktı dizinini oluştur
-        self.create_output_directory(output_dir)
-        # Eski inference dosyalari yeni merge sirasini bozmasin.
-        # Yalnizca bu fonksiyonun urettigi .png dosyalari silinir (veri kaybi riskini azaltir).
-        for old_name in os.listdir(output_dir):
-            old_path = os.path.join(output_dir, old_name)
-            if os.path.isfile(old_path) and old_name.lower().endswith('.png'):
-                try:
-                    os.remove(old_path)
-                except Exception as e:
-                    logger.warning(f"Eski inference dosyasi silinemedi ({old_path}): {e}")
-
         
         # Modeli yukle (farkli Keras surumleri icin uyumluluk fallback'leri ile)
         logger.info(f"Model yukleniyor: {model_path}")
@@ -1554,6 +1589,17 @@ class ImageProcessor:
         if model is None:
             detailed_error = "\n  - ".join(load_errors) if load_errors else "Bilinmeyen hata"
             raise ValueError(f"Model yuklenemedi. Denenen yontemler:\n  - {detailed_error}")
+
+        # Model başarıyla yüklendikten sonra çıktı dizinini oluştur. Böylece
+        # yüklenemeyen modeller boş klasör bırakmaz.
+        self.create_output_directory(output_dir)
+        for old_name in os.listdir(output_dir):
+            old_path = os.path.join(output_dir, old_name)
+            if os.path.isfile(old_path) and old_name.lower().endswith('.png'):
+                try:
+                    os.remove(old_path)
+                except Exception as e:
+                    logger.warning(f"Eski inference dosyasi silinemedi ({old_path}): {e}")
         
         # ═══════════════════════════════════════════════════════════════════════
         # RENK MODU BELİRLEME
@@ -1731,8 +1777,14 @@ class ImageProcessor:
             
             # Toplu tahmin (batch prediction)
             try:
-                predictions = model.predict(batch_array, verbose=0)
+                if require_gpu:
+                    with tf.device("/GPU:0"):
+                        predictions = model.predict(batch_array, verbose=0)
+                else:
+                    predictions = model.predict(batch_array, verbose=0)
             except Exception as e:
+                if require_gpu:
+                    raise RuntimeError(f"GPU batch prediction başarısız: {e}") from e
                 logger.error(f"Batch prediction hatası: {e}")
                 pbar.update(len(batch_files))
                 continue

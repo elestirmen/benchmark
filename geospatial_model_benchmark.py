@@ -1021,12 +1021,6 @@ def build_model_map(
     processor = ImageProcessor(reference_dir=None)
     tile_out = model_dir / "02_model_tiles"
     merged_dir = model_dir / "03_merged"
-    georef_path.parent.mkdir(parents=True, exist_ok=True)
-    merged_dir.mkdir(parents=True, exist_ok=True)
-    tile_out.mkdir(parents=True, exist_ok=True)
-    (tile_out / "metadata.json").write_text(
-        json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
     merged_path = merged_dir / f"{model_id}.png"
     started = time.perf_counter()
     with StageTimer(f"Model haritası üretimi | {model_path.name}"):
@@ -1039,10 +1033,16 @@ def build_model_map(
             batch_size=batch_size,
             normalization=normalization,
             enhancement=enhancement,
+            require_gpu=True,
         )
         expected = int(metadata["num_frames_x"]) * int(metadata["num_frames_y"])
         if len(produced) != expected:
             raise RuntimeError(f"Eksik model karosu: expected={expected}, produced={len(produced)}")
+        (tile_out / "metadata.json").write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        merged_dir.mkdir(parents=True, exist_ok=True)
+        georef_path.parent.mkdir(parents=True, exist_ok=True)
         merged = processor.merge_images(
             input_dir=str(tile_out),
             output_path=str(merged_path),
@@ -1135,6 +1135,7 @@ def build_model_queries(
             batch_size=batch_size,
             normalization=normalization,
             enhancement=enhancement,
+            require_gpu=True,
         )
     paths = {Path(path).stem: Path(path) for path in produced}
     missing = sorted(record.query_id for record in queries if record.query_id not in paths)
