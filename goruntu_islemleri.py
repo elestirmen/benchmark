@@ -34,7 +34,7 @@ import json
 import argparse
 import logging
 from pathlib import Path
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Tuple, Optional, Dict, Any, Sequence
 import re
 from datetime import datetime
 
@@ -486,6 +486,329 @@ def apply_enhancement(pixels: np.ndarray, mode: str, clahe_clip: float = 2.0) ->
     if pixels.ndim == 3 and pixels.shape[2] == 1 and out.ndim == 2:
         out = np.expand_dims(out, axis=-1)
     return out
+
+
+OUTPUT_VALUE_MODES = ("auto", "tanh", "sigmoid", "raw")
+
+
+def infer_prediction_value_mode(prediction: np.ndarray, *, tolerance: float = 1e-6) -> str:
+    """Infer one stable output scale from a representative prediction batch.
+
+    The old fallback checked the tanh interval before the sigmoid interval, so
+    every [0, 1] output was incorrectly treated as tanh.  This helper makes the
+    non-overlapping cases explicit and fails closed for unsupported ranges.
+    """
+    values = np.asarray(prediction, dtype=np.float32)
+    if values.size == 0 or not np.all(np.isfinite(values)):
+        raise ValueError("Model output is empty or contains non-finite values.")
+    pmin = float(np.min(values))
+    pmax = float(np.max(values))
+    if pmin >= -tolerance and pmax <= 1.0 + tolerance:
+        return "sigmoid"
+    if pmin < -tolerance and pmin >= -1.1 and pmax <= 1.1:
+        return "tanh"
+    if pmin >= -tolerance and pmax <= 255.0 + tolerance and pmax > 1.0 + tolerance:
+        return "raw"
+    raise ValueError(
+        "Model output scale is ambiguous/unsupported: "
+        f"min={pmin:.8g}, max={pmax:.8g}. Set output_value_mode explicitly."
+    )
+
+
+def prediction_to_uint8(
+    prediction: np.ndarray,
+    output_value_mode: str = "auto",
+) -> np.ndarray:
+    """Convert a model prediction to uint8 without per-tile normalization."""
+    values = np.asarray(prediction, dtype=np.float32)
+    mode = (
+        infer_prediction_value_mode(values)
+        if output_value_mode in ("", "auto", None)
+        else str(output_value_mode)
+    )
+    if mode == "tanh":
+        converted = np.clip((values + 1.0) * 127.5, 0, 255)
+    elif mode == "sigmoid":
+        converted = np.clip(values * 255.0, 0, 255)
+    elif mode == "raw":
+        converted = np.clip(values, 0, 255)
+    else:
+        raise ValueError(
+            f"Unknown output_value_mode={output_value_mode!r}; "
+            f"expected one of {OUTPUT_VALUE_MODES}."
+        )
+    return converted.astype(np.uint8)
+
+
+def model_activation_output_mode(model: Any) -> Optional[str]:
+    """Return a known final activation scale, or None for custom/linear heads."""
+    try:
+        activation = getattr(model.layers[-1], "activation", None)
+        name = (getattr(activation, "__name__", "") or "").lower()
+    except Exception:
+        return None
+    if name == "tanh":
+        return "tanh"
+    if name in ("sigmoid", "hard_sigmoid"):
+        return "sigmoid"
+    return None
+
+
+class LoadedModelRuntime:
+    """One loaded Keras model shared by map and query inference phases."""
+
+    def __init__(
+        self,
+        model: Any,
+        *,
+        model_path: str,
+        color_mode: str = "auto",
+        normalization: str = "minus1_1",
+        enhancement: str = "none",
+        clahe_clip: float = 2.0,
+        require_gpu: bool = False,
+        output_value_mode: str = "auto",
+    ) -> None:
+        if normalization not in NORMALIZATION_MODES:
+            raise ValueError(f"Unknown normalization mode: {normalization}")
+        if enhancement not in ENHANCEMENT_MODES:
+            raise ValueError(f"Unknown enhancement mode: {enhancement}")
+        if output_value_mode not in OUTPUT_VALUE_MODES:
+            raise ValueError(f"Unknown output value mode: {output_value_mode}")
+        self.model = model
+        self.model_path = str(model_path)
+        self.normalization = normalization
+        self.enhancement = enhancement
+        self.clahe_clip = float(clahe_clip)
+        self.require_gpu = bool(require_gpu)
+        self.input_shape = getattr(model, "input_shape", None)
+        self.output_shape = getattr(model, "output_shape", None)
+        input_channels = self.input_shape[-1] if self.input_shape else None
+        output_channels = self.output_shape[-1] if self.output_shape else None
+        if input_channels in (1, 3):
+            self.input_channels = int(input_channels)
+        else:
+            self.input_channels = 1 if color_mode == "grayscale" else 3
+        self.output_channels = int(output_channels) if output_channels in (1, 3) else output_channels
+        self.color_mode = "grayscale" if self.input_channels == 1 else "rgb"
+        activation_mode = model_activation_output_mode(model)
+        self.output_value_mode: Optional[str] = (
+            activation_mode if output_value_mode == "auto" else output_value_mode
+        )
+        self.requested_output_value_mode = output_value_mode
+        self.closed = False
+
+    @classmethod
+    def load(
+        cls,
+        model_path: str,
+        **kwargs: Any,
+    ) -> "LoadedModelRuntime":
+        if not TENSORFLOW_AVAILABLE:
+            raise ImportError(
+                "TensorFlow is unavailable; model inference cannot run. "
+                f"Details: {TENSORFLOW_IMPORT_ERROR}"
+            )
+        suffix = Path(model_path).suffix.lower()
+        if suffix in (".h5", ".hdf5") and not H5PY_AVAILABLE:
+            raise ImportError(
+                "h5py is required for .h5/.hdf5 models. "
+                f"Details: {H5PY_IMPORT_ERROR}"
+            )
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found: {model_path}")
+
+        require_gpu = bool(kwargs.get("require_gpu", False))
+        physical_gpus = tf.config.list_physical_devices("GPU")
+        if require_gpu and not physical_gpus:
+            raise RuntimeError(
+                "TensorFlow did not find a GPU; silent CPU fallback is disabled."
+            )
+        for gpu in physical_gpus:
+            try:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            except RuntimeError:
+                pass
+
+        def ssim_loss(y_true: Any, y_pred: Any) -> Any:
+            return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
+
+        class CompatibleConv2DTranspose(tf.keras.layers.Conv2DTranspose):
+            def __init__(self, *args: Any, groups: int = 1, **layer_kwargs: Any) -> None:
+                del groups
+                super().__init__(*args, **layer_kwargs)
+
+        attempts = [
+            ("standard", {"compile": False}),
+            ("ssim_loss", {"custom_objects": {"ssim_loss": ssim_loss}, "compile": False}),
+            (
+                "ssim_loss + Conv2DTranspose compatibility",
+                {
+                    "custom_objects": {
+                        "ssim_loss": ssim_loss,
+                        "Conv2DTranspose": CompatibleConv2DTranspose,
+                    },
+                    "compile": False,
+                },
+            ),
+        ]
+        errors: list[str] = []
+        model = None
+        for attempt_name, attempt_kwargs in attempts:
+            try:
+                model = load_model(model_path, **attempt_kwargs)
+                logger.info("Model loaded (%s): %s", attempt_name, model_path)
+                break
+            except Exception as exc:
+                errors.append(f"{attempt_name}: {exc}")
+        if model is None:
+            raise ValueError("Model could not be loaded:\n  - " + "\n  - ".join(errors))
+        runtime = cls(model, model_path=model_path, **kwargs)
+        logger.info(
+            "Loaded runtime | input=%s output=%s channels=%s output_mode=%s",
+            runtime.input_shape,
+            runtime.output_shape,
+            runtime.input_channels,
+            runtime.output_value_mode or "infer-once",
+        )
+        return runtime
+
+    def _prepare_image(
+        self,
+        pixels_raw: np.ndarray,
+        *,
+        image_size: Tuple[int, int],
+        source_color: str,
+    ) -> np.ndarray:
+        if pixels_raw.ndim == 2:
+            pixels = pixels_raw
+            source_channels = 1
+        elif pixels_raw.ndim == 3 and pixels_raw.shape[2] == 1:
+            pixels = pixels_raw[:, :, 0]
+            source_channels = 1
+        elif pixels_raw.ndim == 3 and pixels_raw.shape[2] >= 3:
+            pixels = pixels_raw[:, :, :3]
+            if source_color == "bgr":
+                pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2RGB)
+            elif source_color != "rgb":
+                raise ValueError(f"Unknown source color order: {source_color}")
+            source_channels = 3
+        else:
+            raise ValueError(f"Unexpected image shape: {pixels_raw.shape}")
+
+        if self.input_channels == 1 and source_channels == 3:
+            pixels = cv2.cvtColor(pixels, cv2.COLOR_RGB2GRAY)
+        elif self.input_channels == 3 and source_channels == 1:
+            pixels = cv2.cvtColor(pixels, cv2.COLOR_GRAY2RGB)
+        pixels = cv2.resize(
+            pixels,
+            (int(image_size[1]), int(image_size[0])),
+            interpolation=cv2.INTER_NEAREST,
+        )
+        pixels = apply_enhancement(pixels, self.enhancement, self.clahe_clip)
+        pixels = pixels.astype(np.float32)
+        if self.input_channels == 1 and pixels.ndim == 2:
+            pixels = np.expand_dims(pixels, axis=-1)
+        return apply_normalization(pixels, self.normalization)
+
+    def predict_images(
+        self,
+        images: Sequence[np.ndarray],
+        *,
+        image_size: Tuple[int, int],
+        source_color: str = "rgb",
+    ) -> list[np.ndarray]:
+        if self.closed:
+            raise RuntimeError("LoadedModelRuntime is already closed.")
+        if not images:
+            return []
+        batch = np.asarray(
+            [
+                self._prepare_image(image, image_size=image_size, source_color=source_color)
+                for image in images
+            ]
+        )
+        if self.require_gpu:
+            with tf.device("/GPU:0"):
+                predictions = self.model.predict(batch, verbose=0)
+        else:
+            predictions = self.model.predict(batch, verbose=0)
+        predictions = np.asarray(predictions, dtype=np.float32)
+        if self.output_value_mode is None:
+            self.output_value_mode = infer_prediction_value_mode(predictions)
+            logger.info("Model output mode inferred once: %s", self.output_value_mode)
+        outputs: list[np.ndarray] = []
+        for prediction in predictions:
+            if prediction.ndim == 3 and prediction.shape[-1] == 1:
+                prediction = prediction[:, :, 0]
+            converted = prediction_to_uint8(prediction, self.output_value_mode)
+            expected_h, expected_w = int(image_size[0]), int(image_size[1])
+            if converted.shape[:2] != (expected_h, expected_w):
+                converted = cv2.resize(
+                    converted,
+                    (expected_w, expected_h),
+                    interpolation=cv2.INTER_NEAREST,
+                )
+            outputs.append(converted)
+        return outputs
+
+    def process_directory(
+        self,
+        input_dir: str,
+        output_dir: str,
+        *,
+        image_size: Tuple[int, int],
+        batch_size: int,
+    ) -> List[str]:
+        if not os.path.isdir(input_dir):
+            raise FileNotFoundError(f"Input directory not found: {input_dir}")
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        for old in Path(output_dir).glob("*.png"):
+            old.unlink()
+        files = natsorted(
+            name
+            for name in os.listdir(input_dir)
+            if any(name.lower().endswith(ext) for ext in (".jpg", ".jpeg", ".png", ".tif", ".tiff"))
+        )
+        if not files:
+            raise ValueError(f"No input images found: {input_dir}")
+        output_files: list[str] = []
+        for batch_start in range(0, len(files), batch_size):
+            batch_names = files[batch_start : batch_start + batch_size]
+            images: list[np.ndarray] = []
+            valid_names: list[str] = []
+            for name in batch_names:
+                image = cv2.imread(os.path.join(input_dir, name), cv2.IMREAD_UNCHANGED)
+                if image is None:
+                    logger.error("Image could not be read: %s", name)
+                    continue
+                images.append(image)
+                valid_names.append(name)
+            predictions = self.predict_images(
+                images,
+                image_size=image_size,
+                source_color="bgr",
+            )
+            for name, prediction in zip(valid_names, predictions):
+                output_path = str(Path(output_dir) / f"{Path(name).stem}.png")
+                if not cv2.imwrite(output_path, prediction):
+                    raise OSError(f"Prediction PNG could not be written: {output_path}")
+                output_files.append(output_path)
+        return output_files
+
+    def close(self) -> None:
+        if self.closed:
+            return
+        self.closed = True
+        self.model = None
+        if TENSORFLOW_AVAILABLE:
+            tf.keras.backend.clear_session()
+
+    def __enter__(self) -> "LoadedModelRuntime":
+        return self
+
+    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
+        self.close()
 
 
 class ImageProcessor:
@@ -1482,7 +1805,9 @@ class ImageProcessor:
         normalization: str = "minus1_1",
         enhancement: str = "none",
         clahe_clip: float = 2.0,
-        require_gpu: bool = False
+        require_gpu: bool = False,
+        model_runtime: Optional[LoadedModelRuntime] = None,
+        output_value_mode: str = "auto",
     ) -> List[str]:
         """
         Parçalara bölünmüş görüntüleri sinir ağı modelinden batch inference ile geçirir.
@@ -1511,7 +1836,19 @@ class ImageProcessor:
             ImportError: TensorFlow yüklü değilse
             FileNotFoundError: Model dosyası bulunamazsa
         """
-        if not H5PY_AVAILABLE:
+        if model_runtime is not None:
+            if model_runtime.normalization != normalization:
+                raise ValueError("Loaded runtime normalization differs from the requested setting.")
+            if model_runtime.enhancement != enhancement:
+                raise ValueError("Loaded runtime enhancement differs from the requested setting.")
+            return model_runtime.process_directory(
+                input_dir,
+                output_dir,
+                image_size=image_size,
+                batch_size=batch_size,
+            )
+
+        if Path(model_path).suffix.lower() in ('.h5', '.hdf5') and not H5PY_AVAILABLE:
             raise ImportError(
                 ".h5 model desteği için h5py yüklenemedi. "
                 f"Ayrıntı: {H5PY_IMPORT_ERROR}"
@@ -1703,16 +2040,20 @@ class ImageProcessor:
         # Modelin son katman aktivasyonundan çıkış değer aralığını belirle.
         # Böylece tahmin -> uint8 dönüşümü her karoda tutarlı olur; karo bazlı
         # tahmine bağlı yanlış ölçekleme ve dikiş artefaktı önlenir.
-        output_value_mode = None  # "tanh" -> [-1,1], "sigmoid" -> [0,1]
+        detected_output_mode = (
+            None if output_value_mode == "auto" else output_value_mode
+        )  # "tanh" -> [-1,1], "sigmoid" -> [0,1]
         try:
             last_activation = getattr(model.layers[-1], 'activation', None)
             activation_name = getattr(last_activation, '__name__', '') or ''
             if activation_name == 'tanh':
-                output_value_mode = 'tanh'
+                detected_output_mode = 'tanh'
             elif activation_name in ('sigmoid', 'hard_sigmoid'):
-                output_value_mode = 'sigmoid'
-            if output_value_mode:
-                logger.info(f"Model çıkış aktivasyonu: {activation_name} -> '{output_value_mode}' ölçeği")
+                detected_output_mode = 'sigmoid'
+            if output_value_mode != "auto":
+                detected_output_mode = output_value_mode
+            if detected_output_mode:
+                logger.info(f"Model çıkış aktivasyonu: {activation_name} -> '{detected_output_mode}' ölçeği")
             else:
                 logger.info("Model çıkış aktivasyonu belirlenemedi; değer aralığından tahmin edilecek.")
         except Exception as e:
@@ -1802,22 +2143,12 @@ class ImageProcessor:
                     if pred.ndim == 3 and pred.shape[-1] == 1:
                         pred = pred[:, :, 0]
 
-                    pmin = float(np.min(pred))
-                    pmax = float(np.max(pred))
-
-                    # Tahmin -> uint8: önce modelin aktivasyonundan belirlenen
-                    # sabit ölçek; algılanamadıysa değer aralığına göre tahmin.
-                    # Parça bazlı dinamik normalize dikiş artefaktını artırır.
-                    if output_value_mode == 'tanh':
-                        pred_uint8 = np.clip((pred + 1.0) * 127.5, 0, 255).astype(np.uint8)
-                    elif output_value_mode == 'sigmoid':
-                        pred_uint8 = np.clip(pred * 255.0, 0, 255).astype(np.uint8)
-                    elif -1.1 <= pmin and pmax <= 1.1:
-                        pred_uint8 = np.clip((pred + 1.0) * 127.5, 0, 255).astype(np.uint8)
-                    elif -0.1 <= pmin and pmax <= 1.1:
-                        pred_uint8 = np.clip(pred * 255.0, 0, 255).astype(np.uint8)
-                    else:
-                        pred_uint8 = np.clip(pred, 0, 255).astype(np.uint8)
+                    if detected_output_mode is None:
+                        # Infer once from the first representative batch, never
+                        # independently per tile.
+                        detected_output_mode = infer_prediction_value_mode(predictions)
+                        logger.info("Model output mode inferred once: %s", detected_output_mode)
+                    pred_uint8 = prediction_to_uint8(pred, detected_output_mode)
 
                     expected_h, expected_w = int(image_size[0]), int(image_size[1])
                     pred_h, pred_w = pred_uint8.shape[:2]
@@ -2074,8 +2405,8 @@ class ImageProcessor:
                 
                 if model_dir and os.path.exists(model_dir):
                     # Tüm modelleri işle
-                    model_files = [f for f in os.listdir(model_dir) 
-                                  if f.endswith(('.h5', '.keras'))]
+                    model_files = [f for f in os.listdir(model_dir)
+                                  if f.lower().endswith(('.h5', '.keras', '.hdf5'))]
                     
                     if len(model_files) == 0:
                         logger.warning(f"Model dizininde model dosyası bulunamadı: {model_dir}")
@@ -2516,7 +2847,7 @@ Ornekler:
     )
     pipeline_parser.add_argument('--overlap', type=int, default=split_cfg["overlap"], help='Bolme ortusme miktari (piksel)')
     pipeline_parser.add_argument('--crop_overlap', type=int, default=merge_cfg["crop_overlap"], help='Birlestirmede kullanilacak ortusme genisligi')
-    pipeline_parser.add_argument('--color_mode', default=pipeline_cfg["color_mode"], choices=['grayscale', 'rgb'], help='Renk modu')
+    pipeline_parser.add_argument('--color_mode', default=pipeline_cfg["color_mode"], choices=['auto', 'grayscale', 'rgb'], help='Renk modu')
     pipeline_parser.add_argument('--batch_size', type=int, default=pipeline_cfg["batch_size"], help='Batch boyutu')
     pipeline_parser.add_argument('--reference', default=pipeline_cfg["reference_raster"], help='Referans raster dosyasi')
     pipeline_parser.add_argument('--reference_dir', default=pipeline_cfg["reference_dir"], help='Referans raster dizini')

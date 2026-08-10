@@ -1,3 +1,9 @@
+"""LEGACY exploratory script; not imported or executed by the benchmark CLI.
+
+The supported reproducible pipeline is ``geospatial_model_benchmark.py``.
+This file is retained only for historical comparison.
+"""
+
 import os
 os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,40).__str__()
 import cv2
@@ -183,11 +189,3 @@ for i in range(len(haritalar_klasoru)):
     
     epochs = np.append(epochs,(i+1)*100)
     dosyaya_yaz(anlik_name,epochs,sonuclar_dogru1,sonuclar_yanlis1,sonuclar_dogru2,sonuclar_yanlis2)
-                
-            
-            
-            
-        
-        
-    
-        

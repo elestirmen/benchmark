@@ -37,7 +37,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Sequence
+from typing import Any, Sequence
 
 import cv2
 import numpy as np
@@ -54,6 +54,9 @@ DEFAULT_MAP = SCRIPT_DIR / "urgup_bingmap_utm_30_cm.tif"
 DEFAULT_MODEL_DIR = SCRIPT_DIR / "models"
 DEFAULT_OUTPUT_ROOT = SCRIPT_DIR / "outputs"
 RAW_MODEL_ID = "RAW_BASELINE"
+SCIENTIFIC_SEMANTICS_VERSION = 2
+QUERY_MANIFEST_SCHEMA_VERSION = 2
+SUMMARY_STATE_SCHEMA_VERSION = 2
 
 DEFAULT_SEARCH_MODE_ORDER = {
     "roi_500m": 0,
@@ -212,6 +215,13 @@ class PreparedSearchMap:
     pyramid: dict[int, np.ndarray] | None
 
 
+@dataclass(frozen=True)
+class PreparedRoiSearch:
+    pyramid: dict[int, np.ndarray]
+    x0: int
+    y0: int
+
+
 class StageTimer:
     def __init__(self, label: str) -> None:
         self.label = label
@@ -255,7 +265,9 @@ def configure_logging(run_dir: Path, verbose: bool) -> Path:
     run_dir.mkdir(parents=True, exist_ok=True)
     log_path = run_dir / "benchmark.log"
     LOG.setLevel(logging.DEBUG if verbose else logging.INFO)
-    LOG.handlers.clear()
+    for old_handler in list(LOG.handlers):
+        old_handler.close()
+        LOG.removeHandler(old_handler)
     formatter = logging.Formatter(
         "%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
@@ -283,7 +295,7 @@ def parse_int_list(value: str) -> tuple[int, ...]:
 
 def parse_patterns(values: Sequence[str] | None) -> tuple[str, ...]:
     if not values:
-        return ("*.h5", "*.keras")
+        return ("*.h5", "*.keras", "*.hdf5")
     patterns: list[str] = []
     for value in values:
         patterns.extend(part.strip() for part in value.split(",") if part.strip())
@@ -381,6 +393,40 @@ def validate_rasters(query_path: Path, map_path: Path) -> dict[str, Any]:
                 f"CRS uyuşmuyor: query={query_ds.crs}, map={map_ds.crs}. "
                 "Benchmark öncesi açık bir yeniden projeksiyon adımı gerekir."
             )
+        for label, dataset in (("query", query_ds), ("map", map_ds)):
+            transform = dataset.transform
+            coefficients = (transform.a, transform.b, transform.d, transform.e)
+            if not all(math.isfinite(float(value)) for value in coefficients):
+                raise ValueError(f"{label} raster transform contains non-finite values: {transform}")
+            if not math.isclose(transform.b, 0.0, rel_tol=0.0, abs_tol=1e-12) or not math.isclose(
+                transform.d, 0.0, rel_tol=0.0, abs_tol=1e-12
+            ):
+                raise ValueError(
+                    f"{label} raster has unsupported rotation/skew: {transform}"
+                )
+            if transform.a <= 0.0 or transform.e >= 0.0:
+                raise ValueError(
+                    f"{label} raster must be north-up with positive X and negative Y pixel size: {transform}"
+                )
+            if dataset.count == 2 or dataset.count < 1:
+                raise ValueError(
+                    f"{label} raster has unsupported band count {dataset.count}; expected 1 or at least 3."
+                )
+            used_band_count = 1 if dataset.count == 1 else 3
+            used_dtypes = tuple(dataset.dtypes[:used_band_count])
+            if any(dtype != "uint8" for dtype in used_dtypes):
+                raise ValueError(
+                    f"{label} raster has unsupported dtype {used_dtypes}. "
+                    "Silent uint16/float to uint8 conversion is forbidden; preprocess explicitly."
+                )
+        query_resolution = (abs(query_ds.transform.a), abs(query_ds.transform.e))
+        map_resolution = (abs(map_ds.transform.a), abs(map_ds.transform.e))
+        for axis, query_value, map_value in zip(("X", "Y"), query_resolution, map_resolution):
+            if not math.isclose(query_value, map_value, rel_tol=1e-9, abs_tol=1e-12):
+                raise ValueError(
+                    f"Raster GSD mismatch on {axis}: query={query_value:.12g}, map={map_value:.12g}. "
+                    "The benchmark does not resample silently."
+                )
         common = intersection_bounds(query_ds.bounds, map_ds.bounds)
         return {
             "crs": str(query_ds.crs),
@@ -403,10 +449,14 @@ def read_rgb_window(dataset: rasterio.io.DatasetReader, window: Window) -> np.nd
 
 
 def to_gray(image: np.ndarray) -> np.ndarray:
+    if image.dtype != np.uint8:
+        raise ValueError(
+            f"Unsupported image dtype {image.dtype}; silent uint8 truncation is forbidden."
+        )
     if image.ndim == 2:
-        return image.astype(np.uint8, copy=False)
+        return image
     if image.shape[2] == 1:
-        return image[:, :, 0].astype(np.uint8, copy=False)
+        return image[:, :, 0]
     return cv2.cvtColor(image[:, :, :3], cv2.COLOR_RGB2GRAY)
 
 
@@ -505,15 +555,49 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
     rows: list[dict[str, Any]] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            line = line.strip()
-            if not line:
+    file_size = path.stat().st_size
+    with path.open("rb") as handle:
+        line_number = 0
+        while True:
+            line_start = handle.tell()
+            raw_line = handle.readline()
+            if not raw_line:
+                break
+            line_number += 1
+            if not raw_line.strip():
                 continue
             try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError as exc:
-                raise ValueError(f"Geçersiz JSONL: {path}:{line_number}: {exc}") from exc
+                decoded = raw_line.decode("utf-8")
+                row = json.loads(decoded)
+                if not isinstance(row, dict):
+                    raise ValueError("JSONL row is not an object")
+                rows.append(row)
+            except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+                remaining = handle.read()
+                if remaining.strip():
+                    raise ValueError(
+                        f"Invalid JSONL in the middle of the file: {path}:{line_number}: {exc}"
+                    ) from exc
+                bad_tail = raw_line + remaining
+                recovery_path = path.with_name(
+                    f"{path.name}.recovery_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.bin"
+                )
+                with recovery_path.open("xb") as recovery:
+                    recovery.write(bad_tail)
+                    recovery.flush()
+                    os.fsync(recovery.fileno())
+                with path.open("r+b") as repair:
+                    repair.truncate(line_start)
+                    repair.flush()
+                    os.fsync(repair.fileno())
+                LOG.warning(
+                    "CORRUPT JSONL TAIL RECOVERED | file=%s | line=%d | bytes=%d | recovery=%s",
+                    path,
+                    line_number,
+                    file_size - line_start,
+                    recovery_path,
+                )
+                break
     return rows
 
 
@@ -547,6 +631,8 @@ def generate_query_manifest(
         float(edge_buffer_m) if edge_buffer_m is not None else tile_size * max_pixel_size_m
     )
     selection_config = {
+        "manifest_schema_version": QUERY_MANIFEST_SCHEMA_VERSION,
+        "scientific_semantics_version": SCIENTIFIC_SEMANTICS_VERSION,
         "query_raster": str(query_raster.resolve()),
         "map_raster": str(map_raster.resolve()),
         "tile_size": tile_size,
@@ -658,6 +744,16 @@ def generate_query_manifest(
                 if std < min_std or ent < min_entropy or dark > max_dark_fraction:
                     continue
 
+                # The scientific truth is the geometric centre of the exact
+                # even-sized window that was extracted.  Affine coordinates
+                # operate on pixel-corner coordinates, so using rasterio's
+                # offset='center' here would introduce a half-pixel shift.
+                center_col = col0 + tile_size / 2.0
+                center_row = row0 + tile_size / 2.0
+                center_easting_m, center_northing_m = pixel_center_to_geo(
+                    query_ds.transform, center_col, center_row
+                )
+
                 query_id = f"Q{len(records) + 1:05d}"
                 block_id = f"B{block_row:02d}_{block_col:02d}"
                 tile_path = raw_dir / f"{query_id}.png"
@@ -666,10 +762,10 @@ def generate_query_manifest(
                     QueryRecord(
                         query_id=query_id,
                         block_id=block_id,
-                        center_easting_m=x,
-                        center_northing_m=y,
-                        source_row=int(row),
-                        source_col=int(col),
+                        center_easting_m=center_easting_m,
+                        center_northing_m=center_northing_m,
+                        source_row=int(center_row),
+                        source_col=int(center_col),
                         query_std=std,
                         query_entropy=ent,
                         dark_fraction=dark,
@@ -685,6 +781,8 @@ def generate_query_manifest(
     if not records:
         raise RuntimeError("Kalite kapılarından geçen hiçbir sorgu üretilemedi.")
     payload = {
+        "manifest_schema_version": QUERY_MANIFEST_SCHEMA_VERSION,
+        "scientific_semantics_version": SCIENTIFIC_SEMANTICS_VERSION,
         "created_at_utc": utc_now_iso(),
         "query_raster": str(query_raster.resolve()),
         "map_raster": str(map_raster.resolve()),
@@ -965,6 +1063,45 @@ def import_image_processor() -> Any:
     return ImageProcessor
 
 
+def import_loaded_model_runtime() -> Any:
+    try:
+        from goruntu_islemleri import LoadedModelRuntime  # type: ignore
+    except Exception as exc:
+        raise RuntimeError(
+            "LoadedModelRuntime could not be imported from goruntu_islemleri.py."
+        ) from exc
+    return LoadedModelRuntime
+
+
+def compute_starts(length: int, tile: int, step: int) -> list[int]:
+    """Exact public equivalent of ImageProcessor.split_image._compute_starts."""
+    if length <= tile:
+        return [0]
+    starts = list(range(0, max(length - tile + 1, 1), step))
+    last_start = max(0, length - tile)
+    if not starts or starts[-1] != last_start:
+        starts.append(last_start)
+    return starts
+
+
+def streaming_map_metadata(source_map: Path, *, tile_size: int, overlap: int) -> dict[str, Any]:
+    frame_size = tile_size - overlap
+    with rasterio.open(source_map) as dataset:
+        y_starts = compute_starts(dataset.height, tile_size, frame_size)
+        x_starts = compute_starts(dataset.width, tile_size, frame_size)
+        return {
+            "tile_size": tile_size,
+            "frame_size": frame_size,
+            "num_frames_x": len(y_starts),
+            "num_frames_y": len(x_starts),
+            "overlap": overlap,
+            "y_starts": y_starts,
+            "x_starts": x_starts,
+            "original_size": [dataset.height, dataset.width],
+            "original_path": str(source_map.resolve()),
+        }
+
+
 def ensure_shared_map_tiles(
     map_raster: Path,
     shared_dir: Path,
@@ -1030,7 +1167,7 @@ def validate_generated_geotiff(path: Path, source_map: Path) -> bool:
         return False
 
 
-def build_model_map(
+def build_model_map_legacy(
     model_path: Path,
     model_dir: Path,
     shared_tiles: Path,
@@ -1142,6 +1279,192 @@ def build_model_map(
     return georef_path, elapsed
 
 
+def model_prediction_to_legacy_gray(prediction: np.ndarray) -> np.ndarray:
+    """Match legacy PNG write/read followed by OpenCV BGR2GRAY exactly."""
+    if prediction.ndim == 2:
+        return np.ascontiguousarray(prediction)
+    if prediction.ndim == 3 and prediction.shape[2] == 1:
+        return np.ascontiguousarray(prediction[:, :, 0])
+    if prediction.ndim == 3 and prediction.shape[2] >= 3:
+        return cv2.cvtColor(prediction[:, :, :3], cv2.COLOR_BGR2GRAY)
+    raise ValueError(f"Unsupported prediction shape: {prediction.shape}")
+
+
+def build_model_map(
+    model_path: Path,
+    model_dir: Path,
+    shared_tiles: Path,
+    metadata: dict[str, Any],
+    source_map: Path,
+    *,
+    tile_size: int,
+    overlap: int,
+    batch_size: int,
+    normalization: str,
+    enhancement: str,
+    force: bool,
+    keep_intermediate: bool,
+    model_runtime: Any,
+    model_sha256: str,
+) -> tuple[Path, float]:
+    """Stream source windows through one model runtime into the final GeoTIFF."""
+    del shared_tiles  # kept in the call signature for backward-compatible callers
+    model_id = safe_slug(model_path.stem)
+    georef_path = model_dir / "04_georef" / f"{model_id}_geo.tif"
+    timing_path = model_dir / "map_timing.json"
+    manifest_path = model_dir / "map_manifest.json"
+    expected_manifest = {
+        "schema_version": 1,
+        "scientific_semantics_version": SCIENTIFIC_SEMANTICS_VERSION,
+        "model_sha256": model_sha256,
+        "source_map": str(source_map.resolve()),
+        "source_size": source_map.stat().st_size,
+        "source_mtime_ns": source_map.stat().st_mtime_ns,
+        "tile_size": tile_size,
+        "overlap": overlap,
+        "normalization": normalization,
+        "enhancement": enhancement,
+        "output_value_mode": getattr(model_runtime, "requested_output_value_mode", "auto"),
+    }
+    cached_manifest: dict[str, Any] = {}
+    if manifest_path.is_file():
+        try:
+            candidate = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if isinstance(candidate, dict):
+                cached_manifest = candidate
+        except (OSError, json.JSONDecodeError):
+            cached_manifest = {}
+    if (
+        not force
+        and cached_manifest == expected_manifest
+        and validate_generated_geotiff(georef_path, source_map)
+    ):
+        elapsed = 0.0
+        if timing_path.is_file():
+            elapsed = float(json.loads(timing_path.read_text(encoding="utf-8")).get("elapsed_seconds", 0.0))
+        LOG.info("Streaming model map reused: %s", georef_path)
+        return georef_path, elapsed
+
+    y_starts = [int(value) for value in metadata["y_starts"]]
+    x_starts = [int(value) for value in metadata["x_starts"]]
+    if metadata.get("original_size") is None:
+        raise ValueError("Streaming map metadata is missing original_size.")
+    crop_overlap = overlap // 2
+    tile_plan = [(i, j, y, x) for i, y in enumerate(y_starts) for j, x in enumerate(x_starts)]
+    georef_path.parent.mkdir(parents=True, exist_ok=True)
+    partial_path = georef_path.with_suffix(georef_path.suffix + ".partial")
+    if partial_path.exists():
+        partial_path.unlink()
+
+    input_debug_dir = model_dir / "01_source_tiles"
+    prediction_debug_dir = model_dir / "02_model_tiles"
+    merged_debug_path = model_dir / "03_merged" / f"{model_id}.png"
+    if keep_intermediate:
+        input_debug_dir.mkdir(parents=True, exist_ok=True)
+        prediction_debug_dir.mkdir(parents=True, exist_ok=True)
+        (prediction_debug_dir / "metadata.json").write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+
+    started = time.perf_counter()
+    with StageTimer(f"Streaming model map | {model_path.name}"):
+        with rasterio.open(source_map) as source:
+            output_profile = source.profile.copy()
+            output_profile.update(
+                driver="GTiff",
+                count=1,
+                dtype="uint8",
+                nodata=None,
+                compress="LZW",
+                width=source.width,
+                height=source.height,
+                transform=source.transform,
+                crs=source.crs,
+            )
+            with rasterio.open(partial_path, "w", **output_profile) as destination:
+                for batch_start in range(0, len(tile_plan), batch_size):
+                    batch_plan = tile_plan[batch_start : batch_start + batch_size]
+                    source_tiles: list[np.ndarray] = []
+                    for i, j, start_y, start_x in batch_plan:
+                        tile = read_rgb_window(
+                            source,
+                            Window(start_x, start_y, tile_size, tile_size),
+                        )
+                        source_tiles.append(tile)
+                        if keep_intermediate:
+                            write_png(input_debug_dir / f"goruntu_{i}_{j}.png", tile)
+                    predictions = model_runtime.predict_images(
+                        source_tiles,
+                        image_size=(tile_size, tile_size),
+                        source_color="rgb",
+                    )
+                    if len(predictions) != len(batch_plan):
+                        raise RuntimeError(
+                            f"Model returned {len(predictions)} tiles for a batch of {len(batch_plan)}."
+                        )
+                    for (i, j, start_y, start_x), prediction in zip(batch_plan, predictions):
+                        if keep_intermediate:
+                            debug_path = prediction_debug_dir / f"goruntu_{i}_{j}.png"
+                            if not cv2.imwrite(str(debug_path), prediction):
+                                raise OSError(f"Prediction PNG could not be written: {debug_path}")
+                        gray = model_prediction_to_legacy_gray(prediction)
+                        top_crop = crop_overlap if i > 0 else 0
+                        bottom_crop = crop_overlap if i < len(y_starts) - 1 else 0
+                        left_crop = crop_overlap if j > 0 else 0
+                        right_crop = crop_overlap if j < len(x_starts) - 1 else 0
+                        source_y2 = gray.shape[0] - bottom_crop if bottom_crop else gray.shape[0]
+                        source_x2 = gray.shape[1] - right_crop if right_crop else gray.shape[1]
+                        dest_y = start_y + top_crop
+                        dest_x = start_x + left_crop
+                        write_height = min(source_y2 - top_crop, source.height - dest_y)
+                        write_width = min(source_x2 - left_crop, source.width - dest_x)
+                        if write_height <= 0 or write_width <= 0:
+                            raise ValueError(f"Invalid streaming placement for tile {(i, j)}")
+                        cropped = gray[
+                            top_crop : top_crop + write_height,
+                            left_crop : left_crop + write_width,
+                        ]
+                        destination.write(
+                            cropped,
+                            1,
+                            window=Window(dest_x, dest_y, write_width, write_height),
+                        )
+        os.replace(partial_path, georef_path)
+        if not validate_generated_geotiff(georef_path, source_map):
+            raise RuntimeError(f"Streaming GeoTIFF validation failed: {georef_path}")
+
+    elapsed = time.perf_counter() - started
+    timing_path.write_text(
+        json.dumps(
+            {
+                "model": str(model_path.resolve()),
+                "elapsed_seconds": elapsed,
+                "created_at_utc": utc_now_iso(),
+                "pipeline": "streaming_v1",
+                "intermediate_png_count": len(tile_plan) * 2 if keep_intermediate else 0,
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    manifest_path.write_text(
+        json.dumps(expected_manifest, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    if keep_intermediate:
+        merged_debug_path.parent.mkdir(parents=True, exist_ok=True)
+        with rasterio.open(georef_path) as output:
+            if not cv2.imwrite(str(merged_debug_path), output.read(1)):
+                raise OSError(f"Merged debug PNG could not be written: {merged_debug_path}")
+    LOG.info(
+        "STREAMING MAP READY | tiles=%d | intermediate_png=%d | seconds=%.2f",
+        len(tile_plan),
+        len(tile_plan) * 2 + 1 if keep_intermediate else 0,
+        elapsed,
+    )
+    return georef_path, elapsed
+
+
 def build_model_queries(
     model_path: Path,
     queries: Sequence[QueryRecord],
@@ -1152,6 +1475,7 @@ def build_model_queries(
     normalization: str,
     enhancement: str,
     force: bool,
+    model_runtime: Any,
 ) -> tuple[dict[str, Path], float]:
     expected_names = {f"{record.query_id}.png" for record in queries}
     existing = {path.name for path in output_dir.glob("Q*.png")} if output_dir.exists() else set()
@@ -1174,6 +1498,7 @@ def build_model_queries(
             normalization=normalization,
             enhancement=enhancement,
             require_gpu=True,
+            model_runtime=model_runtime,
         )
     paths = {Path(path).stem: Path(path) for path in produced}
     missing = sorted(record.query_id for record in queries if record.query_id not in paths)
@@ -1359,6 +1684,11 @@ def pixel_center_to_geo(transform: Affine, x: float, y: float) -> tuple[float, f
     return float(east), float(north)
 
 
+def snap_near_integer_pixel(value: float, *, tolerance: float = 1e-9) -> float:
+    nearest = float(round(value))
+    return nearest if math.isclose(float(value), nearest, rel_tol=0.0, abs_tol=tolerance) else float(value)
+
+
 def raw_query_template(record: QueryRecord, crop_border: int) -> np.ndarray:
     image = load_gray_image(Path(record.raw_tile_file))
     if crop_border <= 0:
@@ -1459,6 +1789,61 @@ def search_in_mode(
     return SearchOutcome(
         x=local.x + x0,
         y=local.y + y0,
+        top1_score=local.top1_score,
+        top2_score=local.top2_score,
+        peak_margin=local.peak_margin,
+        psr=local.psr,
+    )
+
+
+def prepare_roi_search(
+    *,
+    map_gray: np.ndarray,
+    map_transform: Affine,
+    center_easting_m: float,
+    center_northing_m: float,
+    roi_radius_m: float,
+    template_shape: tuple[int, int],
+    factors: Sequence[int],
+) -> PreparedRoiSearch:
+    """Build one map-only ROI pyramid reusable across query variants."""
+    expected_row, expected_col = rowcol(map_transform, center_easting_m, center_northing_m)
+    radius_x = int(math.ceil(roi_radius_m / abs(map_transform.a)))
+    radius_y = int(math.ceil(roi_radius_m / abs(map_transform.e)))
+    half_h = template_shape[0] // 2
+    half_w = template_shape[1] // 2
+    x0 = max(0, int(expected_col) - radius_x - half_w)
+    y0 = max(0, int(expected_row) - radius_y - half_h)
+    x1 = min(map_gray.shape[1], int(expected_col) + radius_x + half_w + 1)
+    y1 = min(map_gray.shape[0], int(expected_row) + radius_y + half_h + 1)
+    roi = map_gray[y0:y1, x0:x1]
+    if roi.shape[0] < template_shape[0] or roi.shape[1] < template_shape[1]:
+        raise ValueError(f"ROI is smaller than template: shape={roi.shape}")
+    return PreparedRoiSearch(build_pyramid(roi, factors), x0, y0)
+
+
+def search_with_prepared_roi(
+    prepared_roi: PreparedRoiSearch,
+    template: np.ndarray,
+    *,
+    factors: Sequence[int],
+    top_k: int,
+    refine_radius_px: int,
+    nms_radius_px: int,
+    template_pyramid: dict[int, np.ndarray] | None,
+) -> SearchOutcome:
+    local = coarse_to_fine_search(
+        prepared_roi.pyramid,
+        template,
+        factors=factors,
+        top_k=top_k,
+        refine_radius_full_px=refine_radius_px,
+        nms_radius_full_px=nms_radius_px,
+        template_pyramid=template_pyramid,
+    )
+    return SearchOutcome(
+        x=local.x + prepared_roi.x0,
+        y=local.y + prepared_roi.y0,
         top1_score=local.top1_score,
         top2_score=local.top2_score,
         peak_margin=local.peak_margin,
@@ -1655,9 +2040,12 @@ def run_searches_for_representation(
             pred_e, pred_n = pixel_center_to_geo(
                 map_transform, predicted_center_x, predicted_center_y
             )
-            expected_row, expected_col = rowcol(
-                map_transform, record.center_easting_m, record.center_northing_m
+            expected_col, expected_row = (~map_transform) * (
+                record.center_easting_m,
+                record.center_northing_m,
             )
+            expected_col = snap_near_integer_pixel(expected_col)
+            expected_row = snap_near_integer_pixel(expected_row)
             error_px = math.hypot(
                 predicted_center_x - float(expected_col),
                 predicted_center_y - float(expected_row),
@@ -1704,6 +2092,7 @@ def run_searches_for_representation(
         evaluated = executor.map(evaluate_task, pending)
 
     try:
+        last_progress_log = 0.0
         with JsonlBatchWriter(results_jsonl) as checkpoint_writer:
             for index, (record, mode_name, result) in enumerate(evaluated, start=1):
                 status = str(result["status"])
@@ -1721,18 +2110,36 @@ def run_searches_for_representation(
                     if result.get("error_m") is not None
                     else f"durum={status} neden={reason}"
                 )
-                LOG.info(
-                    "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
-                    model_id,
-                    query_variant,
-                    mode_name,
-                    index,
-                    total,
-                    100.0 * index / max(total, 1),
-                    record.query_id,
-                    error_text,
-                    eta / 60.0,
+                now = time.monotonic()
+                should_log = (
+                    index == 1
+                    or index == total
+                    or index % 25 == 0
+                    or now - last_progress_log >= 5.0
                 )
+                if should_log:
+                    LOG.info(
+                        "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
+                        model_id,
+                        query_variant,
+                        mode_name,
+                        index,
+                        total,
+                        100.0 * index / max(total, 1),
+                        record.query_id,
+                        error_text,
+                        eta / 60.0,
+                    )
+                    last_progress_log = now
+                else:
+                    LOG.debug(
+                        "RESULT | model=%s | variant=%s | mode=%s | query=%s | %s",
+                        model_id,
+                        query_variant,
+                        mode_name,
+                        record.query_id,
+                        error_text,
+                    )
     finally:
         if executor is not None:
             executor.shutdown(wait=True, cancel_futures=False)
@@ -1740,6 +2147,320 @@ def run_searches_for_representation(
         "ARAMA TAMAMLANDI | model=%s | varyant=%s | süre=%.2f dk",
         model_id,
         query_variant,
+        (time.perf_counter() - started) / 60.0,
+    )
+
+
+def run_searches_for_variants(
+    *,
+    run_id: str,
+    direction: str,
+    model_id: str,
+    model_file: str,
+    model_sha256: str,
+    map_path: Path,
+    prepared_map: PreparedSearchMap,
+    map_build_seconds: float,
+    variant_inputs: Sequence[
+        tuple[str, Sequence[QueryRecord], dict[str, Path] | None, float]
+    ],
+    crop_border: int,
+    search_modes: Sequence[tuple[str, float | None]],
+    factors: Sequence[int],
+    top_k: int,
+    refine_radius_px: int,
+    nms_radius_px: int,
+    normalization: str,
+    source_query_raster: Path,
+    source_map_raster: Path,
+    results_jsonl: Path,
+    done: set[tuple[str, str, str, str, str]],
+    search_workers: int,
+) -> None:
+    """Evaluate variants together so each map ROI pyramid is built only once."""
+    map_gray = prepared_map.gray
+    map_transform = prepared_map.transform
+    global_pyramid = prepared_map.pyramid
+    variant_order = [name for name, _, _, _ in variant_inputs]
+    records_by_variant = {
+        name: {record.query_id: record for record in records}
+        for name, records, _, _ in variant_inputs
+    }
+    paths_by_variant = {name: paths for name, _, paths, _ in variant_inputs}
+    inference_per_query = {
+        name: seconds / max(1, len(records))
+        for name, records, _, seconds in variant_inputs
+    }
+    base_records = list(variant_inputs[0][1]) if variant_inputs else []
+    tasks: list[tuple[QueryRecord, str, float | None, tuple[str, ...]]] = []
+    total_results = 0
+    for base_record in base_records:
+        for mode_name, radius in search_modes:
+            pending_variants = tuple(
+                variant
+                for variant in variant_order
+                if (
+                    direction,
+                    variant,
+                    mode_name,
+                    model_id,
+                    base_record.query_id,
+                )
+                not in done
+            )
+            if pending_variants:
+                tasks.append((base_record, mode_name, radius, pending_variants))
+                total_results += len(pending_variants)
+
+    template_cache: dict[tuple[str, str], tuple[np.ndarray, float, dict[int, np.ndarray]]] = {}
+    cache_bytes = 0
+    for variant, records, query_paths, _ in variant_inputs:
+        for record in records:
+            try:
+                if model_id == RAW_MODEL_ID:
+                    template = raw_query_template(record, crop_border)
+                else:
+                    if query_paths is None or record.query_id not in query_paths:
+                        continue
+                    template = model_query_template(query_paths[record.query_id], crop_border)
+                template = np.ascontiguousarray(template)
+                levels = {factor: resize_template(template, factor) for factor in factors}
+                template_cache[(variant, record.query_id)] = (
+                    template,
+                    float(np.std(template)),
+                    levels,
+                )
+                cache_bytes += sum(level.nbytes for level in levels.values())
+            except Exception:
+                LOG.debug(
+                    "Template cache failed | variant=%s query=%s | %s",
+                    variant,
+                    record.query_id,
+                    traceback.format_exc(),
+                )
+    LOG.info(
+        "SHARED VARIANT SEARCH | model=%s | variants=%s | tasks=%d | results=%d | template_cache=%.1f MiB",
+        model_id,
+        ",".join(variant_order),
+        len(tasks),
+        total_results,
+        cache_bytes / (1024 * 1024),
+    )
+
+    def evaluate_task(
+        task: tuple[QueryRecord, str, float | None, tuple[str, ...]],
+    ) -> list[tuple[str, QueryRecord, str, dict[str, Any]]]:
+        base_record, mode_name, roi_radius_m, pending_variants = task
+        prepared_roi: PreparedRoiSearch | None = None
+        roi_error: Exception | None = None
+        if mode_name != "global":
+            representative = next(
+                (
+                    template_cache[(variant, base_record.query_id)][0]
+                    for variant in pending_variants
+                    if (variant, base_record.query_id) in template_cache
+                ),
+                None,
+            )
+            if representative is not None and roi_radius_m is not None:
+                try:
+                    prepared_roi = prepare_roi_search(
+                        map_gray=map_gray,
+                        map_transform=map_transform,
+                        center_easting_m=base_record.center_easting_m,
+                        center_northing_m=base_record.center_northing_m,
+                        roi_radius_m=roi_radius_m,
+                        template_shape=representative.shape[:2],
+                        factors=factors,
+                    )
+                except Exception as exc:
+                    roi_error = exc
+
+        outputs: list[tuple[str, QueryRecord, str, dict[str, Any]]] = []
+        for variant in pending_variants:
+            record = records_by_variant[variant][base_record.query_id]
+            row_started = time.perf_counter()
+            status = "ok"
+            reason = "ok"
+            result: dict[str, Any] = {
+                "run_id": run_id,
+                "direction": direction,
+                "query_variant": variant,
+                "search_mode": mode_name,
+                "roi_radius_m": roi_radius_m,
+                "model_id": model_id,
+                "model_file": model_file,
+                "model_sha256": model_sha256,
+                "query_id": record.query_id,
+                "block_id": record.block_id,
+                "query_center_easting_m": record.center_easting_m,
+                "query_center_northing_m": record.center_northing_m,
+                "expected_center_easting_m": record.center_easting_m,
+                "expected_center_northing_m": record.center_northing_m,
+                "query_std": record.query_std,
+                "query_entropy": record.query_entropy,
+                "query_dark_fraction": record.dark_fraction,
+                "query_inference_seconds": (
+                    inference_per_query[variant] if model_id != RAW_MODEL_ID else 0.0
+                ),
+                "map_build_seconds": map_build_seconds,
+                "pyramid_factors": ",".join(str(item) for item in factors),
+                "top_k": top_k,
+                "normalization": normalization if model_id != RAW_MODEL_ID else "RAW",
+                "template_size_px": 0,
+                "source_query_raster": str(source_query_raster.resolve()),
+                "source_map_raster": str(source_map_raster.resolve()),
+                "created_at_utc": utc_now_iso(),
+            }
+            try:
+                cached = template_cache.get((variant, record.query_id))
+                if cached is None:
+                    query_paths = paths_by_variant[variant]
+                    if model_id == RAW_MODEL_ID:
+                        template = raw_query_template(record, crop_border)
+                    elif query_paths is not None and record.query_id in query_paths:
+                        template = model_query_template(query_paths[record.query_id], crop_border)
+                    else:
+                        raise FileNotFoundError(f"Model query missing: {record.query_id}")
+                    template = np.ascontiguousarray(template)
+                    template_std = float(np.std(template))
+                    template_levels = {
+                        factor: resize_template(template, factor) for factor in factors
+                    }
+                else:
+                    template, template_std, template_levels = cached
+                result["template_size_px"] = int(template.shape[0])
+                if template_std < 2.0:
+                    status = "rejected"
+                    reason = "low_model_template_variance"
+                    raise ValueError(reason)
+                if mode_name == "global":
+                    if global_pyramid is None:
+                        raise RuntimeError("Global search pyramid was not prepared.")
+                    outcome = coarse_to_fine_search(
+                        global_pyramid,
+                        template,
+                        factors=factors,
+                        top_k=top_k,
+                        refine_radius_full_px=refine_radius_px,
+                        nms_radius_full_px=nms_radius_px,
+                        template_pyramid=template_levels,
+                    )
+                else:
+                    if roi_error is not None:
+                        raise roi_error
+                    if prepared_roi is None:
+                        raise RuntimeError("ROI pyramid was not prepared.")
+                    outcome = search_with_prepared_roi(
+                        prepared_roi,
+                        template,
+                        factors=factors,
+                        top_k=top_k,
+                        refine_radius_px=refine_radius_px,
+                        nms_radius_px=nms_radius_px,
+                        template_pyramid=template_levels,
+                    )
+                predicted_center_x = outcome.x + template.shape[1] / 2.0
+                predicted_center_y = outcome.y + template.shape[0] / 2.0
+                pred_e, pred_n = pixel_center_to_geo(
+                    map_transform, predicted_center_x, predicted_center_y
+                )
+                expected_col, expected_row = (~map_transform) * (
+                    record.center_easting_m,
+                    record.center_northing_m,
+                )
+                expected_col = snap_near_integer_pixel(expected_col)
+                expected_row = snap_near_integer_pixel(expected_row)
+                error_px = math.hypot(
+                    predicted_center_x - float(expected_col),
+                    predicted_center_y - float(expected_row),
+                )
+                error_m = math.hypot(
+                    pred_e - record.center_easting_m,
+                    pred_n - record.center_northing_m,
+                )
+                result.update(
+                    {
+                        "predicted_center_easting_m": pred_e,
+                        "predicted_center_northing_m": pred_n,
+                        "error_m": error_m,
+                        "error_px": error_px,
+                        "top1_score": outcome.top1_score,
+                        "top2_score": outcome.top2_score,
+                        "peak_margin": outcome.peak_margin,
+                        "psr": outcome.psr,
+                        "success_5m": int(error_m <= 5.0),
+                        "success_10m": int(error_m <= 10.0),
+                        "success_25m": int(error_m <= 25.0),
+                        "success_50m": int(error_m <= 50.0),
+                    }
+                )
+            except Exception as exc:
+                if status != "rejected":
+                    status = "error"
+                    reason = f"{type(exc).__name__}: {exc}"
+                LOG.debug(
+                    "Shared search failed | variant=%s query=%s | %s",
+                    variant,
+                    record.query_id,
+                    traceback.format_exc(),
+                )
+            result["status"] = status
+            result["reason"] = reason
+            result["search_seconds"] = time.perf_counter() - row_started
+            for column in RESULT_COLUMNS:
+                result.setdefault(column, None)
+            outputs.append((variant, record, mode_name, result))
+        return outputs
+
+    started = time.perf_counter()
+    executor: ThreadPoolExecutor | None = None
+    if search_workers == 1:
+        evaluated = map(evaluate_task, tasks)
+    else:
+        executor = ThreadPoolExecutor(
+            max_workers=search_workers,
+            thread_name_prefix=f"shared-search-{model_id[:18]}",
+        )
+        evaluated = executor.map(evaluate_task, tasks)
+    completed = 0
+    last_progress_log = 0.0
+    try:
+        with JsonlBatchWriter(results_jsonl) as checkpoint_writer:
+            for task_results in evaluated:
+                for variant, record, mode_name, result in task_results:
+                    checkpoint_writer.append(result)
+                    done.add((direction, variant, mode_name, model_id, record.query_id))
+                    completed += 1
+                    now = time.monotonic()
+                    if (
+                        completed == 1
+                        or completed == total_results
+                        or completed % 25 == 0
+                        or now - last_progress_log >= 5.0
+                    ):
+                        elapsed = time.perf_counter() - started
+                        rate = completed / max(elapsed, 1e-9)
+                        eta = (total_results - completed) / max(rate, 1e-9)
+                        LOG.info(
+                            "SHARED PROGRESS | model=%s | %d/%d | variant=%s | mode=%s | query=%s | ETA=%.1f min",
+                            model_id,
+                            completed,
+                            total_results,
+                            variant,
+                            mode_name,
+                            record.query_id,
+                            eta / 60.0,
+                        )
+                        last_progress_log = now
+    finally:
+        if executor is not None:
+            executor.shutdown(wait=True, cancel_futures=False)
+    LOG.info(
+        "SHARED SEARCH COMPLETE | model=%s | variants=%s | results=%d | minutes=%.2f",
+        model_id,
+        ",".join(variant_order),
+        completed,
         (time.perf_counter() - started) / 60.0,
     )
 
@@ -1927,7 +2648,332 @@ def aggregate_results(
     return summary
 
 
-def write_summary_files(
+SUMMARY_COMPACT_COLUMNS = (
+    "block_id",
+    "status",
+    "error_m",
+    "search_seconds",
+    "top1_score",
+)
+
+
+def atomic_write_json(path: Path, value: Any, *, compact: bool = False) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    with temporary.open("w", encoding="utf-8", newline="\n") as handle:
+        json.dump(
+            value,
+            handle,
+            indent=None if compact else 2,
+            separators=(",", ":") if compact else None,
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, path)
+
+
+def summary_group_key(row: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        str(row.get("direction", "")),
+        str(row.get("query_variant", "clean")),
+        str(row.get("search_mode", "global")),
+        str(row.get("model_id", "")),
+    )
+
+
+def summary_group_token(key: tuple[str, str, str, str]) -> str:
+    canonical = json.dumps(key, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def compact_summary_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {column: row.get(column) for column in SUMMARY_COMPACT_COLUMNS}
+
+
+def hydrate_summary_rows(
+    key: tuple[str, str, str, str], rows: Sequence[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    direction, query_variant, search_mode, model_id = key
+    return [
+        {
+            "direction": direction,
+            "query_variant": query_variant,
+            "search_mode": search_mode,
+            "model_id": model_id,
+            **row,
+        }
+        for row in rows
+    ]
+
+
+def file_region_sha256(path: Path, start: int, end: int) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        handle.seek(start)
+        remaining = max(0, end - start)
+        while remaining:
+            block = handle.read(min(remaining, 1024 * 1024))
+            if not block:
+                break
+            digest.update(block)
+            remaining -= len(block)
+    return digest.hexdigest()
+
+
+def jsonl_boundary_fingerprint(path: Path, offset: int) -> dict[str, Any]:
+    head_end = min(offset, 4096)
+    tail_start = max(0, offset - 4096)
+    return {
+        "offset": offset,
+        "head_sha256": file_region_sha256(path, 0, head_end),
+        "tail_start": tail_start,
+        "tail_sha256": file_region_sha256(path, tail_start, offset),
+    }
+
+
+def read_jsonl_from_offset(path: Path, start_offset: int) -> tuple[list[dict[str, Any]], int]:
+    """Read complete appended objects and recover only a corrupt final tail."""
+    if not path.exists():
+        if start_offset:
+            raise ValueError("JSONL disappeared after summary state was created.")
+        return [], 0
+    size = path.stat().st_size
+    if start_offset < 0 or start_offset > size:
+        raise ValueError(f"Invalid JSONL byte offset {start_offset} for size {size}.")
+    with path.open("rb") as handle:
+        if start_offset:
+            handle.seek(start_offset - 1)
+            if handle.read(1) != b"\n":
+                raise ValueError("JSONL summary offset is not on a line boundary.")
+        handle.seek(start_offset)
+        rows: list[dict[str, Any]] = []
+        line_number = 0
+        valid_end = start_offset
+        while True:
+            line_start = handle.tell()
+            raw_line = handle.readline()
+            if not raw_line:
+                break
+            line_number += 1
+            if not raw_line.strip():
+                valid_end = handle.tell()
+                continue
+            try:
+                row = json.loads(raw_line.decode("utf-8"))
+                if not isinstance(row, dict):
+                    raise ValueError("JSONL row is not an object")
+            except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+                remaining = handle.read()
+                if remaining.strip():
+                    raise ValueError(
+                        f"Invalid JSONL in the middle of appended data at byte {line_start}: {exc}"
+                    ) from exc
+                bad_tail = raw_line + remaining
+                recovery_path = path.with_name(
+                    f"{path.name}.recovery_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.bin"
+                )
+                with recovery_path.open("xb") as recovery:
+                    recovery.write(bad_tail)
+                    recovery.flush()
+                    os.fsync(recovery.fileno())
+                with path.open("r+b") as repair:
+                    repair.truncate(line_start)
+                    repair.flush()
+                    os.fsync(repair.fileno())
+                LOG.warning(
+                    "CORRUPT JSONL TAIL RECOVERED | byte=%d | recovery=%s",
+                    line_start,
+                    recovery_path,
+                )
+                valid_end = line_start
+                break
+            rows.append(row)
+            valid_end = handle.tell()
+    return rows, valid_end
+
+
+def summary_state_metadata(config: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "state_schema_version": SUMMARY_STATE_SCHEMA_VERSION,
+        "summary_schema_version": 5,
+        "scientific_semantics_version": config.get(
+            "scientific_semantics_version", SCIENTIFIC_SEMANTICS_VERSION
+        ),
+        "bootstrap_iterations": int(config.get("bootstrap_iterations", 1000)),
+        "seed": int(config.get("seed", 42)),
+    }
+
+
+def summary_state_is_valid(
+    state: dict[str, Any],
+    *,
+    metadata: dict[str, Any],
+    results_path: Path,
+) -> bool:
+    if state.get("metadata") != metadata or not results_path.is_file():
+        return False
+    boundary = state.get("jsonl_boundary")
+    if not isinstance(boundary, dict):
+        return False
+    try:
+        offset = int(boundary["offset"])
+        if offset < 0 or offset > results_path.stat().st_size:
+            return False
+        expected = jsonl_boundary_fingerprint(results_path, offset)
+        return expected == boundary
+    except (OSError, KeyError, TypeError, ValueError):
+        return False
+
+
+def rebuild_summary_state(
+    run_dir: Path,
+    rows: Sequence[dict[str, Any]],
+    *,
+    metadata: dict[str, Any],
+    results_offset: int,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    state_root = run_dir / ".summary_state"
+    group_root = state_root / "groups"
+    group_root.mkdir(parents=True, exist_ok=True)
+    grouped: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
+    for row in rows:
+        grouped.setdefault(summary_group_key(row), []).append(compact_summary_row(row))
+    entries: dict[str, Any] = {}
+    summaries: list[dict[str, Any]] = []
+    for key, group_rows in sorted(grouped.items(), key=result_group_sort_key):
+        token = summary_group_token(key)
+        summary = aggregate_results(
+            hydrate_summary_rows(key, group_rows),
+            bootstrap_iterations=int(metadata["bootstrap_iterations"]),
+            seed=int(metadata["seed"]),
+        )[0]
+        payload = {"key": list(key), "rows": group_rows, "summary": summary}
+        relative = f"groups/{token}.json"
+        atomic_write_json(state_root / relative, payload, compact=True)
+        entries[token] = {
+            "key": list(key),
+            "file": relative,
+            "row_count": len(group_rows),
+            "summary": summary,
+        }
+        summaries.append(summary)
+    state = {
+        "metadata": metadata,
+        "jsonl_boundary": jsonl_boundary_fingerprint(run_dir / "results.jsonl", results_offset),
+        "groups": entries,
+        "updated_at_utc": utc_now_iso(),
+    }
+    atomic_write_json(state_root / "summary_state.json", state, compact=True)
+    return state, summaries
+
+
+def update_incremental_summary_state(
+    run_dir: Path,
+    *,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any], list[dict[str, Any]], int, bool]:
+    results_path = run_dir / "results.jsonl"
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    results_path.touch(exist_ok=True)
+    state_root = run_dir / ".summary_state"
+    state_path = state_root / "summary_state.json"
+    state: dict[str, Any] = {}
+    if state_path.is_file():
+        try:
+            candidate = json.loads(state_path.read_text(encoding="utf-8"))
+            if isinstance(candidate, dict):
+                state = candidate
+        except (OSError, json.JSONDecodeError):
+            state = {}
+    if not summary_state_is_valid(state, metadata=metadata, results_path=results_path):
+        rows = read_jsonl(results_path)
+        offset = results_path.stat().st_size if results_path.exists() else 0
+        state, summaries = rebuild_summary_state(
+            run_dir,
+            rows,
+            metadata=metadata,
+            results_offset=offset,
+        )
+        LOG.info("SUMMARY STATE REBUILT | rows=%d | groups=%d", len(rows), len(summaries))
+        return state, summaries, len(rows), True
+
+    offset = int(state["jsonl_boundary"]["offset"])
+    new_rows, new_offset = read_jsonl_from_offset(results_path, offset)
+    groups = state.setdefault("groups", {})
+    touched: dict[str, dict[str, Any]] = {}
+    for row in new_rows:
+        key = summary_group_key(row)
+        token = summary_group_token(key)
+        touched.setdefault(token, {"key": key, "rows": []})["rows"].append(
+            compact_summary_row(row)
+        )
+    try:
+        for token, touched_group in touched.items():
+            key = tuple(touched_group["key"])
+            appended = touched_group["rows"]
+            entry = groups.get(token)
+            group_rows: list[dict[str, Any]] = []
+            relative = f"groups/{token}.json"
+            if isinstance(entry, dict):
+                relative = str(entry.get("file", relative))
+                payload = json.loads((state_root / relative).read_text(encoding="utf-8"))
+                if tuple(payload.get("key", ())) != key:
+                    raise ValueError(f"Summary group key mismatch for {token}")
+                group_rows = [row for row in payload.get("rows", []) if isinstance(row, dict)]
+                if len(group_rows) != int(entry.get("row_count", -1)):
+                    raise ValueError(f"Summary group row count mismatch for {token}")
+            group_rows.extend(appended)
+            summary = aggregate_results(
+                hydrate_summary_rows(key, group_rows),
+                bootstrap_iterations=int(metadata["bootstrap_iterations"]),
+                seed=int(metadata["seed"]),
+            )[0]
+            atomic_write_json(
+                state_root / relative,
+                {"key": list(key), "rows": group_rows, "summary": summary},
+                compact=True,
+            )
+            groups[token] = {
+                "key": list(key),
+                "file": relative,
+                "row_count": len(group_rows),
+                "summary": summary,
+            }
+    except (OSError, ValueError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        LOG.warning("Incremental summary cache invalid; rebuilding from JSONL: %s", exc)
+        rows = read_jsonl(results_path)
+        new_offset = results_path.stat().st_size if results_path.exists() else 0
+        state, summaries = rebuild_summary_state(
+            run_dir,
+            rows,
+            metadata=metadata,
+            results_offset=new_offset,
+        )
+        return state, summaries, len(rows), True
+
+    state["jsonl_boundary"] = jsonl_boundary_fingerprint(results_path, new_offset)
+    state["updated_at_utc"] = utc_now_iso()
+    atomic_write_json(state_path, state, compact=True)
+    summaries = [
+        entry["summary"]
+        for _, entry in sorted(
+            groups.items(),
+            key=lambda item: result_group_sort_key((tuple(item[1]["key"]), None)),
+        )
+    ]
+    LOG.info(
+        "INCREMENTAL SUMMARY | new_rows=%d | touched_groups=%d | total_groups=%d",
+        len(new_rows),
+        len(touched),
+        len(summaries),
+    )
+    return state, summaries, len(new_rows), False
+
+
+def write_summary_files_legacy(
     run_dir: Path, *, write_results_csv: bool = True
 ) -> tuple[Path, Path]:
     result_rows = read_jsonl(run_dir / "results.jsonl")
@@ -2031,6 +3077,73 @@ def write_summary_files(
     csv_write(summary_csv, summary, columns)
     summary_metadata_path.write_text(
         json.dumps(current_metadata, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    return summary_json, summary_csv
+
+
+def write_summary_files(
+    run_dir: Path, *, write_results_csv: bool = True
+) -> tuple[Path, Path]:
+    """Publish summaries using an incremental cache, with final full verification."""
+    config_path = run_dir / "run_config.json"
+    config = json.loads(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
+    metadata = summary_state_metadata(config)
+    _, incremental_summary, new_row_count, state_rebuilt = update_incremental_summary_state(
+        run_dir,
+        metadata=metadata,
+    )
+    summary = incremental_summary
+    equivalence = "checkpoint_not_full_verified"
+
+    if write_results_csv:
+        # A normal completion deliberately performs one authoritative full pass.
+        # It both creates the large CSV export and proves the disposable
+        # incremental cache is scientifically identical to JSONL truth.
+        full_rows = read_jsonl(run_dir / "results.jsonl")
+        csv_write(run_dir / "results.csv", full_rows, RESULT_COLUMNS)
+        full_summary = aggregate_results(
+            full_rows,
+            bootstrap_iterations=int(metadata["bootstrap_iterations"]),
+            seed=int(metadata["seed"]),
+        )
+        if full_summary == incremental_summary:
+            equivalence = "exact_match"
+        else:
+            equivalence = "mismatch_rebuilt_from_jsonl"
+            LOG.error(
+                "INCREMENTAL SUMMARY MISMATCH | JSONL full result wins; cache is being rebuilt."
+            )
+            offset = (run_dir / "results.jsonl").stat().st_size
+            rebuild_summary_state(
+                run_dir,
+                full_rows,
+                metadata=metadata,
+                results_offset=offset,
+            )
+        summary = full_summary
+
+    summary_json = run_dir / "summary.json"
+    summary_csv = run_dir / "summary.csv"
+    summary_metadata_path = run_dir / "summary_metadata.json"
+    atomic_write_json(summary_json, summary)
+    columns = (
+        list(summary[0].keys())
+        if summary
+        else ["direction", "query_variant", "search_mode", "model_id"]
+    )
+    summary_csv_tmp = summary_csv.with_name(f".{summary_csv.name}.{os.getpid()}.tmp")
+    csv_write(summary_csv_tmp, summary, columns)
+    os.replace(summary_csv_tmp, summary_csv)
+    atomic_write_json(
+        summary_metadata_path,
+        {
+            **metadata,
+            "incremental_equivalence": equivalence,
+            "state_rebuilt": state_rebuilt,
+            "new_rows_processed": new_row_count,
+            "group_count": len(summary),
+            "updated_at_utc": utc_now_iso(),
+        },
     )
     return summary_json, summary_csv
 
@@ -2281,12 +3394,10 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
     shared_tiles = direction_dir / "map_shared_tiles"
     metadata: dict[str, Any] | None = None
     if args.include_models:
-        metadata = ensure_shared_map_tiles(
+        metadata = streaming_map_metadata(
             map_raster,
-            shared_tiles,
             tile_size=args.tile_size,
             overlap=args.overlap,
-            force=args.force_maps,
         )
 
     results_jsonl = run_dir / "results.jsonl"
@@ -2316,33 +3427,32 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                 search_modes=args.search_modes,
             )
             try:
-                for query_variant, variant_queries in pending_raw_variants:
-                    run_searches_for_representation(
-                        run_id=args.run_id,
-                        direction=direction,
-                        query_variant=query_variant,
-                        model_id=RAW_MODEL_ID,
-                        model_file="",
-                        model_sha256="",
-                        map_path=map_raster,
-                        prepared_map=raw_search_map,
-                        map_build_seconds=0.0,
-                        queries=variant_queries,
-                        query_paths=None,
-                        query_inference_total_seconds=0.0,
-                        crop_border=args.crop_border,
-                        search_modes=args.search_modes,
-                        factors=args.pyramid_factors,
-                        top_k=args.top_k,
-                        refine_radius_px=args.refine_radius_px,
-                        nms_radius_px=args.nms_radius_px,
-                        normalization="RAW",
-                        source_query_raster=query_raster,
-                        source_map_raster=map_raster,
-                        results_jsonl=results_jsonl,
-                        done=done,
-                        search_workers=args.search_workers,
-                    )
+                run_searches_for_variants(
+                    run_id=args.run_id,
+                    direction=direction,
+                    model_id=RAW_MODEL_ID,
+                    model_file="",
+                    model_sha256="",
+                    map_path=map_raster,
+                    prepared_map=raw_search_map,
+                    map_build_seconds=0.0,
+                    variant_inputs=[
+                        (query_variant, variant_queries, None, 0.0)
+                        for query_variant, variant_queries in pending_raw_variants
+                    ],
+                    crop_border=args.crop_border,
+                    search_modes=args.search_modes,
+                    factors=args.pyramid_factors,
+                    top_k=args.top_k,
+                    refine_radius_px=args.refine_radius_px,
+                    nms_radius_px=args.nms_radius_px,
+                    normalization="RAW",
+                    source_query_raster=query_raster,
+                    source_map_raster=map_raster,
+                    results_jsonl=results_jsonl,
+                    done=done,
+                    search_workers=args.search_workers,
+                )
             finally:
                 del raw_search_map
 
@@ -2394,51 +3504,67 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                     model_path.name,
                 )
                 continue
-            model_map, map_seconds = build_model_map(
-                model_path,
-                model_root,
-                shared_tiles,
-                metadata,
-                map_raster,
-                tile_size=args.tile_size,
-                overlap=args.overlap,
-                batch_size=args.batch_size,
+            Runtime = import_loaded_model_runtime()
+            model_runtime = Runtime.load(
+                str(model_path),
+                color_mode="grayscale",
                 normalization=args.normalization,
                 enhancement=args.enhancement,
-                force=args.force_maps,
-                keep_intermediate=args.keep_intermediate,
-            )
-            model_search_map = prepare_search_map(
-                model_map,
-                model_id=model_id,
-                factors=args.pyramid_factors,
-                search_modes=args.search_modes,
+                require_gpu=True,
+                output_value_mode=args.output_value_mode,
             )
             try:
-                for query_variant, variant_queries in pending_model_variants:
-                    query_paths, query_seconds = build_model_queries(
-                        model_path,
-                        variant_queries,
-                        model_root / "query_model_tiles" / query_variant,
-                        tile_size=args.tile_size,
-                        batch_size=args.batch_size,
-                        normalization=args.normalization,
-                        enhancement=args.enhancement,
-                        force=args.force_queries,
-                    )
-                    run_searches_for_representation(
+                model_map, map_seconds = build_model_map(
+                    model_path,
+                    model_root,
+                    shared_tiles,
+                    metadata,
+                    map_raster,
+                    tile_size=args.tile_size,
+                    overlap=args.overlap,
+                    batch_size=args.batch_size,
+                    normalization=args.normalization,
+                    enhancement=args.enhancement,
+                    force=args.force_maps,
+                    keep_intermediate=args.keep_intermediate,
+                    model_runtime=model_runtime,
+                    model_sha256=model_sha,
+                )
+                model_search_map = prepare_search_map(
+                    model_map,
+                    model_id=model_id,
+                    factors=args.pyramid_factors,
+                    search_modes=args.search_modes,
+                )
+                try:
+                    model_variant_inputs: list[
+                        tuple[str, Sequence[QueryRecord], dict[str, Path] | None, float]
+                    ] = []
+                    for query_variant, variant_queries in pending_model_variants:
+                        query_paths, query_seconds = build_model_queries(
+                            model_path,
+                            variant_queries,
+                            model_root / "query_model_tiles" / query_variant,
+                            tile_size=args.tile_size,
+                            batch_size=args.batch_size,
+                            normalization=args.normalization,
+                            enhancement=args.enhancement,
+                            force=args.force_queries,
+                            model_runtime=model_runtime,
+                        )
+                        model_variant_inputs.append(
+                            (query_variant, variant_queries, query_paths, query_seconds)
+                        )
+                    run_searches_for_variants(
                         run_id=args.run_id,
                         direction=direction,
-                        query_variant=query_variant,
                         model_id=model_id,
                         model_file=str(model_path.resolve()),
                         model_sha256=model_sha,
                         map_path=model_map,
                         prepared_map=model_search_map,
                         map_build_seconds=map_seconds,
-                        queries=variant_queries,
-                        query_paths=query_paths,
-                        query_inference_total_seconds=query_seconds,
+                        variant_inputs=model_variant_inputs,
                         crop_border=args.crop_border,
                         search_modes=args.search_modes,
                         factors=args.pyramid_factors,
@@ -2452,8 +3578,10 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                         done=done,
                         search_workers=args.search_workers,
                     )
+                finally:
+                    del model_search_map
             finally:
-                del model_search_map
+                model_runtime.close()
         except Exception as exc:
             LOG.error("MODEL BAŞARISIZ | %s | %s", model_path.name, exc)
             LOG.debug("Model traceback:\n%s", traceback.format_exc())
@@ -2583,6 +3711,15 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["minus1_1", "zero_1", "raw", "zscore"],
         default="minus1_1",
     )
+    parser.add_argument(
+        "--output-value-mode",
+        choices=["auto", "tanh", "sigmoid", "raw"],
+        default="auto",
+        help=(
+            "Model output scale. auto uses the final activation or infers once from the first batch; "
+            "ambiguous ranges fail closed."
+        ),
+    )
     parser.add_argument("--enhancement", choices=["none", "hist_eq", "clahe"], default="none")
     parser.add_argument("--keep-intermediate", action="store_true")
     parser.add_argument("--force-queries", action="store_true")
@@ -2640,7 +3777,8 @@ def resume_signature_payload(args: argparse.Namespace) -> dict[str, Any]:
         }
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "scientific_semantics_version": SCIENTIFIC_SEMANTICS_VERSION,
         "query_raster": raster_identity(args.query_raster),
         "map_raster": raster_identity(args.map_raster),
         "model_dir": str(args.model_dir.resolve()),
@@ -2670,6 +3808,7 @@ def resume_signature_payload(args: argparse.Namespace) -> dict[str, Any]:
         "nms_radius_px": args.nms_radius_px,
         "batch_size": args.batch_size,
         "normalization": args.normalization,
+        "output_value_mode": args.output_value_mode,
         "enhancement": args.enhancement,
         "hard_v1_profile": HARD_V1_PROFILE if "hard_v1" in args.query_variants else None,
     }
@@ -2708,6 +3847,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     resume_signature = signature_sha256(resume_payload)
     if config_path.is_file() and results_path.is_file():
         previous_config = json.loads(config_path.read_text(encoding="utf-8"))
+        previous_semantics = previous_config.get("scientific_semantics_version")
+        if previous_semantics != SCIENTIFIC_SEMANTICS_VERSION:
+            raise RuntimeError(
+                "This run uses an older scientific semantics version "
+                f"({previous_semantics!r}); current={SCIENTIFIC_SEMANTICS_VERSION}. "
+                "Do not mix centre conventions. Start a new --run-id."
+            )
         previous_signature = previous_config.get("resume_signature")
         if previous_signature is not None and previous_signature != resume_signature:
             raise RuntimeError(
@@ -2740,6 +3886,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         {"name": name, "roi_radius_m": radius} for name, radius in args.search_modes
     ]
     config["hard_v1_profile"] = HARD_V1_PROFILE
+    config["scientific_semantics_version"] = SCIENTIFIC_SEMANTICS_VERSION
     config["resume_signature_payload"] = resume_payload
     config["resume_signature"] = resume_signature
     config["created_at_utc"] = utc_now_iso()

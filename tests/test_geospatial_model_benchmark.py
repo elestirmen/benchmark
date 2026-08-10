@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import argparse
+import logging
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -15,7 +17,6 @@ from affine import Affine
 
 
 BENCHMARK_DIR = Path(__file__).resolve().parents[1]
-import sys
 
 if str(BENCHMARK_DIR) not in sys.path:
     sys.path.insert(0, str(BENCHMARK_DIR))
@@ -28,15 +29,25 @@ from geospatial_model_benchmark import (  # noqa: E402
     QueryRecord,
     aggregate_results,
     augment_hard_v1,
+    build_model_map,
     build_parser,
+    main as benchmark_main,
     build_pyramid,
     coarse_to_fine_search,
+    compute_starts,
     generate_query_manifest,
     invoke_excel_report,
-    prepare_query_variants,
+    model_prediction_to_legacy_gray,
+    parse_patterns,
+    read_jsonl,
     refresh_excel_after_model,
+    run_direction,
     run_searches_for_representation,
+    run_searches_for_variants,
     search_in_mode,
+    select_models,
+    streaming_map_metadata,
+    validate_rasters,
     write_summary_files,
 )
 
@@ -166,6 +177,281 @@ class CheckpointWriterTests(unittest.TestCase):
             results_csv.write_text("sentinel", encoding="utf-8")
             write_summary_files(run_dir, write_results_csv=False)
             self.assertEqual(results_csv.read_text(encoding="utf-8"), "sentinel")
+
+    def test_partial_final_jsonl_line_is_quarantined_and_valid_prefix_survives(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "results.jsonl"
+            path.write_bytes(b'{"row": 1}\n{"row": 2')
+            self.assertEqual(read_jsonl(path), [{"row": 1}])
+            self.assertEqual(path.read_bytes(), b'{"row": 1}\n')
+            recovery = list(path.parent.glob("results.jsonl.recovery_*.bin"))
+            self.assertEqual(len(recovery), 1)
+            self.assertEqual(recovery[0].read_bytes(), b'{"row": 2')
+
+    def test_jsonl_corruption_in_the_middle_fails_fast(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "results.jsonl"
+            original = b'{"row": 1}\nnot-json\n{"row": 3}\n'
+            path.write_bytes(original)
+            with self.assertRaisesRegex(ValueError, "middle"):
+                read_jsonl(path)
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_incremental_summary_reads_only_appended_rows_then_matches_full_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            (run_dir / "run_config.json").write_text(
+                json.dumps(
+                    {
+                        "bootstrap_iterations": 10,
+                        "seed": 42,
+                        "scientific_semantics_version": 2,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            results = run_dir / "results.jsonl"
+            first = {
+                "direction": "A",
+                "query_variant": "clean",
+                "search_mode": "global",
+                "model_id": "M1",
+                "query_id": "Q1",
+                "block_id": "B1",
+                "status": "ok",
+                "error_m": 2.0,
+                "search_seconds": 1.0,
+                "top1_score": 0.9,
+            }
+            results.write_text(json.dumps(first) + "\n", encoding="utf-8")
+            write_summary_files(run_dir, write_results_csv=False)
+            previous_offset = json.loads(
+                (run_dir / ".summary_state" / "summary_state.json").read_text(encoding="utf-8")
+            )["jsonl_boundary"]["offset"]
+            second = {**first, "query_id": "Q2", "error_m": 30.0}
+            with results.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(second) + "\n")
+            with patch(
+                "geospatial_model_benchmark.read_jsonl",
+                side_effect=AssertionError("checkpoint must not scan the full JSONL"),
+            ):
+                write_summary_files(run_dir, write_results_csv=False)
+            state = json.loads(
+                (run_dir / ".summary_state" / "summary_state.json").read_text(encoding="utf-8")
+            )
+            self.assertGreater(state["jsonl_boundary"]["offset"], previous_offset)
+            write_summary_files(run_dir, write_results_csv=True)
+            metadata = json.loads((run_dir / "summary_metadata.json").read_text(encoding="utf-8"))
+            self.assertEqual(metadata["incremental_equivalence"], "exact_match")
+            self.assertEqual(len((run_dir / "results.csv").read_text(encoding="utf-8-sig").splitlines()), 3)
+
+
+class CorrectnessGuardTests(unittest.TestCase):
+    def _write_raster(
+        self,
+        path: Path,
+        *,
+        transform: Affine = Affine(0.3, 0, 600000, 0, -0.3, 4200000),
+        dtype: str = "uint8",
+        seed: int = 1,
+        width: int = 192,
+        height: int = 160,
+    ) -> None:
+        rng = np.random.default_rng(seed)
+        if dtype == "uint8":
+            data = rng.integers(0, 256, size=(3, height, width), dtype=np.uint8)
+        else:
+            data = rng.integers(0, 4096, size=(3, height, width), dtype=np.uint16)
+        with rasterio.open(
+            path,
+            "w",
+            driver="GTiff",
+            height=height,
+            width=width,
+            count=3,
+            dtype=dtype,
+            crs="EPSG:32636",
+            transform=transform,
+        ) as dataset:
+            dataset.write(data)
+
+    def test_hdf5_is_part_of_default_discovery(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            for name in ("a.h5", "b.keras", "c.hdf5", "ignore.txt"):
+                (model_dir / name).write_bytes(b"x")
+            self.assertEqual(parse_patterns(None), ("*.h5", "*.keras", "*.hdf5"))
+            self.assertEqual(
+                [path.name for path in select_models(model_dir, parse_patterns(None), None)],
+                ["a.h5", "b.keras", "c.hdf5"],
+            )
+
+    def test_output_conversion_modes_are_non_overlapping_and_explicit(self) -> None:
+        from goruntu_islemleri import prediction_to_uint8
+
+        sigmoid = np.asarray([[0.0, 0.5, 1.0]], dtype=np.float32)
+        tanh = np.asarray([[-1.0, 0.0, 1.0]], dtype=np.float32)
+        raw = np.asarray([[0.0, 128.0, 255.0]], dtype=np.float32)
+        self.assertTrue(np.array_equal(prediction_to_uint8(sigmoid, "sigmoid"), [[0, 127, 255]]))
+        self.assertTrue(np.array_equal(prediction_to_uint8(tanh, "tanh"), [[0, 127, 255]]))
+        self.assertTrue(np.array_equal(prediction_to_uint8(sigmoid, "auto"), [[0, 127, 255]]))
+        self.assertTrue(np.array_equal(prediction_to_uint8(tanh, "auto"), [[0, 127, 255]]))
+        self.assertTrue(np.array_equal(prediction_to_uint8(raw, "raw"), [[0, 128, 255]]))
+        with self.assertRaisesRegex(ValueError, "ambiguous"):
+            prediction_to_uint8(np.asarray([[-4.0, 500.0]], dtype=np.float32), "auto")
+
+    def test_runtime_direct_and_png_query_paths_are_pixel_equal(self) -> None:
+        from goruntu_islemleri import LoadedModelRuntime
+
+        class FakeRawModel:
+            input_shape = (None, 8, 8, 3)
+            output_shape = (None, 8, 8, 3)
+
+            def predict(self, batch, verbose=0):
+                return batch
+
+        rng = np.random.default_rng(321)
+        rgb = rng.integers(0, 256, size=(8, 8, 3), dtype=np.uint8)
+        runtime = LoadedModelRuntime(
+            FakeRawModel(),
+            model_path="fake.keras",
+            normalization="raw",
+            enhancement="none",
+            output_value_mode="raw",
+        )
+        direct = runtime.predict_images([rgb], image_size=(8, 8), source_color="rgb")[0]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            input_dir = root / "input"
+            output_dir = root / "output"
+            input_dir.mkdir()
+            cv2.imwrite(str(input_dir / "Q00001.png"), cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+            [output_path] = runtime.process_directory(
+                str(input_dir), str(output_dir), image_size=(8, 8), batch_size=1
+            )
+            cached = cv2.imread(output_path, cv2.IMREAD_UNCHANGED)
+        self.assertTrue(np.array_equal(direct, cached))
+
+    def test_raster_gsd_rotation_and_dtype_fail_fast(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            query = root / "query.tif"
+            valid = root / "valid.tif"
+            gsd = root / "gsd.tif"
+            rotated = root / "rotated.tif"
+            uint16 = root / "uint16.tif"
+            self._write_raster(query)
+            self._write_raster(valid, seed=2)
+            self._write_raster(gsd, transform=Affine(0.4, 0, 600000, 0, -0.4, 4200000))
+            self._write_raster(rotated, transform=Affine(0.3, 0.01, 600000, 0, -0.3, 4200000))
+            self._write_raster(uint16, dtype="uint16")
+            validate_rasters(query, valid)
+            with self.assertRaisesRegex(ValueError, "GSD mismatch"):
+                validate_rasters(query, gsd)
+            with self.assertRaisesRegex(ValueError, "rotation/skew"):
+                validate_rasters(query, rotated)
+            with self.assertRaisesRegex(ValueError, "dtype"):
+                validate_rasters(query, uint16)
+
+    def test_manifest_truth_and_perfect_match_use_the_same_even_tile_centre(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            raster_path = root / "same.tif"
+            self._write_raster(raster_path, width=384, height=384, seed=99)
+            records = generate_query_manifest(
+                raster_path,
+                raster_path,
+                root / "queries",
+                tile_size=64,
+                samples_per_block=1,
+                block_size_m=50.0,
+                max_queries=1,
+                seed=42,
+                min_std=1.0,
+                min_entropy=1.0,
+                max_dark_fraction=1.0,
+                edge_buffer_m=0.0,
+                force=True,
+            )
+            record = records[0]
+            with rasterio.open(raster_path) as dataset:
+                expected_e, expected_n = dataset.transform * (record.source_col, record.source_row)
+                map_gray = cv2.cvtColor(
+                    np.moveaxis(dataset.read([1, 2, 3]), 0, -1),
+                    cv2.COLOR_RGB2GRAY,
+                )
+                transform = dataset.transform
+            self.assertAlmostEqual(record.center_easting_m, expected_e, places=9)
+            self.assertAlmostEqual(record.center_northing_m, expected_n, places=9)
+            prepared = PreparedSearchMap(map_gray, transform, build_pyramid(map_gray, (4, 2, 1)))
+            results = root / "results.jsonl"
+            run_searches_for_representation(
+                run_id="perfect",
+                direction="same",
+                query_variant="clean",
+                model_id="RAW_BASELINE",
+                model_file="",
+                model_sha256="",
+                map_path=raster_path,
+                prepared_map=prepared,
+                map_build_seconds=0.0,
+                queries=records,
+                query_paths=None,
+                query_inference_total_seconds=0.0,
+                crop_border=0,
+                search_modes=(("global", None),),
+                factors=(4, 2, 1),
+                top_k=8,
+                refine_radius_px=32,
+                nms_radius_px=32,
+                normalization="RAW",
+                source_query_raster=raster_path,
+                source_map_raster=raster_path,
+                results_jsonl=results,
+                done=set(),
+                search_workers=1,
+            )
+            row = json.loads(results.read_text(encoding="utf-8"))
+            self.assertEqual(row["error_px"], 0.0)
+            self.assertAlmostEqual(row["error_m"], 0.0, places=9)
+            self.assertAlmostEqual(
+                row["predicted_center_easting_m"], row["expected_center_easting_m"], places=9
+            )
+            self.assertAlmostEqual(
+                row["predicted_center_northing_m"], row["expected_center_northing_m"], places=9
+            )
+
+    def test_old_scientific_semantics_checkpoint_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            query = root / "query.tif"
+            map_path = root / "map.tif"
+            self._write_raster(query)
+            self._write_raster(map_path, seed=2)
+            run_dir = root / "old_run"
+            run_dir.mkdir()
+            (run_dir / "run_config.json").write_text(json.dumps({}), encoding="utf-8")
+            (run_dir / "results.jsonl").write_text("{}\n", encoding="utf-8")
+            try:
+                with self.assertRaisesRegex(RuntimeError, "older scientific semantics"):
+                    benchmark_main(
+                        [
+                            "--query-raster",
+                            str(query),
+                            "--map-raster",
+                            str(map_path),
+                            "--resume-run",
+                            str(run_dir),
+                            "--no-include-models",
+                            "--max-queries",
+                            "1",
+                        ]
+                    )
+            finally:
+                logger = logging.getLogger("geospatial_benchmark")
+                for handler in list(logger.handlers):
+                    handler.close()
+                    logger.removeHandler(handler)
 
 
 class DefaultBenchmarkModeTests(unittest.TestCase):
@@ -418,6 +704,376 @@ class ParallelSearchTests(unittest.TestCase):
             serial = [{k: v for k, v in row.items() if k not in ignored} for row in outputs[1]]
             parallel = [{k: v for k, v in row.items() if k not in ignored} for row in outputs[2]]
             self.assertEqual(serial, parallel)
+
+
+class PerformanceEquivalenceTests(unittest.TestCase):
+    class IdentityGrayRuntime:
+        requested_output_value_mode = "raw"
+
+        def predict_images(self, images, *, image_size, source_color="rgb"):
+            self.assert_source_color = source_color
+            return [cv2.cvtColor(image, cv2.COLOR_RGB2GRAY) for image in images]
+
+    def _write_rgb_raster(self, path: Path, *, width: int, height: int) -> np.ndarray:
+        rng = np.random.default_rng(2026)
+        rgb = rng.integers(0, 256, size=(height, width, 3), dtype=np.uint8)
+        with rasterio.open(
+            path,
+            "w",
+            driver="GTiff",
+            height=height,
+            width=width,
+            count=3,
+            dtype="uint8",
+            crs="EPSG:32636",
+            transform=Affine(0.3, 0, 600000, 0, -0.3, 4200000),
+        ) as dataset:
+            dataset.write(np.moveaxis(rgb, -1, 0))
+        return rgb
+
+    def test_streaming_map_is_pixel_equal_to_corrected_legacy_placement(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.tif"
+            rgb = self._write_rgb_raster(source, width=170, height=150)
+            model = root / "identity.keras"
+            model.write_bytes(b"fake")
+            tile_size = 64
+            overlap = 16
+            metadata = streaming_map_metadata(source, tile_size=tile_size, overlap=overlap)
+            output, _ = build_model_map(
+                model,
+                root / "model",
+                root / "unused_tiles",
+                metadata,
+                source,
+                tile_size=tile_size,
+                overlap=overlap,
+                batch_size=3,
+                normalization="minus1_1",
+                enhancement="none",
+                force=True,
+                keep_intermediate=False,
+                model_runtime=self.IdentityGrayRuntime(),
+                model_sha256="fake-sha",
+            )
+            expected = np.zeros(rgb.shape[:2], dtype=np.uint8)
+            crop = overlap // 2
+            y_starts = compute_starts(rgb.shape[0], tile_size, tile_size - overlap)
+            x_starts = compute_starts(rgb.shape[1], tile_size, tile_size - overlap)
+            for i, start_y in enumerate(y_starts):
+                for j, start_x in enumerate(x_starts):
+                    prediction = cv2.cvtColor(
+                        rgb[start_y : start_y + tile_size, start_x : start_x + tile_size],
+                        cv2.COLOR_RGB2GRAY,
+                    )
+                    top = crop if i > 0 else 0
+                    bottom = crop if i < len(y_starts) - 1 else 0
+                    left = crop if j > 0 else 0
+                    right = crop if j < len(x_starts) - 1 else 0
+                    y2 = prediction.shape[0] - bottom if bottom else prediction.shape[0]
+                    x2 = prediction.shape[1] - right if right else prediction.shape[1]
+                    patch_data = prediction[top:y2, left:x2]
+                    dest_y, dest_x = start_y + top, start_x + left
+                    expected[
+                        dest_y : dest_y + patch_data.shape[0],
+                        dest_x : dest_x + patch_data.shape[1],
+                    ] = patch_data
+            with rasterio.open(output) as dataset:
+                actual = dataset.read(1)
+                self.assertEqual(dataset.transform, Affine(0.3, 0, 600000, 0, -0.3, 4200000))
+                self.assertEqual(str(dataset.crs), "EPSG:32636")
+            self.assertEqual(actual.dtype, expected.dtype)
+            self.assertTrue(np.array_equal(actual, expected))
+            self.assertEqual(list((root / "model").rglob("*.png")), [])
+
+    def test_three_channel_streaming_gray_matches_legacy_bgr_conversion(self) -> None:
+        prediction = np.asarray(
+            [[[10, 20, 200], [200, 20, 10]], [[0, 100, 255], [255, 100, 0]]],
+            dtype=np.uint8,
+        )
+        expected = cv2.cvtColor(prediction, cv2.COLOR_BGR2GRAY)
+        self.assertTrue(
+            np.array_equal(model_prediction_to_legacy_gray(prediction), expected)
+        )
+
+    def test_clean_and_hard_share_one_roi_pyramid_with_numeric_equality(self) -> None:
+        rng = np.random.default_rng(77)
+        map_gray = rng.integers(0, 256, size=(320, 352), dtype=np.uint8)
+        transform = Affine(1, 0, 500000, 0, -1, 4200000)
+        row, col, size = 120, 140, 64
+        tile = map_gray[row : row + size, col : col + size]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            records = []
+            for variant in ("clean", "hard_v1"):
+                path = root / f"{variant}.png"
+                self.assertTrue(cv2.imwrite(str(path), tile))
+                records.append(
+                    (
+                        variant,
+                        [
+                            QueryRecord(
+                                query_id="Q00001",
+                                block_id="B1",
+                                center_easting_m=500000 + col + size / 2,
+                                center_northing_m=4200000 - row - size / 2,
+                                source_row=row + size // 2,
+                                source_col=col + size // 2,
+                                query_std=float(np.std(tile)),
+                                query_entropy=7.0,
+                                dark_fraction=0.0,
+                                raw_tile_file=str(path),
+                            )
+                        ],
+                        None,
+                        0.0,
+                    )
+                )
+            prepared = PreparedSearchMap(map_gray, transform, None)
+            shared_jsonl = root / "shared.jsonl"
+            original_build = build_pyramid
+            with patch(
+                "geospatial_model_benchmark.build_pyramid",
+                wraps=original_build,
+            ) as pyramid_builder:
+                run_searches_for_variants(
+                    run_id="shared",
+                    direction="synthetic",
+                    model_id="RAW_BASELINE",
+                    model_file="",
+                    model_sha256="",
+                    map_path=root / "map.tif",
+                    prepared_map=prepared,
+                    map_build_seconds=0.0,
+                    variant_inputs=records,
+                    crop_border=0,
+                    search_modes=(("roi_100m", 100.0),),
+                    factors=(4, 2, 1),
+                    top_k=5,
+                    refine_radius_px=32,
+                    nms_radius_px=16,
+                    normalization="RAW",
+                    source_query_raster=root / "query.tif",
+                    source_map_raster=root / "map.tif",
+                    results_jsonl=shared_jsonl,
+                    done=set(),
+                    search_workers=1,
+                )
+            self.assertEqual(pyramid_builder.call_count, 1)
+            shared_rows = read_jsonl(shared_jsonl)
+            self.assertEqual(len(shared_rows), 2)
+            ignored = {"query_variant", "created_at_utc", "search_seconds"}
+            first = {key: value for key, value in shared_rows[0].items() if key not in ignored}
+            second = {key: value for key, value in shared_rows[1].items() if key not in ignored}
+            self.assertEqual(first, second)
+
+            legacy_jsonl = root / "legacy.jsonl"
+            for variant, variant_records, _, _ in records:
+                run_searches_for_representation(
+                    run_id="shared",
+                    direction="synthetic",
+                    query_variant=variant,
+                    model_id="RAW_BASELINE",
+                    model_file="",
+                    model_sha256="",
+                    map_path=root / "map.tif",
+                    prepared_map=prepared,
+                    map_build_seconds=0.0,
+                    queries=variant_records,
+                    query_paths=None,
+                    query_inference_total_seconds=0.0,
+                    crop_border=0,
+                    search_modes=(("roi_100m", 100.0),),
+                    factors=(4, 2, 1),
+                    top_k=5,
+                    refine_radius_px=32,
+                    nms_radius_px=16,
+                    normalization="RAW",
+                    source_query_raster=root / "query.tif",
+                    source_map_raster=root / "map.tif",
+                    results_jsonl=legacy_jsonl,
+                    done=set(),
+                    search_workers=1,
+                )
+            legacy_rows = read_jsonl(legacy_jsonl)
+            allowed_differences = {"created_at_utc", "search_seconds"}
+            self.assertEqual(
+                [
+                    {key: value for key, value in row.items() if key not in allowed_differences}
+                    for row in shared_rows
+                ],
+                [
+                    {key: value for key, value in row.items() if key not in allowed_differences}
+                    for row in legacy_rows
+                ],
+            )
+
+    def test_one_model_runtime_is_loaded_once_for_map_clean_and_hard(self) -> None:
+        class FakeRuntime:
+            load_calls = 0
+            close_calls = 0
+
+            @classmethod
+            def load(cls, *args, **kwargs):
+                cls.load_calls += 1
+                return cls()
+
+            def close(self):
+                type(self).close_calls += 1
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            query = root / "query.tif"
+            map_path = root / "map.tif"
+            self._write_rgb_raster(query, width=128, height=128)
+            self._write_rgb_raster(map_path, width=128, height=128)
+            model_dir = root / "models"
+            model_dir.mkdir()
+            (model_dir / "model.keras").write_bytes(b"fake")
+            tile_path = root / "Q00001.png"
+            cv2.imwrite(str(tile_path), np.full((64, 64), 128, dtype=np.uint8))
+            record = QueryRecord(
+                query_id="Q00001",
+                block_id="B1",
+                center_easting_m=600010.0,
+                center_northing_m=4199990.0,
+                source_row=32,
+                source_col=32,
+                query_std=20.0,
+                query_entropy=5.0,
+                dark_fraction=0.0,
+                raw_tile_file=str(tile_path),
+            )
+            args = SimpleNamespace(
+                tile_size=64,
+                overlap=16,
+                samples_per_block=1,
+                block_size_m=50.0,
+                max_queries=1,
+                seed=42,
+                min_query_std=1.0,
+                min_query_entropy=1.0,
+                max_dark_fraction=1.0,
+                query_edge_buffer_m=0.0,
+                force_queries=False,
+                query_variants=("clean", "hard_v1"),
+                include_models=True,
+                include_raw=False,
+                models=None,
+                model_dir=model_dir,
+                max_models=None,
+                run_id="runtime_once",
+                search_modes=(("global", None),),
+                pyramid_factors=(4, 2, 1),
+                top_k=5,
+                refine_radius_px=16,
+                nms_radius_px=16,
+                batch_size=16,
+                normalization="minus1_1",
+                enhancement="none",
+                output_value_mode="auto",
+                force_maps=False,
+                keep_intermediate=False,
+                crop_border=8,
+                search_workers=1,
+                fail_fast=True,
+                excel_update="model",
+                excel_engine="openpyxl",
+            )
+            prepared = PreparedSearchMap(np.zeros((128, 128), dtype=np.uint8), Affine.identity(), {})
+            with (
+                patch("geospatial_model_benchmark.generate_query_manifest", return_value=[record]),
+                patch(
+                    "geospatial_model_benchmark.prepare_query_variants",
+                    return_value={"clean": [record], "hard_v1": [record]},
+                ),
+                patch("geospatial_model_benchmark.import_loaded_model_runtime", return_value=FakeRuntime),
+                patch("geospatial_model_benchmark.build_model_map", return_value=(map_path, 1.0)),
+                patch("geospatial_model_benchmark.prepare_search_map", return_value=prepared),
+                patch(
+                    "geospatial_model_benchmark.build_model_queries",
+                    return_value=({record.query_id: tile_path}, 1.0),
+                ) as build_queries,
+                patch("geospatial_model_benchmark.run_searches_for_variants") as shared_search,
+                patch("geospatial_model_benchmark.refresh_excel_after_model"),
+            ):
+                run_direction(args, root / "run", query, map_path)
+            self.assertEqual(FakeRuntime.load_calls, 1)
+            self.assertEqual(FakeRuntime.close_calls, 1)
+            self.assertEqual(build_queries.call_count, 2)
+            self.assertEqual(shared_search.call_count, 1)
+
+    def test_progress_info_is_throttled_below_result_count(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            tile = np.arange(64, dtype=np.uint8).reshape(8, 8)
+            variant_inputs = []
+            for variant in ("clean", "hard_v1"):
+                records = []
+                for index in range(30):
+                    path = root / f"{variant}_{index}.png"
+                    cv2.imwrite(str(path), tile)
+                    records.append(
+                        QueryRecord(
+                            query_id=f"Q{index:05d}",
+                            block_id="B1",
+                            center_easting_m=32.0,
+                            center_northing_m=-32.0,
+                            source_row=32,
+                            source_col=32,
+                            query_std=float(np.std(tile)),
+                            query_entropy=5.0,
+                            dark_fraction=0.0,
+                            raw_tile_file=str(path),
+                        )
+                    )
+                variant_inputs.append((variant, records, None, 0.0))
+            prepared = PreparedSearchMap(
+                np.zeros((64, 64), dtype=np.uint8),
+                Affine.identity(),
+                {1: np.zeros((64, 64), dtype=np.uint8)},
+            )
+            fake_outcome = SimpleNamespace(
+                x=28,
+                y=28,
+                top1_score=1.0,
+                top2_score=0.5,
+                peak_margin=0.5,
+                psr=10.0,
+            )
+            with (
+                patch("geospatial_model_benchmark.coarse_to_fine_search", return_value=fake_outcome),
+                patch("geospatial_model_benchmark.LOG.info") as info,
+            ):
+                run_searches_for_variants(
+                    run_id="progress",
+                    direction="synthetic",
+                    model_id="RAW_BASELINE",
+                    model_file="",
+                    model_sha256="",
+                    map_path=root / "map.tif",
+                    prepared_map=prepared,
+                    map_build_seconds=0.0,
+                    variant_inputs=variant_inputs,
+                    crop_border=0,
+                    search_modes=(("global", None),),
+                    factors=(1,),
+                    top_k=2,
+                    refine_radius_px=8,
+                    nms_radius_px=8,
+                    normalization="RAW",
+                    source_query_raster=root / "query.tif",
+                    source_map_raster=root / "map.tif",
+                    results_jsonl=root / "progress.jsonl",
+                    done=set(),
+                    search_workers=1,
+                )
+            progress_calls = [
+                call for call in info.call_args_list if call.args and call.args[0].startswith("SHARED PROGRESS")
+            ]
+            self.assertLess(len(progress_calls), 60)
+            self.assertLessEqual(len(progress_calls), 5)
 
 
 class ManifestTests(unittest.TestCase):

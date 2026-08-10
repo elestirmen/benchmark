@@ -4,7 +4,7 @@ Aynı sinir ağını hem sorgu parçasına hem arama haritasına uygulayıp, met
 
 ```text
 model(query 544×544)  → 16 px kenar kırpma → 512×512 şablon
-model(tam arama rasterı) → örtüşmeli mozaik → jeoreferanslı GeoTIFF
+model(tam arama rasterı; rasterio window/batch streaming) → doğrudan 1-band jeoreferanslı GeoTIFF
 şablon → çok adaylı kaba–ince TM_CCOEFF_NORMED → UTM hata (m)
 ```
 
@@ -30,14 +30,14 @@ Ham eşleştirme `RAW_BASELINE` olarak ayrı tutulur. Model benchmarkları GPU z
 ```text
 benchmark/
 ├── geospatial_model_benchmark.py   # ana CLI
-├── goruntu_islemleri.py            # karo / inference / mozaik / jeoreferans
+├── goruntu_islemleri.py            # ortak model runtime / inference / legacy yardımcıları
 ├── build_benchmark_excel_openpyxl.py
 ├── environment.yml                 # Windows / Conda / TensorFlow 2.10 CUDA
 ├── requirements_wsl.txt            # WSL2 / güncel TensorFlow CUDA
 ├── gpu_test.py                     # TensorFlow GPU erişim kontrolü
 ├── DATA.md                         # raster gereksinimleri
 ├── PROVENANCE.md                   # kod/model kökeni
-├── models/                         # .h5 / .keras (Git dışı)
+├── models/                         # .h5 / .keras / .hdf5 (Git dışı)
 ├── tests/
 └── outputs/<run_id>/               # koşu çıktıları
 ```
@@ -120,11 +120,14 @@ Varsayılan `--bidirectional`: Google→Bing, sonra Bing→Google. Tek yön içi
 
 - Sorgular ortak UTM alanından seçilir; 1 km bloklara ayrılır; sabit `--seed` ile bloklu örnekleme.
 - Tüm modeller aynı `query_manifest.json` sorgularını kullanır; `clean` / `hard_v1` aynı merkezleri paylaşır.
+- Bilimsel semantik v2'de manifest merkezi, seçilen sürekli rastgele nokta değil gerçekten çıkarılan çift-boyutlu karonun geometrik merkezidir. 544→512 simetrik kırpma merkezi değiştirmez.
 - Varsayılan: blok başına en fazla 5 sorgu, yön başına 300 sorgu.
 - Her model iki tarafta da aynı kanal, normalizasyon, karo ve kırpma ayarını kullanır.
+- Query/map rasterları aynı CRS ve GSD'ye, kuzey-yukarı rotasyonsuz affine dönüşüme ve desteklenen `uint8` bantlara sahip olmalıdır; benchmark sessiz reprojection, resampling veya dtype truncation yapmaz.
 - Top-1 yanında Top-2, peak margin ve PSR kaydedilir; hata GeoTIFF transformundan UTM metreye çevrilir.
 - ROI ve global sonuçlar birleştirilmez; ayrı özetlenir.
 - Sonuçlar tek doğruluk kaynağı olan `results.jsonl` dosyasına 100 satır veya en geç 2 saniyelik paketlerle yazılır; her model sonunda tampon kesin olarak boşaltılır ve özet + hafif Excel güncellenir.
+- Model sonu özetleri `.summary_state/` altındaki silinebilir artımlı cache ile yalnız yeni JSONL byte aralığından güncellenir. State eksik/bozuk/uyumsuzsa JSONL'den baştan kurulur; normal finalde tam JSONL özetiyle birebir karşılaştırılır.
 - Kenar tamponu: varsayılan bir tam sorgu karosu (~162 m @ 30 cm GSD); merkezler sınırdan ~244 m içeride. Özel değer: `--query-edge-buffer-m 300`.
 
 ## Çalıştırma
@@ -171,7 +174,9 @@ python geospatial_model_benchmark.py `
   --run-id urgup_tum_modeller_300
 ```
 
-`clean,hard_v1` sorgu yükünü ~2× artırır; model haritası yön×model başına bir kez üretilir. İki yönlü çalışma da maliyeti ~2× yapar.
+`clean,hard_v1` sorgu yükünü ~2× artırır; model yön başına bir kez yüklenir ve aynı runtime map, clean ve hard_v1 inference boyunca kullanılır. Aynı `(query_id, ROI modu)` harita piramidi clean/hard_v1 arasında paylaşılır. İki yönlü çalışma maliyeti yaklaşık 2× yapar.
+
+Model haritası varsayılan olarak GeoTIFF pencerelerini doğrudan batch RAM'e okuyup final GeoTIFF'e yazar; binlerce ara map PNG'si oluşturmaz. İnceleme için `--keep-intermediate` verilirse kaynak/prediction karoları ve debug mozaiği ayrıca saklanır.
 
 Arama varsayılanı `--search-workers 8` (güvenli aralık 1–8). İşçiler harita ve piramitleri salt-okunur paylaşır; checkpoint tek koordinatörde yazılır. Seri referans için `--search-workers 1`. Ürgüp’te 6 mod / 48 görev ölçümünde ~2.5× hızlanma görülmüş; konum/NCC/başarı alanları seri ile birebir aynı kalmıştır.
 
@@ -186,7 +191,9 @@ python geospatial_model_benchmark.py `
   --samples-per-block 5
 ```
 
-Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları kilitler; `--search-workers` imzada değildir.
+Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları ve `SCIENTIFIC_SEMANTICS_VERSION=2` merkez konvansiyonunu kilitler; `--search-workers` imzada değildir.
+
+Semantik v1 veya sürümsüz eski bir sonuç klasörü v2 koduyla resume edilmez; eski/yeni merkez gerçeklerinin karışmaması için açık hata verilir ve yeni `--run-id` gerekir.
 
 Farklı `hard_v1` profiliyle üretilmiş bir klasöre devam edilirse benchmark karıştırmamak için yeni `--run-id` ister.
 
@@ -201,6 +208,7 @@ results.jsonl                    # çalışma sırasında paketli checkpoint
 results.csv                      # yalnız normal final dışa aktarımı
 summary.json / summary.csv
 summary_metadata.json
+.summary_state\                   # silinebilir artımlı özet cache'i
 model_errors.jsonl              # yalnız model hatası oluşursa
 benchmark_results.xlsx
 excel_validation.json
@@ -253,7 +261,7 @@ Sorgu başına ayrıca: UTM/piksel hata, Top-1/Top-2 NCC, peak margin, PSR, sür
 --min-query-std / --min-query-entropy / --max-dark-fraction / --query-edge-buffer-m
 --tile-size 544 / --overlap 32 / --crop-border 16
 --search-workers 8 / --batch-size / --pyramid-factors
---normalization minus1_1 / --enhancement none
+--normalization minus1_1 / --enhancement none / --output-value-mode auto
 --excel-engine auto / --excel-update model / --strict-excel / --no-strict-excel
 --force-queries / --force-maps / --keep-intermediate / --fail-fast / --verbose
 ```
