@@ -45,6 +45,12 @@ REQUIRED_SHEETS = [
     "Yapılandırma",
     "Hatalar",
 ]
+LIGHTWEIGHT_SHEETS = [
+    "Özet",
+    "Model Özeti",
+    "Yapılandırma",
+    "Hatalar",
+]
 
 DARK = "374151"
 DARKER = "1F2937"
@@ -71,14 +77,14 @@ SUMMARY_COLUMNS = [
     "rejected_queries",
     "error_queries",
     "coverage",
-    "success_30m_queries",
-    "success_30m",
-    "success_30m_ci95_low",
-    "success_30m_ci95_high",
-    "success_30m_failure_rate",
-    "auc_30m",
-    "mean_error_under_30m",
-    "median_error_under_30m",
+    "success_25m_queries",
+    "success_25m",
+    "success_25m_ci95_low",
+    "success_25m_ci95_high",
+    "success_25m_failure_rate",
+    "auc_25m",
+    "mean_error_under_25m",
+    "median_error_under_25m",
     "mean_error_m",
     "median_error_m",
     "median_error_ci95_low",
@@ -89,7 +95,6 @@ SUMMARY_COLUMNS = [
     "success_10m",
     "success_10m_ci95_low",
     "success_10m_ci95_high",
-    "success_25m",
     "success_50m",
     "mean_top1_score",
     "mean_search_seconds",
@@ -113,13 +118,13 @@ QUERY_COLUMNS = [
 
 SUMMARY_FORMATS = {
     "coverage": "0.0%",
-    "success_30m": "0.0%",
-    "success_30m_ci95_low": "0.0%",
-    "success_30m_ci95_high": "0.0%",
-    "success_30m_failure_rate": "0.0%",
-    "auc_30m": "0.0%",
-    "mean_error_under_30m": "0.00",
-    "median_error_under_30m": "0.00",
+    "success_25m": "0.0%",
+    "success_25m_ci95_low": "0.0%",
+    "success_25m_ci95_high": "0.0%",
+    "success_25m_failure_rate": "0.0%",
+    "auc_25m": "0.0%",
+    "mean_error_under_25m": "0.00",
+    "median_error_under_25m": "0.00",
     "mean_error_m": "0.00",
     "median_error_m": "0.00",
     "median_error_ci95_low": "0.00",
@@ -130,7 +135,6 @@ SUMMARY_FORMATS = {
     "success_10m": "0.0%",
     "success_10m_ci95_low": "0.0%",
     "success_10m_ci95_high": "0.0%",
-    "success_25m": "0.0%",
     "success_50m": "0.0%",
     "mean_top1_score": "0.0000",
     "mean_search_seconds": "0.000",
@@ -153,7 +157,7 @@ RESULT_FORMATS = {
     "query_std": "0.00",
     "query_entropy": "0.00",
     "query_dark_fraction": "0.0%",
-    "success_30m": "0",
+    "success_25m": "0",
     "search_seconds": "0.000",
     "query_inference_seconds": "0.000",
     "map_build_seconds": "0.0",
@@ -176,6 +180,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--incremental",
         action="store_true",
         help="Var olan rapora yalnızca yeni ham sonuç satırlarını ekler.",
+    )
+    parser.add_argument(
+        "--lightweight",
+        action="store_true",
+        help="Model sonunda yalnız özet, sıralama, yapılandırma ve hataları yazar.",
     )
     parser.add_argument(
         "--validation-mode",
@@ -507,6 +516,8 @@ def write_dashboard(
     config: dict[str, Any],
     summary_rows: Sequence[dict[str, Any]],
     result_chunks: Sequence[tuple[str, int, Sequence[str]]],
+    *,
+    lightweight: bool = False,
 ) -> None:
     ws = wb["Özet"]
     ws.sheet_view.showGridLines = False
@@ -532,6 +543,9 @@ def write_dashboard(
             ws.cell(row=row_index, column=column).alignment = Alignment(vertical="center")
 
     ws["B4"] = config.get("run_id") or "benchmark"
+    summary_column_letters = {
+        name: get_column_letter(index + 1) for index, name in enumerate(SUMMARY_COLUMNS)
+    }
     count_formulas: list[str] = []
     ok_formulas: list[str] = []
     for sheet_name, row_count, columns in result_chunks:
@@ -545,10 +559,16 @@ def write_dashboard(
             ok_formulas.append(
                 f'COUNTIF(\'{sheet_name}\'!{status_letter}2:{status_letter}{last_row},"ok")'
             )
-    ws["B5"] = "=" + "+".join(count_formulas or ["0"])
     summary_last_row = max(2, len(summary_rows) + 1)
+    if result_chunks:
+        ws["B5"] = "=" + "+".join(count_formulas or ["0"])
+        ws["B7"] = "=" + "+".join(ok_formulas or ["0"])
+    else:
+        total_letter = summary_column_letters["total_queries"]
+        ok_letter = summary_column_letters["ok_queries"]
+        ws["B5"] = f"=SUM('Model Özeti'!{total_letter}2:{total_letter}{summary_last_row})"
+        ws["B7"] = f"=SUM('Model Özeti'!{ok_letter}2:{ok_letter}{summary_last_row})"
     ws["B6"] = f"=COUNTA('Model Özeti'!A2:A{summary_last_row})"
-    ws["B7"] = "=" + "+".join(ok_formulas or ["0"])
     ws["B8"] = "=B5-B7"
     for cell in ("B5", "B6", "B7", "B8"):
         ws[cell].number_format = "#,##0"
@@ -556,9 +576,14 @@ def write_dashboard(
     ws.merge_cells("A10:H11")
     ws["A10"] = (
         "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına "
-        "uygulanır. Ana başarı ölçütü tüm sorgular üzerinden 30 m içinde konumlamadır; "
-        "clean ve hard_v1 koşulları ayrı raporlanır; tüm-hata ortalaması yalnız tanısaldır."
+        "uygulanır. Ana başarı ölçütü tüm sorgular üzerinden 25 m içinde konumlamadır; "
+        "clean ve hard_v1 koşulları ayrı raporlanır; aşağıdaki sıralama yalnız global aramayı "
+        "gösterir; tüm-hata ortalaması yalnız tanısaldır."
     )
+    if lightweight:
+        ws["A10"].value += (
+            " Bu ara raporda ham sonuçlar yoktur; tam tablo koşu sonunda eklenir."
+        )
     ws["A10"].fill = PatternFill("solid", fgColor="F3F4F6")
     ws["A10"].font = Font(name="Aptos", italic=True, color="4B5563")
     ws["A10"].alignment = Alignment(wrap_text=True, vertical="center")
@@ -567,10 +592,10 @@ def write_dashboard(
     ws.row_dimensions[11].height = 18
 
     ranking_headers = [
-        "Model ve arama modu",
-        "30 m başarı",
-        "30 m içi medyan hata",
-        "AUC@30m",
+        "Model (global arama)",
+        "25 m başarı",
+        "25 m içi medyan hata",
+        "AUC@25m",
     ]
     for column, header in enumerate(ranking_headers, start=1):
         ws.cell(row=14, column=column, value=header)
@@ -581,21 +606,19 @@ def write_dashboard(
         [
             (index + 2, row)
             for index, row in enumerate(summary_rows)
-            if row.get("success_30m") is not None
+            if row.get("search_mode") == "global"
+            and row.get("success_25m") is not None
         ],
         key=lambda item: (
-            -float(item[1].get("success_30m") or 0.0),
-            -float(item[1].get("auc_30m") or 0.0),
+            -float(item[1].get("success_25m") or 0.0),
+            -float(item[1].get("auc_25m") or 0.0),
             (
-                float(item[1]["median_error_under_30m"])
-                if item[1].get("median_error_under_30m") is not None
+                float(item[1]["median_error_under_25m"])
+                if item[1].get("median_error_under_25m") is not None
                 else float("inf")
             ),
         ),
     )[:15]
-    summary_column_letters = {
-        name: get_column_letter(index + 1) for index, name in enumerate(SUMMARY_COLUMNS)
-    }
     for offset, (source_row, _) in enumerate(summary_positions, start=15):
         model_letter = summary_column_letters["model_id"]
         variant_letter = summary_column_letters["query_variant"]
@@ -614,20 +637,20 @@ def write_dashboard(
         ws.cell(
             row=offset,
             column=2,
-            value=f"='Model Özeti'!{summary_column_letters['success_30m']}{source_row}",
+            value=f"='Model Özeti'!{summary_column_letters['success_25m']}{source_row}",
         )
         ws.cell(
             row=offset,
             column=3,
             value=(
                 f"='Model Özeti'!"
-                f"{summary_column_letters['median_error_under_30m']}{source_row}"
+                f"{summary_column_letters['median_error_under_25m']}{source_row}"
             ),
         )
         ws.cell(
             row=offset,
             column=4,
-            value=f"='Model Özeti'!{summary_column_letters['auc_30m']}{source_row}",
+            value=f"='Model Özeti'!{summary_column_letters['auc_25m']}{source_row}",
         )
         for column in range(1, 5):
             ws.cell(row=offset, column=column).border = SUBTLE_BORDER
@@ -644,7 +667,7 @@ def write_dashboard(
         chart = BarChart()
         chart.type = "bar"
         chart.style = 10
-        chart.title = "30 m konumlama başarısı - en iyi modeller"
+        chart.title = "Global aramada 25 m başarısı - en iyi modeller"
         chart.height = 8.5
         chart.width = 17.0
         chart.varyColors = False
@@ -769,29 +792,31 @@ def build_workbook(
     output_path: Path,
     *,
     validation_mode: str = "deep",
+    lightweight: bool = False,
 ) -> dict[str, Any]:
     LOG.info("Kaynak dosyalar okunuyor: %s", run_dir)
     config = read_json(run_dir / "run_config.json", {})
     summary_rows = read_json(run_dir / "summary.json", [])
-    result_rows = read_jsonl(run_dir / "results.jsonl")
+    result_rows = [] if lightweight else read_jsonl(run_dir / "results.jsonl")
     error_rows = read_jsonl(run_dir / "model_errors.jsonl")
-    query_rows = find_query_rows(run_dir)
+    query_rows = [] if lightweight else find_query_rows(run_dir)
     if not isinstance(summary_rows, list):
         raise ValueError("summary.json bir liste içermelidir.")
     LOG.info(
-        "Kayıt sayıları | sonuç=%d | özet=%d | sorgu=%d | model_hatası=%d",
-        len(result_rows),
+        "Kayıt sayıları | sonuç=%s | özet=%d | sorgu=%s | model_hatası=%d | kapsam=%s",
+        len(result_rows) if not lightweight else "atlanıyor",
         len(summary_rows),
-        len(query_rows),
+        len(query_rows) if not lightweight else "atlanıyor",
         len(error_rows),
+        "hafif" if lightweight else "tam",
     )
 
     wb = Workbook()
     wb.remove(wb.active)
     wb.create_sheet("Özet")
     summary_ws = wb.create_sheet("Model Özeti")
-    raw_ws = wb.create_sheet("Ham Sonuçlar")
-    query_ws = wb.create_sheet("Sorgu Manifesti")
+    raw_ws = wb.create_sheet("Ham Sonuçlar") if not lightweight else None
+    query_ws = wb.create_sheet("Sorgu Manifesti") if not lightweight else None
     config_ws = wb.create_sheet("Yapılandırma")
     error_ws = wb.create_sheet("Hatalar")
     try:
@@ -821,8 +846,8 @@ def build_workbook(
             f"{coverage_letter}2:{coverage_letter}{summary_ws.max_row}",
             CellIsRule(operator="lessThan", formula=["1"], fill=PatternFill("solid", fgColor=BAD)),
         )
-    if summary_ws.max_row >= 2 and "success_30m" in summary_columns:
-        success_letter = get_column_letter(summary_columns.index("success_30m") + 1)
+    if summary_ws.max_row >= 2 and "success_25m" in summary_columns:
+        success_letter = get_column_letter(summary_columns.index("success_25m") + 1)
         summary_ws.conditional_formatting.add(
             f"{success_letter}2:{success_letter}{summary_ws.max_row}",
             ColorScaleRule(
@@ -838,54 +863,59 @@ def build_workbook(
     add_error_conditional_formatting(summary_ws, summary_columns)
 
     result_columns = ordered_columns(result_rows, ["run_id", "status"])
-    per_sheet = MAX_EXCEL_ROWS - 1
     raw_chunks: list[tuple[str, int, Sequence[str]]] = []
-    chunks = [result_rows[index : index + per_sheet] for index in range(0, len(result_rows), per_sheet)]
-    if not chunks:
-        chunks = [[]]
-    for chunk_index, chunk in enumerate(chunks, start=1):
-        if chunk_index == 1:
-            ws = raw_ws
-            sheet_name = "Ham Sonuçlar"
-        else:
-            sheet_name = f"Ham Sonuçlar {chunk_index}"
-            ws = wb.create_sheet(sheet_name)
-        LOG.info("%s sayfası yazılıyor (%d satır).", sheet_name, len(chunk))
+    if not lightweight:
+        assert raw_ws is not None and query_ws is not None
+        per_sheet = MAX_EXCEL_ROWS - 1
+        chunks = [
+            result_rows[index : index + per_sheet]
+            for index in range(0, len(result_rows), per_sheet)
+        ]
+        if not chunks:
+            chunks = [[]]
+        for chunk_index, chunk in enumerate(chunks, start=1):
+            if chunk_index == 1:
+                ws = raw_ws
+                sheet_name = "Ham Sonuçlar"
+            else:
+                sheet_name = f"Ham Sonuçlar {chunk_index}"
+                ws = wb.create_sheet(sheet_name)
+            LOG.info("%s sayfası yazılıyor (%d satır).", sheet_name, len(chunk))
+            write_table(
+                ws,
+                chunk,
+                result_columns,
+                table_name=safe_table_name("RawResults", chunk_index),
+                number_formats=RESULT_FORMATS,
+            )
+            set_widths(
+                ws,
+                result_columns,
+                overrides={
+                    "model_id": 48,
+                    "model_file": 56,
+                    "source_query_raster": 48,
+                    "source_map_raster": 48,
+                    "reason": 38,
+                },
+            )
+            add_error_conditional_formatting(ws, result_columns)
+            raw_chunks.append((sheet_name, len(chunk), result_columns))
+
+        query_columns = ordered_columns(query_rows, QUERY_COLUMNS)
+        LOG.info("Sorgu Manifesti sayfası yazılıyor (%d satır).", len(query_rows))
         write_table(
-            ws,
-            chunk,
-            result_columns,
-            table_name=safe_table_name("RawResults", chunk_index),
-            number_formats=RESULT_FORMATS,
+            query_ws,
+            query_rows,
+            query_columns,
+            table_name="QueryManifest_01",
+            number_formats=QUERY_FORMATS,
         )
         set_widths(
-            ws,
-            result_columns,
-            overrides={
-                "model_id": 48,
-                "model_file": 56,
-                "source_query_raster": 48,
-                "source_map_raster": 48,
-                "reason": 38,
-            },
+            query_ws,
+            query_columns,
+            overrides={"direction": 38, "raw_tile_file": 58},
         )
-        add_error_conditional_formatting(ws, result_columns)
-        raw_chunks.append((sheet_name, len(chunk), result_columns))
-
-    query_columns = ordered_columns(query_rows, QUERY_COLUMNS)
-    LOG.info("Sorgu Manifesti sayfası yazılıyor (%d satır).", len(query_rows))
-    write_table(
-        query_ws,
-        query_rows,
-        query_columns,
-        table_name="QueryManifest_01",
-        number_formats=QUERY_FORMATS,
-    )
-    set_widths(
-        query_ws,
-        query_columns,
-        overrides={"direction": 38, "raw_tile_file": 58},
-    )
 
     config_rows = [
         {"Parametre": key, "Değer": excel_value(value)} for key, value in sorted(config.items())
@@ -923,17 +953,18 @@ def build_workbook(
                 error_ws.cell(row=row, column=index).alignment = Alignment(vertical="top", wrap_text=True)
 
     LOG.info("Özet panosu ve formül bağlı grafik hazırlanıyor.")
-    write_dashboard(wb, config, summary_rows, raw_chunks)
+    write_dashboard(wb, config, summary_rows, raw_chunks, lightweight=lightweight)
     wb.active = wb.sheetnames.index("Özet")
 
-    write_excel_state(
-        wb,
-        build_excel_state(
-            run_dir,
-            result_rows=len(result_rows),
-            result_columns=result_columns,
-        ),
-    )
+    if not lightweight:
+        write_excel_state(
+            wb,
+            build_excel_state(
+                run_dir,
+                result_rows=len(result_rows),
+                result_columns=result_columns,
+            ),
+        )
     actual_path, output_mode = save_workbook_safely(wb, output_path)
     LOG.info(
         "Çalışma kitabı kaydedildi: %s (%.2f MiB)",
@@ -946,6 +977,7 @@ def build_workbook(
         mode=validation_mode,
         requested_path=output_path,
         output_mode=output_mode,
+        lightweight=lightweight,
     )
     write_latest_pointer(
         run_dir,
@@ -1167,8 +1199,8 @@ def rebuild_small_sheets(
             f"{letter}2:{letter}{summary_ws.max_row}",
             CellIsRule(operator="lessThan", formula=["1"], fill=PatternFill("solid", fgColor=BAD)),
         )
-    if summary_ws.max_row >= 2 and "success_30m" in summary_columns:
-        letter = get_column_letter(summary_columns.index("success_30m") + 1)
+    if summary_ws.max_row >= 2 and "success_25m" in summary_columns:
+        letter = get_column_letter(summary_columns.index("success_25m") + 1)
         summary_ws.conditional_formatting.add(
             f"{letter}2:{letter}{summary_ws.max_row}",
             ColorScaleRule(
@@ -1326,6 +1358,7 @@ def validate_workbook_checkpoint(
     *,
     requested_path: Path,
     output_mode: str,
+    lightweight: bool = False,
 ) -> dict[str, Any]:
     """Fast model-boundary validation without reloading millions of cells."""
     LOG.info("XLSX checkpoint ZIP, sayfa, tablo, formül ve grafik yapısı doğrulanıyor.")
@@ -1347,10 +1380,11 @@ def validate_workbook_checkpoint(
                 overview_rid = element.attrib.get(f"{{{rel_ns}}}id")
             if name == STATE_SHEET:
                 state_hidden = element.attrib.get("state") in {"hidden", "veryHidden"}
-        missing = [name for name in REQUIRED_SHEETS if name not in sheets]
+        required_sheets = LIGHTWEIGHT_SHEETS if lightweight else REQUIRED_SHEETS
+        missing = [name for name in required_sheets if name not in sheets]
         if missing:
             raise RuntimeError(f"Eksik çalışma sayfaları: {missing}")
-        if STATE_SHEET not in sheets or not state_hidden:
+        if not lightweight and (STATE_SHEET not in sheets or not state_hidden):
             raise RuntimeError("Artımlı Excel durum sayfası eksik veya gizli değil.")
 
         table_names: list[str] = []
@@ -1362,13 +1396,9 @@ def validate_workbook_checkpoint(
             name = root.attrib.get("displayName") or root.attrib.get("name") or member
             table_names.append(name)
             table_refs[name] = root.attrib.get("ref", "")
-        expected_tables = {
-            "ModelSummary_01",
-            "RawResults_01",
-            "QueryManifest_01",
-            "RunConfig_01",
-            "ModelErrors_01",
-        }
+        expected_tables = {"ModelSummary_01", "RunConfig_01", "ModelErrors_01"}
+        if not lightweight:
+            expected_tables.update({"RawResults_01", "QueryManifest_01"})
         missing_tables = sorted(expected_tables - set(table_names))
         if missing_tables:
             raise RuntimeError(f"Eksik Excel tabloları: {missing_tables}")
@@ -1402,6 +1432,7 @@ def validate_workbook_checkpoint(
     report = {
         "validated_at_utc": utc_now_iso(),
         "validation_mode": "checkpoint",
+        "report_scope": "lightweight" if lightweight else "full",
         "engine": "openpyxl",
         "openpyxl_version": __import__("openpyxl").__version__,
         "requested_workbook": str(requested_path.resolve()),
@@ -1437,6 +1468,7 @@ def validate_workbook(
     mode: str = "deep",
     requested_path: Path | None = None,
     output_mode: str = "primary",
+    lightweight: bool = False,
 ) -> dict[str, Any]:
     requested_path = requested_path or output_path
     if mode == "checkpoint":
@@ -1445,6 +1477,7 @@ def validate_workbook(
             run_dir,
             requested_path=requested_path,
             output_mode=output_mode,
+            lightweight=lightweight,
         )
     if mode != "deep":
         raise ValueError(f"Bilinmeyen Excel doğrulama modu: {mode}")
@@ -1455,7 +1488,8 @@ def validate_workbook(
             raise RuntimeError(f"XLSX arşiv üyesi bozuk: {bad_member}")
 
     wb = load_workbook(output_path, data_only=False, read_only=False)
-    missing = [name for name in REQUIRED_SHEETS if name not in wb.sheetnames]
+    required_sheets = LIGHTWEIGHT_SHEETS if lightweight else REQUIRED_SHEETS
+    missing = [name for name in required_sheets if name not in wb.sheetnames]
     if missing:
         raise RuntimeError(f"Eksik çalışma sayfaları: {missing}")
 
@@ -1492,6 +1526,7 @@ def validate_workbook(
     report = {
         "validated_at_utc": utc_now_iso(),
         "validation_mode": "deep",
+        "report_scope": "lightweight" if lightweight else "full",
         "engine": "openpyxl",
         "openpyxl_version": __import__("openpyxl").__version__,
         "requested_workbook": str(requested_path.resolve()),
@@ -1529,7 +1564,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     output_path = (args.output or (run_dir / "benchmark_results.xlsx")).resolve()
     if not run_dir.is_dir():
         raise FileNotFoundError(f"Koşu klasörü bulunamadı: {run_dir}")
-    if args.incremental:
+    if args.incremental and args.lightweight:
+        raise ValueError("--incremental ve --lightweight birlikte kullanılamaz.")
+    if args.lightweight:
+        report = build_workbook(
+            run_dir,
+            output_path,
+            validation_mode=args.validation_mode,
+            lightweight=True,
+        )
+    elif args.incremental:
         try:
             report = update_workbook_incremental(
                 run_dir,

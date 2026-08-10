@@ -22,6 +22,8 @@ if str(BENCHMARK_DIR) not in sys.path:
 
 from geospatial_model_benchmark import (  # noqa: E402
     HARD_V1_PROFILE,
+    JsonlBatchWriter,
+    RESULT_COLUMNS,
     PreparedSearchMap,
     QueryRecord,
     aggregate_results,
@@ -35,6 +37,7 @@ from geospatial_model_benchmark import (  # noqa: E402
     refresh_excel_after_model,
     run_searches_for_representation,
     search_in_mode,
+    write_summary_files,
 )
 
 
@@ -65,14 +68,40 @@ class ExcelCheckpointTests(unittest.TestCase):
                     model_status="tamamlandı",
                 )
         self.assertEqual(result, workbook)
-        write_summary.assert_called_once_with(run_dir)
+        write_summary.assert_called_once_with(run_dir, write_results_csv=False)
         invoke_excel.assert_called_once_with(
             run_dir,
             strict=False,
             engine="openpyxl",
-            incremental=True,
+            lightweight=True,
             validation_mode="checkpoint",
         )
+
+    def test_lightweight_reporter_flag_is_forwarded(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            workbook = run_dir / "benchmark_results.xlsx"
+            workbook.write_bytes(b"xlsx")
+            marker = json.dumps({"path": str(workbook), "report": {}})
+            completed = SimpleNamespace(
+                returncode=0,
+                stdout=f"WORKBOOK_READY_JSON: {marker}\n",
+                stderr="",
+            )
+            with patch(
+                "geospatial_model_benchmark.subprocess.run", return_value=completed
+            ) as run:
+                result = invoke_excel_report(
+                    run_dir,
+                    strict=False,
+                    engine="openpyxl",
+                    lightweight=True,
+                    validation_mode="checkpoint",
+                )
+            self.assertEqual(result, workbook.resolve())
+            command = run.call_args.args[0]
+            self.assertIn("--lightweight", command)
+            self.assertNotIn("--incremental", command)
 
     def test_incremental_report_returns_actual_locked_copy_path_from_reporter(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -99,6 +128,44 @@ class ExcelCheckpointTests(unittest.TestCase):
             command = run.call_args.args[0]
             self.assertIn("--incremental", command)
             self.assertEqual(command[command.index("--validation-mode") + 1], "checkpoint")
+
+
+class CheckpointWriterTests(unittest.TestCase):
+    def test_jsonl_rows_are_flushed_in_batches_and_on_close(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "results.jsonl"
+            with JsonlBatchWriter(path, max_rows=2, max_seconds=60.0) as writer:
+                writer.append({"row": 1})
+                self.assertEqual(path.stat().st_size, 0)
+                writer.append({"row": 2})
+                self.assertGreater(path.stat().st_size, 0)
+                writer.append({"row": 3})
+            rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(rows, [{"row": 1}, {"row": 2}, {"row": 3}])
+
+    def test_model_summary_refresh_does_not_rewrite_results_csv(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            row = {
+                "direction": "A",
+                "query_variant": "clean",
+                "search_mode": "global",
+                "model_id": "M",
+                "status": "ok",
+                "error_m": 4.0,
+                "search_seconds": 1.0,
+                "top1_score": 0.8,
+            }
+            (run_dir / "results.jsonl").write_text(
+                json.dumps(row) + "\n", encoding="utf-8"
+            )
+            (run_dir / "run_config.json").write_text(
+                json.dumps({"bootstrap_iterations": 0, "seed": 42}), encoding="utf-8"
+            )
+            results_csv = run_dir / "results.csv"
+            results_csv.write_text("sentinel", encoding="utf-8")
+            write_summary_files(run_dir, write_results_csv=False)
+            self.assertEqual(results_csv.read_text(encoding="utf-8"), "sentinel")
 
 
 class DefaultBenchmarkModeTests(unittest.TestCase):
@@ -179,6 +246,10 @@ class CoarseToFineSearchTests(unittest.TestCase):
 
 
 class AggregateTests(unittest.TestCase):
+    def test_raw_result_schema_uses_only_the_25m_threshold(self) -> None:
+        self.assertIn("success_25m", RESULT_COLUMNS)
+        self.assertNotIn("success_30m", RESULT_COLUMNS)
+
     def test_clean_and_hard_results_are_aggregated_separately(self) -> None:
         rows = [
             {
@@ -191,12 +262,12 @@ class AggregateTests(unittest.TestCase):
                 "search_seconds": 1.0,
                 "top1_score": 0.8,
             }
-            for variant, error in (("clean", 2.0), ("hard_v1", 50.0))
+            for variant, error in (("clean", 2.0), ("hard_v1", 27.0))
         ]
         summary = aggregate_results(rows, bootstrap_iterations=0)
         self.assertEqual([row["query_variant"] for row in summary], ["clean", "hard_v1"])
-        self.assertEqual(summary[0]["success_30m"], 1.0)
-        self.assertEqual(summary[1]["success_30m"], 0.0)
+        self.assertEqual(summary[0]["success_25m"], 1.0)
+        self.assertEqual(summary[1]["success_25m"], 0.0)
 
     def test_summary_order_is_roi_small_to_global_within_each_model(self) -> None:
         rows = []
@@ -230,15 +301,14 @@ class AggregateTests(unittest.TestCase):
         self.assertAlmostEqual(summary["coverage"], 2 / 3)
         self.assertAlmostEqual(summary["median_error_m"], 10.0)
         self.assertAlmostEqual(summary["success_5m"], 0.5)
-        self.assertAlmostEqual(summary["success_25m"], 1.0)
-        self.assertEqual(summary["success_30m_queries"], 2)
-        self.assertAlmostEqual(summary["success_30m"], 2 / 3)
-        self.assertAlmostEqual(summary["success_30m_failure_rate"], 1 / 3)
-        self.assertAlmostEqual(summary["mean_error_under_30m"], 10.0)
-        self.assertAlmostEqual(summary["median_error_under_30m"], 10.0)
-        self.assertAlmostEqual(summary["auc_30m"], 4 / 9)
+        self.assertEqual(summary["success_25m_queries"], 2)
+        self.assertAlmostEqual(summary["success_25m"], 2 / 3)
+        self.assertAlmostEqual(summary["success_25m_failure_rate"], 1 / 3)
+        self.assertAlmostEqual(summary["mean_error_under_25m"], 10.0)
+        self.assertAlmostEqual(summary["median_error_under_25m"], 10.0)
+        self.assertAlmostEqual(summary["auc_25m"], 2 / 5)
 
-    def test_large_miss_does_not_dominate_primary_30m_score(self) -> None:
+    def test_large_miss_does_not_dominate_primary_25m_score(self) -> None:
         rows = [
             {
                 "direction": "A",
@@ -258,9 +328,9 @@ class AggregateTests(unittest.TestCase):
             },
         ]
         summary = aggregate_results(rows, bootstrap_iterations=25)[0]
-        self.assertAlmostEqual(summary["success_30m"], 0.5)
-        self.assertAlmostEqual(summary["mean_error_under_30m"], 10.0)
-        self.assertAlmostEqual(summary["median_error_under_30m"], 10.0)
+        self.assertAlmostEqual(summary["success_25m"], 0.5)
+        self.assertAlmostEqual(summary["mean_error_under_25m"], 10.0)
+        self.assertAlmostEqual(summary["median_error_under_25m"], 10.0)
         self.assertGreater(summary["mean_error_m"], 2000.0)
 
     def test_no_valid_match_has_zero_primary_success_with_defined_ci(self) -> None:
@@ -276,9 +346,9 @@ class AggregateTests(unittest.TestCase):
             }
         ]
         summary = aggregate_results(rows, bootstrap_iterations=25)[0]
-        self.assertEqual(summary["success_30m"], 0.0)
-        self.assertEqual(summary["success_30m_ci95_low"], 0.0)
-        self.assertEqual(summary["success_30m_ci95_high"], 0.0)
+        self.assertEqual(summary["success_25m"], 0.0)
+        self.assertEqual(summary["success_25m_ci95_low"], 0.0)
+        self.assertEqual(summary["success_25m_ci95_high"], 0.0)
 
 
 class ParallelSearchTests(unittest.TestCase):
@@ -338,7 +408,6 @@ class ParallelSearchTests(unittest.TestCase):
                     normalization="RAW",
                     source_query_raster=root / "query.tif",
                     source_map_raster=root / "map.tif",
-                    results_csv=result_dir / "results.csv",
                     results_jsonl=jsonl,
                     done=set(),
                     search_workers=workers,

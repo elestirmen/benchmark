@@ -8,9 +8,9 @@ The benchmark applies the *same* sat-to-map model to both sides:
 
 It preserves a RAW baseline, samples query centres in projected coordinates,
 uses deterministic spatially stratified sampling, performs multi-candidate
-coarse-to-fine normalized cross correlation, checkpoints every query, and
-writes machine-readable CSV/JSONL outputs.  It refreshes the Excel workbook at
-model boundaries and performs a strict final Excel export at the end.
+coarse-to-fine normalized cross correlation, checkpoints small JSONL batches,
+and writes machine-readable CSV/JSONL outputs.  It refreshes a lightweight
+Excel workbook at model boundaries and performs a strict full export at the end.
 
 The expensive map production stages reuse the repository-local
 ``goruntu_islemleri.py`` copy so the benchmark code is self-contained.
@@ -141,7 +141,6 @@ RESULT_COLUMNS = [
     "success_5m",
     "success_10m",
     "success_25m",
-    "success_30m",
     "success_50m",
     "status",
     "reason",
@@ -445,22 +444,61 @@ def csv_write(path: Path, rows: Sequence[dict[str, Any]], columns: Sequence[str]
         writer.writerows(rows)
 
 
-def csv_append(path: Path, row: dict[str, Any], columns: Sequence[str]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    exists = path.exists() and path.stat().st_size > 0
-    with path.open("a", newline="", encoding="utf-8-sig") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(columns), extrasaction="ignore")
-        if not exists:
-            writer.writeheader()
-        writer.writerow(row)
-        handle.flush()
-
-
 def jsonl_append(path: Path, row: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n")
         handle.flush()
+
+
+class JsonlBatchWriter:
+    """Append durable-enough checkpoints without opening and flushing per row."""
+
+    def __init__(self, path: Path, *, max_rows: int = 100, max_seconds: float = 2.0) -> None:
+        if max_rows <= 0 or max_seconds <= 0:
+            raise ValueError("JSONL batch limits must be positive.")
+        self.path = path
+        self.max_rows = max_rows
+        self.max_seconds = max_seconds
+        self._buffer: list[str] = []
+        self._handle: Any | None = None
+        self._last_flush = time.monotonic()
+
+    def __enter__(self) -> "JsonlBatchWriter":
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._handle = self.path.open("a", encoding="utf-8")
+        self._last_flush = time.monotonic()
+        return self
+
+    def append(self, row: dict[str, Any]) -> None:
+        if self._handle is None:
+            raise RuntimeError("JsonlBatchWriter is not open.")
+        self._buffer.append(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n")
+        if (
+            len(self._buffer) >= self.max_rows
+            or time.monotonic() - self._last_flush >= self.max_seconds
+        ):
+            self.flush()
+
+    def flush(self) -> None:
+        if self._handle is None or not self._buffer:
+            return
+        self._handle.write("".join(self._buffer))
+        self._handle.flush()
+        self._buffer.clear()
+        self._last_flush = time.monotonic()
+
+    def close(self) -> None:
+        if self._handle is None:
+            return
+        try:
+            self.flush()
+        finally:
+            self._handle.close()
+            self._handle = None
+
+    def __exit__(self, exc_type: Any, exc: Any, traceback_value: Any) -> None:
+        self.close()
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -1475,7 +1513,6 @@ def run_searches_for_representation(
     normalization: str,
     source_query_raster: Path,
     source_map_raster: Path,
-    results_csv: Path,
     results_jsonl: Path,
     done: set[tuple[str, str, str, str, str]],
     search_workers: int,
@@ -1639,7 +1676,6 @@ def run_searches_for_representation(
                     "success_5m": int(error_m <= 5.0),
                     "success_10m": int(error_m <= 10.0),
                     "success_25m": int(error_m <= 25.0),
-                    "success_30m": int(error_m <= 30.0),
                     "success_50m": int(error_m <= 50.0),
                 }
             )
@@ -1668,35 +1704,35 @@ def run_searches_for_representation(
         evaluated = executor.map(evaluate_task, pending)
 
     try:
-        for index, (record, mode_name, result) in enumerate(evaluated, start=1):
-            status = str(result["status"])
-            reason = str(result["reason"])
-            # Only this coordinator thread writes checkpoints; worker threads
-            # share read-only map arrays and never write CSV/JSONL.
-            csv_append(results_csv, result, RESULT_COLUMNS)
-            jsonl_append(results_jsonl, result)
-            done.add((direction, query_variant, mode_name, model_id, record.query_id))
+        with JsonlBatchWriter(results_jsonl) as checkpoint_writer:
+            for index, (record, mode_name, result) in enumerate(evaluated, start=1):
+                status = str(result["status"])
+                reason = str(result["reason"])
+                # Only this coordinator thread writes the append-only checkpoint;
+                # worker threads share read-only arrays and never touch files.
+                checkpoint_writer.append(result)
+                done.add((direction, query_variant, mode_name, model_id, record.query_id))
 
-            elapsed = time.perf_counter() - started
-            rate = index / max(elapsed, 1e-9)
-            eta = (total - index) / max(rate, 1e-9)
-            error_text = (
-                f"hata={result['error_m']:.2f} m skor={result['top1_score']:.4f}"
-                if result.get("error_m") is not None
-                else f"durum={status} neden={reason}"
-            )
-            LOG.info(
-                "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
-                model_id,
-                query_variant,
-                mode_name,
-                index,
-                total,
-                100.0 * index / max(total, 1),
-                record.query_id,
-                error_text,
-                eta / 60.0,
-            )
+                elapsed = time.perf_counter() - started
+                rate = index / max(elapsed, 1e-9)
+                eta = (total - index) / max(rate, 1e-9)
+                error_text = (
+                    f"hata={result['error_m']:.2f} m skor={result['top1_score']:.4f}"
+                    if result.get("error_m") is not None
+                    else f"durum={status} neden={reason}"
+                )
+                LOG.info(
+                    "İLERLEME | model=%s | varyant=%s | mod=%s | %d/%d (%%%0.1f) | %s | %s | ETA=%.1f dk",
+                    model_id,
+                    query_variant,
+                    mode_name,
+                    index,
+                    total,
+                    100.0 * index / max(total, 1),
+                    record.query_id,
+                    error_text,
+                    eta / 60.0,
+                )
     finally:
         if executor is not None:
             executor.shutdown(wait=True, cancel_futures=False)
@@ -1724,37 +1760,37 @@ def block_bootstrap_intervals(
         "median_error_ci95_high": None,
         "success_10m_ci95_low": None,
         "success_10m_ci95_high": None,
-        "success_30m_ci95_low": None,
-        "success_30m_ci95_high": None,
+        "success_25m_ci95_low": None,
+        "success_25m_ci95_high": None,
     }
     all_rows = list(all_rows) if all_rows is not None else list(rows)
     if iterations <= 0 or not all_rows:
         return empty_result
     if not rows:
-        success_30_by_block: dict[str, list[float]] = {}
+        success_25_by_block: dict[str, list[float]] = {}
         for row in all_rows:
-            success_30_by_block.setdefault(
+            success_25_by_block.setdefault(
                 str(row.get("block_id") or "__all__"), []
             ).append(0.0)
-        all_blocks = sorted(success_30_by_block)
+        all_blocks = sorted(success_25_by_block)
         rng = np.random.default_rng(seed)
-        successes_30m = np.empty(iterations, dtype=np.float64)
+        successes_25m = np.empty(iterations, dtype=np.float64)
         for index in range(iterations):
             sampled_all = rng.choice(all_blocks, size=len(all_blocks), replace=True)
             success_flags = np.asarray(
                 [
                     value
                     for block in sampled_all
-                    for value in success_30_by_block[str(block)]
+                    for value in success_25_by_block[str(block)]
                 ],
                 dtype=np.float64,
             )
-            successes_30m[index] = np.mean(success_flags)
-        empty_result["success_30m_ci95_low"] = float(
-            np.percentile(successes_30m, 2.5)
+            successes_25m[index] = np.mean(success_flags)
+        empty_result["success_25m_ci95_low"] = float(
+            np.percentile(successes_25m, 2.5)
         )
-        empty_result["success_30m_ci95_high"] = float(
-            np.percentile(successes_30m, 97.5)
+        empty_result["success_25m_ci95_high"] = float(
+            np.percentile(successes_25m, 97.5)
         )
         return empty_result
     by_block: dict[str, list[float]] = {}
@@ -1764,22 +1800,22 @@ def block_bootstrap_intervals(
     if not blocks:
         return empty_result
 
-    success_30_by_block: dict[str, list[float]] = {}
+    success_25_by_block: dict[str, list[float]] = {}
     for row in all_rows:
         is_success = (
             row.get("status") == "ok"
             and row.get("error_m") is not None
-            and float(row["error_m"]) <= 30.0
+            and float(row["error_m"]) <= 25.0
         )
-        success_30_by_block.setdefault(
+        success_25_by_block.setdefault(
             str(row.get("block_id") or "__all__"), []
         ).append(float(is_success))
-    all_blocks = sorted(success_30_by_block)
+    all_blocks = sorted(success_25_by_block)
 
     rng = np.random.default_rng(seed)
     medians = np.empty(iterations, dtype=np.float64)
     successes_10m = np.empty(iterations, dtype=np.float64)
-    successes_30m = np.empty(iterations, dtype=np.float64)
+    successes_25m = np.empty(iterations, dtype=np.float64)
     for index in range(iterations):
         sampled = rng.choice(blocks, size=len(blocks), replace=True)
         errors = np.asarray(
@@ -1792,18 +1828,18 @@ def block_bootstrap_intervals(
             [
                 value
                 for block in sampled_all
-                for value in success_30_by_block[str(block)]
+                for value in success_25_by_block[str(block)]
             ],
             dtype=np.float64,
         )
-        successes_30m[index] = np.mean(success_flags)
+        successes_25m[index] = np.mean(success_flags)
     return {
         "median_error_ci95_low": float(np.percentile(medians, 2.5)),
         "median_error_ci95_high": float(np.percentile(medians, 97.5)),
         "success_10m_ci95_low": float(np.percentile(successes_10m, 2.5)),
         "success_10m_ci95_high": float(np.percentile(successes_10m, 97.5)),
-        "success_30m_ci95_low": float(np.percentile(successes_30m, 2.5)),
-        "success_30m_ci95_high": float(np.percentile(successes_30m, 97.5)),
+        "success_25m_ci95_low": float(np.percentile(successes_25m, 2.5)),
+        "success_25m_ci95_high": float(np.percentile(successes_25m, 97.5)),
     }
 
 
@@ -1847,11 +1883,11 @@ def aggregate_results(
             seed=stable_group_seed,
             all_rows=group,
         )
-        errors_under_30m = errors[errors <= 30.0]
-        success_30m_count = int(errors_under_30m.size)
-        success_30m = success_30m_count / max(1, len(group))
-        auc_30m = (
-            float(np.sum(np.clip(1.0 - errors / 30.0, 0.0, 1.0)))
+        errors_under_25m = errors[errors <= 25.0]
+        success_25m_count = int(errors_under_25m.size)
+        success_25m = success_25m_count / max(1, len(group))
+        auc_25m = (
+            float(np.sum(np.clip(1.0 - errors / 25.0, 0.0, 1.0)))
             / max(1, len(group))
             if errors.size
             else 0.0
@@ -1867,14 +1903,14 @@ def aggregate_results(
                 "rejected_queries": sum(row.get("status") == "rejected" for row in group),
                 "error_queries": sum(row.get("status") == "error" for row in group),
                 "coverage": len(ok) / max(1, len(group)),
-                "success_30m_queries": success_30m_count,
-                "success_30m": success_30m,
-                "success_30m_failure_rate": 1.0 - success_30m,
-                "auc_30m": auc_30m,
-                "mean_error_under_30m": (
-                    float(np.mean(errors_under_30m)) if errors_under_30m.size else None
+                "success_25m_queries": success_25m_count,
+                "success_25m": success_25m,
+                "success_25m_failure_rate": 1.0 - success_25m,
+                "auc_25m": auc_25m,
+                "mean_error_under_25m": (
+                    float(np.mean(errors_under_25m)) if errors_under_25m.size else None
                 ),
-                "median_error_under_30m": percentile(errors_under_30m, 50),
+                "median_error_under_25m": percentile(errors_under_25m, 50),
                 "mean_error_m": float(np.mean(errors)) if errors.size else None,
                 "median_error_m": percentile(errors, 50),
                 **confidence_intervals,
@@ -1882,7 +1918,6 @@ def aggregate_results(
                 "p95_error_m": percentile(errors, 95),
                 "success_5m": float(np.mean(errors <= 5.0)) if errors.size else None,
                 "success_10m": float(np.mean(errors <= 10.0)) if errors.size else None,
-                "success_25m": float(np.mean(errors <= 25.0)) if errors.size else None,
                 "success_50m": float(np.mean(errors <= 50.0)) if errors.size else None,
                 "mean_top1_score": float(np.mean(scores)) if scores.size else None,
                 "mean_search_seconds": float(np.mean(search_times)) if search_times.size else None,
@@ -1892,12 +1927,14 @@ def aggregate_results(
     return summary
 
 
-def write_summary_files(run_dir: Path) -> tuple[Path, Path]:
+def write_summary_files(
+    run_dir: Path, *, write_results_csv: bool = True
+) -> tuple[Path, Path]:
     result_rows = read_jsonl(run_dir / "results.jsonl")
-    # JSONL is the checkpoint source of truth. Rebuild CSV on every summary
-    # pass so an interruption between two append operations cannot leave a
-    # duplicated or incomplete CSV.
-    csv_write(run_dir / "results.csv", result_rows, RESULT_COLUMNS)
+    # JSONL is the checkpoint source of truth. The large CSV is a final export,
+    # not a live checkpoint, so model-boundary refreshes do not rewrite it.
+    if write_results_csv:
+        csv_write(run_dir / "results.csv", result_rows, RESULT_COLUMNS)
     config_path = run_dir / "run_config.json"
     config = json.loads(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
     summary_json = run_dir / "summary.json"
@@ -1906,7 +1943,7 @@ def write_summary_files(run_dir: Path) -> tuple[Path, Path]:
     bootstrap_iterations = int(config.get("bootstrap_iterations", 1000))
     seed = int(config.get("seed", 42))
     current_metadata = {
-        "schema_version": 3,
+        "schema_version": 4,
         "bootstrap_iterations": bootstrap_iterations,
         "seed": seed,
     }
@@ -2004,6 +2041,7 @@ def invoke_excel_report(
     engine: str = "auto",
     *,
     incremental: bool = False,
+    lightweight: bool = False,
     validation_mode: str = "deep",
 ) -> Path | None:
     global _AUTO_EXCEL_ENGINE
@@ -2013,10 +2051,10 @@ def invoke_excel_report(
     output = run_dir / "benchmark_results.xlsx"
     failures: list[str] = []
     requested_engine = engine
-    if incremental:
+    if incremental or lightweight:
         if engine == "artifact":
             LOG.info(
-                "Model checkpointinde gerçek artımlı güncelleme için openpyxl motoru kullanılacak."
+                "Model checkpointinde hafif rapor için openpyxl motoru kullanılacak."
             )
         engine = "openpyxl"
     if engine == "auto" and _AUTO_EXCEL_ENGINE is not None:
@@ -2103,12 +2141,14 @@ def invoke_excel_report(
         ]
         if incremental:
             command.append("--incremental")
+        if lightweight:
+            command.append("--lightweight")
         openpyxl_result = run_reporter(
             "openpyxl",
             command,
         )
         if openpyxl_result is not None:
-            if requested_engine == "auto":
+            if requested_engine == "auto" and not lightweight:
                 _AUTO_EXCEL_ENGINE = "openpyxl"
             return openpyxl_result
 
@@ -2140,12 +2180,14 @@ def refresh_excel_after_model(
         model_name,
     )
     try:
-        summary_json, summary_csv = write_summary_files(run_dir)
+        summary_json, summary_csv = write_summary_files(
+            run_dir, write_results_csv=False
+        )
         workbook = invoke_excel_report(
             run_dir,
             strict=False,
             engine=args.excel_engine,
-            incremental=True,
+            lightweight=True,
             validation_mode="checkpoint",
         )
     except Exception:
@@ -2165,7 +2207,7 @@ def refresh_excel_after_model(
         )
         return None
     LOG.info(
-        "ARA EXCEL TAMAMLANDI | model=%d/%d | süre=%.2f sn | excel=%s | özet=%s | csv=%s",
+        "ARA EXCEL TAMAMLANDI | model=%d/%d | süre=%.2f sn | hafif_excel=%s | özet=%s | özet_csv=%s",
         position,
         total,
         time.perf_counter() - started,
@@ -2247,7 +2289,6 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
             force=args.force_maps,
         )
 
-    results_csv = run_dir / "results.csv"
     results_jsonl = run_dir / "results.jsonl"
     existing_rows = read_jsonl(results_jsonl)
     done = completed_keys(existing_rows)
@@ -2298,7 +2339,6 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                         normalization="RAW",
                         source_query_raster=query_raster,
                         source_map_raster=map_raster,
-                        results_csv=results_csv,
                         results_jsonl=results_jsonl,
                         done=done,
                         search_workers=args.search_workers,
@@ -2408,7 +2448,6 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                         normalization=args.normalization,
                         source_query_raster=query_raster,
                         source_map_raster=map_raster,
-                        results_csv=results_csv,
                         results_jsonl=results_jsonl,
                         done=done,
                         search_workers=args.search_workers,
@@ -2728,10 +2767,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     except KeyboardInterrupt:
         LOG.warning("Kullanıcı tarafından durduruldu. Checkpointler korundu; --resume-run ile devam edilebilir.")
-        write_summary_files(run_dir)
+        write_summary_files(run_dir, write_results_csv=False)
         if args.excel_update == "end":
             try:
-                invoke_excel_report(run_dir, strict=False, engine=args.excel_engine)
+                invoke_excel_report(
+                    run_dir,
+                    strict=False,
+                    engine=args.excel_engine,
+                    lightweight=True,
+                    validation_mode="checkpoint",
+                )
             except Exception:
                 LOG.exception("Kesinti sonrası Excel raporu üretilemedi.")
         else:
@@ -2742,8 +2787,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     except Exception:
         LOG.exception("BENCHMARK BAŞARISIZ. Mevcut checkpointler korunmuştur.")
         try:
-            write_summary_files(run_dir)
-            invoke_excel_report(run_dir, strict=False, engine=args.excel_engine)
+            write_summary_files(run_dir, write_results_csv=False)
+            invoke_excel_report(
+                run_dir,
+                strict=False,
+                engine=args.excel_engine,
+                lightweight=True,
+                validation_mode="checkpoint",
+            )
         except Exception:
             LOG.exception("Hata sonrası kısmi rapor üretilemedi.")
         return 1

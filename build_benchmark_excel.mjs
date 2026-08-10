@@ -182,7 +182,7 @@ dashboard.getRange("B4:B8").format = {
 };
 dashboard.getRange("A10:H11").merge();
 dashboard.getRange("A10").values = [[
-  "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına uygulanır. clean ve hard_v1 koşulları ayrı raporlanır; ana başarı ölçütü tüm sorgular üzerinden 30 m içinde konumlamadır.",
+  "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına uygulanır. clean ve hard_v1 koşulları ayrı raporlanır; ana başarı ölçütü tüm sorgular üzerinden 25 m içinde konumlamadır. Aşağıdaki sıralama yalnız global aramayı gösterir.",
 ]];
 dashboard.getRange("A10:H11").format = {
   fill: "#F3F4F6",
@@ -193,23 +193,27 @@ dashboard.getRange("A10:H11").format = {
 };
 
 const ranked = [...summaryRows]
-  .filter((row) => row.success_30m !== null && row.success_30m !== undefined)
+  .filter((row) =>
+    row.search_mode === "global"
+    && row.success_25m !== null
+    && row.success_25m !== undefined
+  )
   .sort((a, b) =>
-    Number(b.success_30m) - Number(a.success_30m)
-    || Number(b.auc_30m ?? 0) - Number(a.auc_30m ?? 0)
-    || Number(a.median_error_under_30m ?? Number.POSITIVE_INFINITY)
-      - Number(b.median_error_under_30m ?? Number.POSITIVE_INFINITY)
+    Number(b.success_25m) - Number(a.success_25m)
+    || Number(b.auc_25m ?? 0) - Number(a.auc_25m ?? 0)
+    || Number(a.median_error_under_25m ?? Number.POSITIVE_INFINITY)
+      - Number(b.median_error_under_25m ?? Number.POSITIVE_INFINITY)
   )
   .slice(0, 15);
-dashboard.getRange("A14:D14").values = [["Model", "30 m başarı", "30 m içi medyan hata", "AUC@30m"]];
+dashboard.getRange("A14:D14").values = [["Model (global arama)", "25 m başarı", "25 m içi medyan hata", "AUC@25m"]];
 dashboard.getRange("A15:D29").values = Array.from({ length: 15 }, (_, index) => {
   const row = ranked[index];
   return row
     ? [
         `${row.model_id} [${row.query_variant ?? "clean"} | ${row.search_mode ?? "global"}]`,
-        row.success_30m,
-        row.median_error_under_30m,
-        row.auc_30m,
+        row.success_25m,
+        row.median_error_under_25m,
+        row.auc_25m,
       ]
     : [null, null, null, null];
 });
@@ -224,7 +228,7 @@ dashboard.getRange("A14:D29").format.borders = {
 if (ranked.length > 0) {
   const chartEnd = 14 + ranked.length;
   const chart = dashboard.charts.add("bar", dashboard.getRange(`A14:B${chartEnd}`));
-  chart.title = "30 m konumlama başarısı - en iyi modeller";
+  chart.title = "Global aramada 25 m başarısı - en iyi modeller";
   chart.hasLegend = false;
   chart.xAxis = { axisType: "textAxis", textStyle: { fontSize: 9 } };
   chart.yAxis = { numberFormatCode: "0.0%" };
@@ -240,27 +244,27 @@ dashboard.getRange("E1:M31").format.columnWidth = 12;
 // Model summary sheet
 const summaryColumns = [
   "direction", "query_variant", "search_mode", "model_id", "total_queries", "ok_queries", "rejected_queries",
-  "error_queries", "coverage", "success_30m_queries", "success_30m",
-  "success_30m_ci95_low", "success_30m_ci95_high", "success_30m_failure_rate",
-  "auc_30m", "mean_error_under_30m", "median_error_under_30m",
+  "error_queries", "coverage", "success_25m_queries", "success_25m",
+  "success_25m_ci95_low", "success_25m_ci95_high", "success_25m_failure_rate",
+  "auc_25m", "mean_error_under_25m", "median_error_under_25m",
   "mean_error_m", "median_error_m",
   "median_error_ci95_low", "median_error_ci95_high", "p90_error_m", "p95_error_m",
   "success_5m", "success_10m", "success_10m_ci95_low", "success_10m_ci95_high",
-  "success_25m", "success_50m",
+  "success_50m",
   "mean_top1_score", "mean_search_seconds", "total_search_seconds",
 ];
 const summaryMatrix = matrixFromRows(summaryRows, summaryColumns);
 const summaryBlock = addTable(summarySheet, summaryMatrix, 0, 0, "ModelSummaryTable");
 styleFlatSheet(summarySheet, summaryBlock.range);
 numberFormatColumns(summarySheet, summaryColumns, {
-  coverage: "0.0%", success_30m: "0.0%", success_30m_ci95_low: "0.0%",
-  success_30m_ci95_high: "0.0%", success_30m_failure_rate: "0.0%", auc_30m: "0.0%",
-  mean_error_under_30m: "0.00", median_error_under_30m: "0.00",
+  coverage: "0.0%", success_25m: "0.0%", success_25m_ci95_low: "0.0%",
+  success_25m_ci95_high: "0.0%", success_25m_failure_rate: "0.0%", auc_25m: "0.0%",
+  mean_error_under_25m: "0.00", median_error_under_25m: "0.00",
   mean_error_m: "0.00", median_error_m: "0.00",
   median_error_ci95_low: "0.00", median_error_ci95_high: "0.00",
   success_10m_ci95_low: "0.0%", success_10m_ci95_high: "0.0%",
   p90_error_m: "0.00", p95_error_m: "0.00", success_5m: "0.0%",
-  success_10m: "0.0%", success_25m: "0.0%", success_50m: "0.0%",
+  success_10m: "0.0%", success_50m: "0.0%",
   mean_top1_score: "0.0000", mean_search_seconds: "0.000",
   total_search_seconds: "0.0",
 }, 1, summaryRows.length);
@@ -287,7 +291,7 @@ numberFormatColumns(rawSheet, resultColumns, {
   error_m: "0.000", error_px: "0.000", top1_score: "0.0000",
   top2_score: "0.0000", peak_margin: "0.0000", psr: "0.00",
   query_std: "0.00", query_entropy: "0.00", query_dark_fraction: "0.0%",
-  success_30m: "0",
+  success_25m: "0",
   search_seconds: "0.000", query_inference_seconds: "0.000", map_build_seconds: "0.0",
 }, 1, rawChunks[0].length);
 rawSheet.getRangeByIndexes(0, 0, Math.max(1, firstRawMatrix.length), resultColumns.length).format.columnWidth = 15;

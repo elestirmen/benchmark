@@ -124,7 +124,7 @@ Varsayılan `--bidirectional`: Google→Bing, sonra Bing→Google. Tek yön içi
 - Her model iki tarafta da aynı kanal, normalizasyon, karo ve kırpma ayarını kullanır.
 - Top-1 yanında Top-2, peak margin ve PSR kaydedilir; hata GeoTIFF transformundan UTM metreye çevrilir.
 - ROI ve global sonuçlar birleştirilmez; ayrı özetlenir.
-- Her sorgu sonrası `results.jsonl` checkpoint; her model sonunda özet + Excel güncellenir.
+- Sonuçlar tek doğruluk kaynağı olan `results.jsonl` dosyasına 100 satır veya en geç 2 saniyelik paketlerle yazılır; her model sonunda tampon kesin olarak boşaltılır ve özet + hafif Excel güncellenir.
 - Kenar tamponu: varsayılan bir tam sorgu karosu (~162 m @ 30 cm GSD); merkezler sınırdan ~244 m içeride. Özel değer: `--query-edge-buffer-m 300`.
 
 ## Çalıştırma
@@ -197,7 +197,8 @@ Her koşu `outputs/<run_id>/` altındadır:
 ```text
 benchmark.log
 run_config.json
-results.jsonl / results.csv
+results.jsonl                    # çalışma sırasında paketli checkpoint
+results.csv                      # yalnız normal final dışa aktarımı
 summary.json / summary.csv
 summary_metadata.json
 model_errors.jsonl              # yalnız model hatası oluşursa
@@ -211,9 +212,9 @@ excel_previews\*.png          # yalnız Artifact motoru
 
 Paylaşılan CUDA derleme önbelleği koşu klasörünün dışında `outputs/cuda_cache/` altında tutulur.
 
-Excel sayfaları: `Özet`, `Model Özeti`, `Ham Sonuçlar`, `Sorgu Manifesti`, `Yapılandırma`, `Hatalar`.
+Model sonu hafif Excel sayfaları: `Özet`, `Model Özeti`, `Yapılandırma`, `Hatalar`. Final Excel bunlara `Ham Sonuçlar` ve `Sorgu Manifesti` sayfalarını ekler.
 
-Model sonu checkpointlerinde Excel baştan kurulmaz: `results.jsonl` dosyasının daha önce raporlanmış öneki SHA-256 ile doğrulanır, yalnızca yeni `Ham Sonuçlar` satırları eklenir ve küçük özet/pano sayfaları yenilenir. Eski raporun veri veya şeması kaynakla uyuşmazsa bilimsel içeriği riske atmamak için otomatik olarak tam üretime dönülür. Benchmark finalinde tam üretim ve derin doğrulama korunur.
+Model sonu checkpointlerinde büyük `results.csv` yeniden yazılmaz ve ham sonuçlar XLSX içine alınmaz. Yalnız tamamlanan sonuçlardan üretilen özet, global sıralama, yapılandırma ve model hataları küçük bir ara rapora yazılır. Benchmark normal tamamlandığında `results.csv` bir kez üretilir; ham sonuçları ve sorgu manifestini içeren tam Excel baştan oluşturulup derin doğrulanır.
 
 | Bayrak | Varsayılan | Anlamı |
 |---|---|---|
@@ -221,19 +222,19 @@ Model sonu checkpointlerinde Excel baştan kurulmaz: `results.jsonl` dosyasını
 | `--excel-update` | `model` | Her model sonunda yenile; yalnız sonda için `end` |
 | `--strict-excel` | açık | Excel üretilemezse koşuyu başarısız say |
 
-`benchmark_results.xlsx` Excel'de açık/kilitliyse dosya zorlanmaz ve benchmark durmaz. Güncel rapor aynı klasöre `benchmark_results_YYYYMMDD_HHMMSS_kilitli_kopya.xlsx` adıyla yazılır; gerçek son dosya `benchmark.log` ve `excel_latest.json` içinde belirtilir. Sonraki model ana dosyayı yeniden denerken en güncel kopyayı artımlı taban olarak kullanır.
+`benchmark_results.xlsx` Excel'de açık/kilitliyse dosya zorlanmaz ve benchmark durmaz. Güncel rapor aynı klasöre `benchmark_results_YYYYMMDD_HHMMSS_kilitli_kopya.xlsx` adıyla yazılır; gerçek son dosya `benchmark.log` ve `excel_latest.json` içinde belirtilir. Sonraki model ana dosyayı yeniden dener.
 
 ## Metrikler
 
-Ana ölçüt: **`success_30m`** — hata ≤ 30 m olan sorguların tüm sorgulara oranı (red/hata = başarısız).
+Ana ölçüt: **`success_25m`** — hata ≤ 25 m olan sorguların tüm sorgulara oranı (red/hata = başarısız).
 
-Sıralama: `success_30m` → `AUC@30m` → başarılıların medyan hatası (`median_error_under_30m`).
+Özet sayfası yalnız `search_mode=global` sonuçlarını gösterir. Sıralama: `success_25m` → `AUC@25m` → başarılıların medyan hatası (`median_error_under_25m`). ROI sonuçları `Model Özeti` sayfasında ayrı tutulur.
 
 | Metrik | Rol |
 |---|---|
-| `AUC@30m` | 0–30 m başarı CDF alanı (normalize); >30 m katkı yok |
-| `mean/median_error_under_30m` | Operasyonel başarıların hassasiyeti |
-| `success_5/10/25/50m` | İkincil, geriye dönük karşılaştırma |
+| `AUC@25m` | 0–25 m başarı CDF alanı (normalize); >25 m katkı yok |
+| `mean/median_error_under_25m` | Operasyonel başarıların hassasiyeti |
+| `success_5/10/50m` | İkincil, geriye dönük karşılaştırma |
 | ortalama / medyan / P90 / P95 hata | Tanısal; ana sıralamada değil |
 
 Sorgu başına ayrıca: UTM/piksel hata, Top-1/Top-2 NCC, peak margin, PSR, süreler, doku istatistikleri. `%95` CI için mekânsal blok bootstrap (varsayılan 1000; `--bootstrap-iterations`).

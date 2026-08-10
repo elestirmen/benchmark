@@ -16,6 +16,7 @@ if str(BENCHMARK_DIR) not in sys.path:
     sys.path.insert(0, str(BENCHMARK_DIR))
 
 from build_benchmark_excel_openpyxl import (  # noqa: E402
+    SUMMARY_COLUMNS,
     build_workbook,
     excel_values_equal,
     resolve_incremental_base,
@@ -66,12 +67,12 @@ class OpenpyxlReportTests(unittest.TestCase):
                     "coverage": 1.0,
                     "mean_error_m": 2.5,
                     "median_error_m": 2.5,
-                    "success_30m_queries": 1,
-                    "success_30m": 1.0,
-                    "success_30m_failure_rate": 0.0,
-                    "auc_30m": 0.9,
-                    "mean_error_under_30m": 2.5,
-                    "median_error_under_30m": 2.5,
+                    "success_25m_queries": 1,
+                    "success_25m": 1.0,
+                    "success_25m_failure_rate": 0.0,
+                    "auc_25m": 0.9,
+                    "mean_error_under_25m": 2.5,
+                    "median_error_under_25m": 2.5,
                     "success_10m": 1.0,
                 }
             ]
@@ -100,9 +101,63 @@ class OpenpyxlReportTests(unittest.TestCase):
             )
             self.assertEqual(workbook["_ExcelState"].sheet_state, "veryHidden")
             self.assertEqual(workbook["Özet"]["B5"].value, "=COUNTA('Ham Sonuçlar'!A2:A2)")
+            self.assertEqual(
+                [workbook["Özet"].cell(14, column).value for column in range(1, 5)],
+                ["Model (global arama)", "25 m başarı", "25 m içi medyan hata", "AUC@25m"],
+            )
+            self.assertIn("success_25m", SUMMARY_COLUMNS)
+            self.assertIn("auc_25m", SUMMARY_COLUMNS)
+            self.assertIn("median_error_under_25m", SUMMARY_COLUMNS)
+            self.assertFalse(any("30m" in column for column in SUMMARY_COLUMNS))
             self.assertEqual(len(workbook["Özet"]._charts), 1)
             self.assertEqual(workbook["Hatalar"].max_row, 2)
             self.assertEqual(len(workbook["Hatalar"].tables), 1)
+
+    def test_lightweight_checkpoint_omits_raw_data_and_ranks_only_global_search(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            (run_dir / "run_config.json").write_text(
+                json.dumps({"run_id": "lightweight_excel", "seed": 42}), encoding="utf-8"
+            )
+            base = {
+                "direction": "A__TO__B",
+                "query_variant": "clean",
+                "model_id": "model_01",
+                "total_queries": 10,
+                "ok_queries": 9,
+                "rejected_queries": 1,
+                "error_queries": 0,
+                "coverage": 0.9,
+                "success_25m_queries": 8,
+                "success_25m_failure_rate": 0.2,
+                "median_error_under_25m": 4.0,
+            }
+            summary = [
+                {**base, "search_mode": "global", "success_25m": 0.8, "auc_25m": 0.7},
+                {**base, "search_mode": "roi_500m", "success_25m": 1.0, "auc_25m": 0.95},
+            ]
+            (run_dir / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
+            (run_dir / "results.jsonl").write_text(
+                "".join(json.dumps({"status": "ok", "row": index}) + "\n" for index in range(500)),
+                encoding="utf-8",
+            )
+
+            output = run_dir / "benchmark_results.xlsx"
+            report = build_workbook(
+                run_dir, output, validation_mode="checkpoint", lightweight=True
+            )
+            self.assertEqual(report["report_scope"], "lightweight")
+            workbook = load_workbook(output, data_only=False)
+            self.assertEqual(workbook.sheetnames, ["Özet", "Model Özeti", "Yapılandırma", "Hatalar"])
+            self.assertNotIn("Ham Sonuçlar", workbook.sheetnames)
+            self.assertEqual(
+                workbook["Özet"]["B5"].value,
+                "=SUM('Model Özeti'!E2:E3)",
+            )
+            self.assertIn("'Model Özeti'!D2", workbook["Özet"]["A15"].value)
+            self.assertIsNone(workbook["Özet"]["A16"].value)
+            self.assertIn("yalnız global aramayı", workbook["Özet"]["A10"].value)
+            self.assertIn("ham sonuçlar yoktur", workbook["Özet"]["A10"].value)
 
     def test_incremental_update_appends_only_new_raw_rows_and_refreshes_dashboard(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -121,11 +176,11 @@ class OpenpyxlReportTests(unittest.TestCase):
                     "rejected_queries": 0,
                     "error_queries": 0,
                     "coverage": 1.0,
-                    "success_30m_queries": 1,
-                    "success_30m": 1.0,
-                    "success_30m_failure_rate": 0.0,
-                    "auc_30m": 0.9,
-                    "median_error_under_30m": 2.5,
+                    "success_25m_queries": 1,
+                    "success_25m": 1.0,
+                    "success_25m_failure_rate": 0.0,
+                    "auc_25m": 0.9,
+                    "median_error_under_25m": 2.5,
                 }
             ]
             (run_dir / "summary.json").write_text(json.dumps(first_summary), encoding="utf-8")
@@ -167,7 +222,7 @@ class OpenpyxlReportTests(unittest.TestCase):
                 {
                     **first_summary[0],
                     "model_id": "model_01",
-                    "median_error_under_30m": 4.0,
+                    "median_error_under_25m": 4.0,
                 }
             ]
             (run_dir / "summary.json").write_text(json.dumps(second_summary), encoding="utf-8")
