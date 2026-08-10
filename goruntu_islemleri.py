@@ -38,6 +38,14 @@ from typing import List, Tuple, Optional, Dict, Any, Sequence
 import re
 from datetime import datetime
 
+# RTX 50 serisinde TensorFlow 2.10 kernel'leri ilk kullanımda PTX'ten
+# derlenebilir.  CUDA driver cache ayarları, CUDA yükleyebilecek herhangi bir
+# üçüncü taraf modül import edilmeden önce görünür olmalıdır.
+_CUDA_CACHE_DIR = Path(__file__).resolve().parent / "outputs" / "cuda_cache"
+_CUDA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("CUDA_CACHE_PATH", str(_CUDA_CACHE_DIR))
+os.environ.setdefault("CUDA_CACHE_MAXSIZE", str(4 * 1024 ** 3))
+
 # ============================================================================
 # MERKEZI YAPILANDIRMA (CONFIG)
 # ============================================================================
@@ -381,14 +389,6 @@ def _build_pipeline_run_dir(output_root: str, image_name: str, run_name: Optiona
     run_folder = _safe_dir_name(run_name) if run_name else datetime.now().strftime("run_%Y%m%d_%H%M%S")
     image_folder = _safe_dir_name(image_name, fallback="girdi")
     return _unique_dir_path(os.path.join(output_root, image_folder, run_folder))
-
-# RTX 50 serisinde TensorFlow 2.10 kernel'leri ilk kullanımda PTX'ten derlenir.
-# Derlenen kernel'leri koşular arasında koru; kullanıcı tarafından verilen değer
-# varsa onu değiştirme.
-_CUDA_CACHE_DIR = Path(__file__).resolve().parent / "outputs" / "cuda_cache"
-_CUDA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-os.environ.setdefault("CUDA_CACHE_PATH", str(_CUDA_CACHE_DIR))
-os.environ.setdefault("CUDA_CACHE_MAXSIZE", str(4 * 1024 ** 3))
 
 # Keras ilk import sırasında h5py'yi göremezse aynı süreçte .h5 desteğini
 # kapalı tutabiliyor. Bu nedenle HDF5 desteğini TensorFlow'dan önce yükle.

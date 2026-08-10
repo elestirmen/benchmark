@@ -29,6 +29,7 @@ from geospatial_model_benchmark import (  # noqa: E402
     QueryRecord,
     aggregate_results,
     augment_hard_v1,
+    build_model_catalog,
     build_model_map,
     build_parser,
     main as benchmark_main,
@@ -285,6 +286,42 @@ class CorrectnessGuardTests(unittest.TestCase):
                 [path.name for path in select_models(model_dir, parse_patterns(None), None)],
                 ["a.h5", "b.keras", "c.hdf5"],
             )
+
+    def test_recursive_catalog_keeps_same_name_different_models_separate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            (model_dir / "run_a").mkdir()
+            (model_dir / "run_b").mkdir()
+            (model_dir / "run_a" / "model.h5").write_bytes(b"weights-a")
+            (model_dir / "run_b" / "model.h5").write_bytes(b"weights-b")
+
+            catalog = build_model_catalog(model_dir, parse_patterns(None), None)
+
+            self.assertEqual(catalog.discovered_files, 2)
+            self.assertEqual(len(catalog.models), 2)
+            self.assertEqual(catalog.duplicate_name_groups, 1)
+            self.assertEqual(catalog.conflicting_name_groups, 1)
+            self.assertEqual(len({model.model_id for model in catalog.models}), 2)
+            self.assertTrue(all(model.sha256[:12] in model.model_id for model in catalog.models))
+            self.assertEqual(
+                {model.relative_path for model in catalog.models},
+                {"run_a/model.h5", "run_b/model.h5"},
+            )
+
+    def test_recursive_catalog_skips_byte_identical_copies(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            (model_dir / "run_a").mkdir()
+            (model_dir / "run_b").mkdir()
+            (model_dir / "run_a" / "first.h5").write_bytes(b"same-weights")
+            (model_dir / "run_b" / "copy.hdf5").write_bytes(b"same-weights")
+
+            catalog = build_model_catalog(model_dir, parse_patterns(None), None)
+
+            self.assertEqual(catalog.discovered_files, 2)
+            self.assertEqual(len(catalog.models), 1)
+            self.assertEqual(catalog.identical_files_skipped, 1)
+            self.assertEqual(len(catalog.models[0].duplicate_paths), 1)
 
     def test_output_conversion_modes_are_non_overlapping_and_explicit(self) -> None:
         from goruntu_islemleri import prediction_to_uint8

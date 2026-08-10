@@ -75,7 +75,7 @@ python gpu_test.py
 
 Model içeren bir koşudan önce `gpu_test.py` çıktısında en az bir GPU görünmelidir. Benchmark, model haritası ve model sorgusu çıkarımlarında GPU'yu zorunlu kılar; GPU yoksa ilgili model `model_errors.jsonl` dosyasına hata olarak yazılır. Yalnız `RAW_BASELINE` çalıştıran `--no-include-models` koşusu model çıkarımı yapmaz.
 
-RTX 50 serisinde `gpu_test.py` içindeki ilk matris işlemi ve ilk model çıkarımı PTX derlemesi nedeniyle 30 dakika veya daha uzun sürebilir. Compute Capability 12.0 için görülen JIT uyarısı bu durumda beklenir. Derlenen kernel'ler varsayılan olarak `outputs/cuda_cache/` altında, en çok 4 GiB olacak şekilde saklanır; mevcut `CUDA_CACHE_PATH` ve `CUDA_CACHE_MAXSIZE` ortam değişkenleri varsa korunur.
+RTX 50 serisinde native Windows TensorFlow 2.10 süreci her başlatıldığında CUDA bağlamı ve TensorFlow çalışma grafiği yeniden kurulur. Compute Capability 12.0 için eksik hazır kernel'ler ilk model yüklemesi/ilk batch sırasında PTX'ten JIT derlenebilir; bu maliyet yeni Python sürecinde tekrar görülebilir. Derlenen sürücü kernel'leri varsayılan olarak `outputs/cuda_cache/` altında, en çok 4 GiB olacak şekilde süreçler arasında saklanır; mevcut `CUDA_CACHE_PATH` ve `CUDA_CACHE_MAXSIZE` değerleri korunur. Disk cache JIT yükünü azaltır fakat süreç içi CUDA bağlamını, TensorFlow graph hazırlığını ve model-özel autotuning'i ortadan kaldırmaz. Benchmark logu artık model yükleme ile ilk GPU batch süresini ayrı gösterir; uzun koşuyu yeniden başlatmak yerine aynı süreçte sürdürmek bu başlangıç maliyetini yalnız bir kez öder.
 
 Excel yedek motoru olan openpyxl her iki kurulum dosyasında da bulunur. Gerekirse tek başına şu komutla kurulabilir:
 
@@ -165,7 +165,7 @@ python geospatial_model_benchmark.py `
 
 ### 4. Tüm modeller, 300 sorgu
 
-`--models` yoksa `models/` altındaki tüm uygun dosyalar işlenir.
+`--models` yoksa `models/` alt klasörleri dahil tüm uygun dosyalar işlenir. Başlangıçta bütün adaylar SHA-256 ile kataloglanır: birebir aynı içerikli kopyalar yalnız bir kez çalıştırılır; aynı dosya adına sahip fakat içeriği farklı modeller göreli klasör yolu ve kısa SHA içeren ayrı `model_id` değerleri alır. Ayrıntılı liste `model_catalog.json`, sayımlar ve katalog özeti `run_config.json` ile başlangıç loguna yazılır. `--max-models`, SHA tekilleştirmesinden sonraki gerçek model sayısına uygulanır.
 
 ```powershell
 python geospatial_model_benchmark.py `
@@ -191,7 +191,7 @@ python geospatial_model_benchmark.py `
   --samples-per-block 5
 ```
 
-Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları ve `SCIENTIFIC_SEMANTICS_VERSION=2` merkez konvansiyonunu kilitler; `--search-workers` imzada değildir.
+Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları, model kataloğunun göreli yol/SHA özetini ve `SCIENTIFIC_SEMANTICS_VERSION=2` merkez konvansiyonunu kilitler; `--search-workers` imzada değildir.
 
 Semantik v1 veya sürümsüz eski bir sonuç klasörü v2 koduyla resume edilmez; eski/yeni merkez gerçeklerinin karışmaması için açık hata verilir ve yeni `--run-id` gerekir.
 
@@ -204,6 +204,7 @@ Her koşu `outputs/<run_id>/` altındadır:
 ```text
 benchmark.log
 run_config.json
+model_catalog.json               # göreli yol + SHA + benzersiz model_id kataloğu
 results.jsonl                    # çalışma sırasında paketli checkpoint
 results.csv                      # yalnız normal final dışa aktarımı
 summary.json / summary.csv

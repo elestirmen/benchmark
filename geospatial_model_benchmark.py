@@ -39,16 +39,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
-import cv2
-import numpy as np
-import rasterio
-from affine import Affine
-from rasterio.coords import BoundingBox
-from rasterio.transform import rowcol
-from rasterio.windows import Window
-
-
+# CUDA's disk cache must be configured before importing libraries that can load
+# the CUDA driver.  TensorFlow itself is imported lazily, but OpenCV and other
+# binary dependencies are imported below and must not get a chance to create a
+# CUDA context first.
 SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_CUDA_CACHE_DIR = SCRIPT_DIR / "outputs" / "cuda_cache"
+DEFAULT_CUDA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("CUDA_CACHE_PATH", str(DEFAULT_CUDA_CACHE_DIR))
+os.environ.setdefault("CUDA_CACHE_MAXSIZE", str(4 * 1024**3))
+
+import cv2  # noqa: E402
+import numpy as np  # noqa: E402
+import rasterio  # noqa: E402
+from affine import Affine  # noqa: E402
+from rasterio.coords import BoundingBox  # noqa: E402
+from rasterio.transform import rowcol  # noqa: E402
+from rasterio.windows import Window  # noqa: E402
+
+
 DEFAULT_QUERY = SCRIPT_DIR / "urgup_30_cm_yeni_gmaps_utm.tif"
 DEFAULT_MAP = SCRIPT_DIR / "urgup_bingmap_utm_30_cm.tif"
 DEFAULT_MODEL_DIR = SCRIPT_DIR / "models"
@@ -57,6 +66,7 @@ RAW_MODEL_ID = "RAW_BASELINE"
 SCIENTIFIC_SEMANTICS_VERSION = 2
 QUERY_MANIFEST_SCHEMA_VERSION = 2
 SUMMARY_STATE_SCHEMA_VERSION = 2
+MODEL_CATALOG_SCHEMA_VERSION = 1
 
 DEFAULT_SEARCH_MODE_ORDER = {
     "roi_500m": 0,
@@ -250,6 +260,55 @@ def safe_slug(value: str, max_len: int = 120) -> str:
     return cleaned[:max_len]
 
 
+@dataclass(frozen=True)
+class ModelSpec:
+    """One scientifically distinct model selected for the benchmark."""
+
+    path: Path
+    relative_path: str
+    sha256: str
+    model_id: str
+    size_bytes: int
+    mtime_ns: int
+    duplicate_paths: tuple[str, ...] = ()
+
+    def signature_entry(self) -> dict[str, Any]:
+        return {
+            "relative_path": self.relative_path,
+            "sha256": self.sha256,
+            "model_id": self.model_id,
+        }
+
+    def config_entry(self) -> dict[str, Any]:
+        return {
+            **self.signature_entry(),
+            "path": str(self.path.resolve()),
+            "size_bytes": self.size_bytes,
+            "mtime_ns": self.mtime_ns,
+            "duplicate_paths": list(self.duplicate_paths),
+        }
+
+
+@dataclass(frozen=True)
+class ModelCatalog:
+    models: tuple[ModelSpec, ...]
+    discovered_files: int
+    unique_content_files: int
+    identical_files_skipped: int
+    duplicate_name_groups: int
+    conflicting_name_groups: int
+
+    def stats(self) -> dict[str, int]:
+        return {
+            "discovered_files": self.discovered_files,
+            "unique_content_files": self.unique_content_files,
+            "selected_models": len(self.models),
+            "identical_files_skipped": self.identical_files_skipped,
+            "duplicate_name_groups": self.duplicate_name_groups,
+            "conflicting_name_groups": self.conflicting_name_groups,
+        }
+
+
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -357,7 +416,7 @@ def select_models(model_dir: Path, patterns: Sequence[str], max_models: int | No
         raise FileNotFoundError(f"Model klasörü bulunamadı: {model_dir}")
     files = [
         path
-        for path in sorted(model_dir.iterdir(), key=lambda p: p.name.lower())
+        for path in sorted(model_dir.rglob("*"), key=lambda p: str(p).lower())
         if path.is_file() and any(fnmatch.fnmatch(path.name, pattern) for pattern in patterns)
     ]
     if max_models is not None:
@@ -367,6 +426,80 @@ def select_models(model_dir: Path, patterns: Sequence[str], max_models: int | No
             f"Model bulunamadı: dir={model_dir}, patterns={','.join(patterns)}"
         )
     return files
+
+
+def model_id_for_path(model_path: Path, model_dir: Path, model_sha256: str) -> str:
+    """Build a readable ID that remains unique across recursive directories."""
+    try:
+        relative = model_path.resolve().relative_to(model_dir.resolve())
+    except ValueError:
+        relative = Path(model_path.name)
+    relative_stem = relative.with_suffix("").as_posix().replace("/", "__")
+    # Keep Windows output paths comfortably below legacy path limits while the
+    # hash suffix preserves uniqueness after truncation.
+    readable = safe_slug(relative_stem, max_len=72)
+    return f"{readable}__{model_sha256[:12]}"
+
+
+def build_model_catalog(
+    model_dir: Path,
+    patterns: Sequence[str],
+    max_models: int | None,
+) -> ModelCatalog:
+    """Hash recursive model inputs, remove byte-identical copies, and assign stable IDs."""
+    candidates = select_models(model_dir, patterns, None)
+    name_groups: dict[str, list[tuple[Path, str]]] = {}
+    content_groups: dict[str, list[Path]] = {}
+    ordered_hashes: list[str] = []
+
+    for path in candidates:
+        model_sha = sha256_file(path)
+        name_groups.setdefault(path.name.casefold(), []).append((path, model_sha))
+        if model_sha not in content_groups:
+            ordered_hashes.append(model_sha)
+            content_groups[model_sha] = []
+        content_groups[model_sha].append(path)
+
+    duplicate_name_groups = sum(1 for items in name_groups.values() if len(items) > 1)
+    conflicting_name_groups = sum(
+        1 for items in name_groups.values() if len({model_sha for _, model_sha in items}) > 1
+    )
+    selected_hashes = ordered_hashes[:max_models] if max_models is not None else ordered_hashes
+    specs: list[ModelSpec] = []
+    for model_sha in selected_hashes:
+        paths = content_groups[model_sha]
+        canonical = paths[0]
+        stat = canonical.stat()
+        relative = canonical.resolve().relative_to(model_dir.resolve()).as_posix()
+        duplicate_paths = tuple(
+            path.resolve().relative_to(model_dir.resolve()).as_posix() for path in paths[1:]
+        )
+        specs.append(
+            ModelSpec(
+                path=canonical,
+                relative_path=relative,
+                sha256=model_sha,
+                model_id=model_id_for_path(canonical, model_dir, model_sha),
+                size_bytes=stat.st_size,
+                mtime_ns=stat.st_mtime_ns,
+                duplicate_paths=duplicate_paths,
+            )
+        )
+
+    model_ids = [model.model_id for model in specs]
+    if len(model_ids) != len(set(model_ids)):
+        raise RuntimeError(
+            "Model kataloğunda göreli yol + SHA kimliği çakıştı; sonuç üretimi güvenle başlatılamaz."
+        )
+
+    return ModelCatalog(
+        models=tuple(specs),
+        discovered_files=len(candidates),
+        unique_content_files=len(content_groups),
+        identical_files_skipped=sum(len(paths) - 1 for paths in content_groups.values()),
+        duplicate_name_groups=duplicate_name_groups,
+        conflicting_name_groups=conflicting_name_groups,
+    )
 
 
 def intersection_bounds(a: BoundingBox, b: BoundingBox) -> BoundingBox:
@@ -1382,7 +1515,10 @@ def build_model_map(
                 crs=source.crs,
             )
             with rasterio.open(partial_path, "w", **output_profile) as destination:
-                for batch_start in range(0, len(tile_plan), batch_size):
+                total_batches = (len(tile_plan) + batch_size - 1) // batch_size
+                for batch_idx, batch_start in enumerate(range(0, len(tile_plan), batch_size), start=1):
+                    if total_batches >= 5 and batch_idx % max(1, total_batches // 10) == 0:
+                        LOG.info("Harita işleniyor | %s | batch %d/%d (%%%d)", model_id, batch_idx, total_batches, int(100 * batch_idx / total_batches))
                     batch_plan = tile_plan[batch_start : batch_start + batch_size]
                     source_tiles: list[np.ndarray] = []
                     for i, j, start_y, start_x in batch_plan:
@@ -1393,11 +1529,20 @@ def build_model_map(
                         source_tiles.append(tile)
                         if keep_intermediate:
                             write_png(input_debug_dir / f"goruntu_{i}_{j}.png", tile)
+                    prediction_started = time.perf_counter()
                     predictions = model_runtime.predict_images(
                         source_tiles,
                         image_size=(tile_size, tile_size),
                         source_color="rgb",
                     )
+                    if batch_idx == 1:
+                        LOG.info(
+                            "İLK GPU BATCH HAZIR | model=%s | batch=%d | süre=%.2f sn | "
+                            "CUDA bağlamı, PTX yükleme/JIT ve TensorFlow graph hazırlığı dahil olabilir",
+                            model_id,
+                            len(batch_plan),
+                            time.perf_counter() - prediction_started,
+                        )
                     if len(predictions) != len(batch_plan):
                         raise RuntimeError(
                             f"Model returned {len(predictions)} tiles for a batch of {len(batch_plan)}."
@@ -3354,7 +3499,13 @@ def direction_name(query_raster: Path, map_raster: Path) -> str:
     return f"{query_raster.stem}__TO__{map_raster.stem}"
 
 
-def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, map_raster: Path) -> None:
+def run_direction(
+    args: argparse.Namespace,
+    run_dir: Path,
+    query_raster: Path,
+    map_raster: Path,
+    model_catalog: ModelCatalog | None = None,
+) -> None:
     direction = direction_name(query_raster, map_raster)
     direction_dir = run_dir / safe_slug(direction)
     direction_dir.mkdir(parents=True, exist_ok=True)
@@ -3459,29 +3610,60 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
     if not args.include_models:
         return
     assert metadata is not None
-    patterns = parse_patterns(args.models)
-    models = select_models(args.model_dir, patterns, args.max_models)
-    LOG.info("MODEL LİSTESİ | adet=%d", len(models))
-    for position, model_path in enumerate(models, start=1):
-        model_id = safe_slug(model_path.stem)
+    if model_catalog is None:
+        model_catalog = build_model_catalog(
+            args.model_dir,
+            parse_patterns(args.models),
+            args.max_models,
+        )
+    models = model_catalog.models
+    LOG.info(
+        "MODEL KATALOĞU | dosya=%d | benzersiz_içerik=%d | aynı_içerik_atlanan=%d | "
+        "aynı_ad_grubu=%d | aynı_ad_farklı_içerik_grubu=%d",
+        model_catalog.discovered_files,
+        model_catalog.unique_content_files,
+        model_catalog.identical_files_skipped,
+        model_catalog.duplicate_name_groups,
+        model_catalog.conflicting_name_groups,
+    )
+    LOG.info("MODEL LİSTESİ | çalıştırılacak=%d", len(models))
+    for position, model_spec in enumerate(models, start=1):
+        model_path = model_spec.path
+        model_id = model_spec.model_id
         model_status = "başarısız"
-        LOG.info("MODEL BAŞLIYOR | %d/%d | %s", position, len(models), model_path.name)
-        model_sha = sha256_file(model_path)
-        previous_model_shas = {
-            str(row.get("model_sha256"))
-            for row in existing_rows
-            if row.get("direction") == direction
-            and row.get("model_id") == model_id
-            and row.get("model_sha256")
-        }
-        if previous_model_shas and previous_model_shas != {model_sha}:
-            raise RuntimeError(
-                f"Model dosyası önceki checkpointten sonra değişmiş: {model_path.name}. "
-                "Sonuçların karışmaması için yeni bir --run-id kullanın."
-            )
-        model_root = direction_dir / "models" / model_id
+        model_sha = model_spec.sha256
         excel_refresh_needed = True
+        LOG.info(
+            "MODEL BAŞLIYOR | %d/%d | id=%s | dosya=%s",
+            position,
+            len(models),
+            model_id,
+            model_spec.relative_path,
+        )
         try:
+            current_stat = model_path.stat()
+            if (
+                current_stat.st_size != model_spec.size_bytes
+                or current_stat.st_mtime_ns != model_spec.mtime_ns
+            ):
+                raise RuntimeError(
+                    f"Model dosyası katalog oluşturulduktan sonra değişmiş: {model_spec.relative_path}. "
+                    "Yeni bir koşu başlatın."
+                )
+            previous_model_shas = {
+                str(row.get("model_sha256"))
+                for row in existing_rows
+                if row.get("direction") == direction
+                and row.get("model_id") == model_id
+                and row.get("model_sha256")
+            }
+            if previous_model_shas and previous_model_shas != {model_sha}:
+                raise RuntimeError(
+                    f"Model dosyası önceki checkpointten sonra değişmiş: {model_path.name}. "
+                    "Sonuçların karışmaması için yeni bir --run-id kullanın veya dosyayı atlayın."
+                )
+            model_root = direction_dir / "models" / model_id
+
             pending_model_variants = [
                 (query_variant, variant_queries)
                 for query_variant, variant_queries in query_variants.items()
@@ -3505,14 +3687,30 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                 )
                 continue
             Runtime = import_loaded_model_runtime()
-            model_runtime = Runtime.load(
-                str(model_path),
-                color_mode="grayscale",
-                normalization=args.normalization,
-                enhancement=args.enhancement,
-                require_gpu=True,
-                output_value_mode=args.output_value_mode,
-            )
+            load_started = time.perf_counter()
+            LOG.info("MODEL YÜKLEME BAŞLADI | %s", model_id)
+            try:
+                model_runtime = Runtime.load(
+                    str(model_path),
+                    color_mode="grayscale",
+                    normalization=args.normalization,
+                    enhancement=args.enhancement,
+                    require_gpu=True,
+                    output_value_mode=args.output_value_mode,
+                )
+            except Exception:
+                LOG.error(
+                    "MODEL YÜKLEME BAŞARISIZ | %s | süre=%.2f sn",
+                    model_id,
+                    time.perf_counter() - load_started,
+                )
+                raise
+            else:
+                LOG.info(
+                    "MODEL YÜKLEME BİTTİ | %s | süre=%.2f sn | ilk süreçte CUDA/PTX hazırlığı dahil olabilir",
+                    model_id,
+                    time.perf_counter() - load_started,
+                )
             try:
                 model_map, map_seconds = build_model_map(
                     model_path,
@@ -3582,6 +3780,10 @@ def run_direction(args: argparse.Namespace, run_dir: Path, query_raster: Path, m
                     del model_search_map
             finally:
                 model_runtime.close()
+
+            if getattr(args, "cleanup_maps", False) and model_root.exists():
+                shutil.rmtree(model_root, ignore_errors=True)
+                LOG.info("TEMİZLİK | %s modelinin geçici klasörü silindi.", model_id)
         except Exception as exc:
             LOG.error("MODEL BAŞARISIZ | %s | %s", model_path.name, exc)
             LOG.debug("Model traceback:\n%s", traceback.format_exc())
@@ -3724,6 +3926,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--keep-intermediate", action="store_true")
     parser.add_argument("--force-queries", action="store_true")
     parser.add_argument("--force-maps", action="store_true")
+    parser.add_argument("--cleanup-maps", action="store_true", help="Her model işlemi bittikten sonra geçici harita dosyalarını siler.")
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--strict-excel", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument(
@@ -3765,7 +3968,10 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("En az RAW veya model kanalı etkin olmalıdır.")
 
 
-def resume_signature_payload(args: argparse.Namespace) -> dict[str, Any]:
+def resume_signature_payload(
+    args: argparse.Namespace,
+    model_catalog: ModelCatalog | None = None,
+) -> dict[str, Any]:
     """Return only settings that can change scientific benchmark results."""
 
     def raster_identity(path: Path) -> dict[str, Any]:
@@ -3776,14 +3982,29 @@ def resume_signature_payload(args: argparse.Namespace) -> dict[str, Any]:
             "mtime_ns": stat.st_mtime_ns,
         }
 
+    model_inventory = [
+        model.signature_entry() for model in (model_catalog.models if model_catalog else ())
+    ]
+    inventory_canonical = json.dumps(
+        model_inventory,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
     return {
         "schema_version": 2,
         "scientific_semantics_version": SCIENTIFIC_SEMANTICS_VERSION,
+        "model_catalog_schema_version": MODEL_CATALOG_SCHEMA_VERSION,
         "query_raster": raster_identity(args.query_raster),
         "map_raster": raster_identity(args.map_raster),
         "model_dir": str(args.model_dir.resolve()),
         "models": list(args.models or []),
         "max_models": args.max_models,
+        "model_inventory_count": len(model_inventory),
+        "model_inventory_sha256": hashlib.sha256(
+            inventory_canonical.encode("utf-8")
+        ).hexdigest(),
         "bidirectional": args.bidirectional,
         "include_raw": args.include_raw,
         "include_models": args.include_models,
@@ -3841,9 +4062,42 @@ def main(argv: Sequence[str] | None = None) -> int:
     LOG.info("Log: %s", log_path)
     LOG.info("Sistem: %s", json.dumps(system_info(), ensure_ascii=False))
 
+    cache_path = Path(os.environ["CUDA_CACHE_PATH"])
+    cache_bytes = sum(
+        path.stat().st_size
+        for path in cache_path.rglob("*")
+        if path.is_file()
+    )
+    LOG.info(
+        "CUDA CACHE | path=%s | max=%s | mevcut=%.1f MiB | "
+        "disk cache süreçler arası PTX yükünü azaltır; TensorFlow/CUDA bağlamı her süreçte yeniden kurulur",
+        cache_path,
+        os.environ.get("CUDA_CACHE_MAXSIZE", ""),
+        cache_bytes / (1024 * 1024),
+    )
+
+    model_catalog: ModelCatalog | None = None
+    if args.include_models:
+        catalog_started = time.perf_counter()
+        LOG.info("MODEL KATALOĞU HAZIRLANIYOR | kök=%s", args.model_dir)
+        model_catalog = build_model_catalog(
+            args.model_dir,
+            parse_patterns(args.models),
+            args.max_models,
+        )
+        LOG.info(
+            "MODEL KATALOĞU HAZIR | dosya=%d | çalıştırılacak=%d | aynı_içerik_atlanan=%d | "
+            "aynı_ad_farklı_içerik_grubu=%d | süre=%.2f sn",
+            model_catalog.discovered_files,
+            len(model_catalog.models),
+            model_catalog.identical_files_skipped,
+            model_catalog.conflicting_name_groups,
+            time.perf_counter() - catalog_started,
+        )
+
     config_path = run_dir / "run_config.json"
     results_path = run_dir / "results.jsonl"
-    resume_payload = resume_signature_payload(args)
+    resume_payload = resume_signature_payload(args, model_catalog)
     resume_signature = signature_sha256(resume_payload)
     if config_path.is_file() and results_path.is_file():
         previous_config = json.loads(config_path.read_text(encoding="utf-8"))
@@ -3875,6 +4129,23 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "Eski koşuda resume_signature yok; mevcut uyumlu ayarlar yeni imzayla kaydedilecek."
             )
 
+    model_catalog_path = run_dir / "model_catalog.json"
+    model_catalog_payload = {
+        "schema_version": MODEL_CATALOG_SCHEMA_VERSION,
+        "model_dir": str(args.model_dir),
+        "patterns": list(parse_patterns(args.models)),
+        "max_models": args.max_models,
+        "stats": model_catalog.stats() if model_catalog else None,
+        "models": [model.config_entry() for model in model_catalog.models]
+        if model_catalog
+        else [],
+    }
+    model_catalog_path.write_text(
+        json.dumps(model_catalog_payload, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    model_catalog_sha = sha256_file(model_catalog_path)
+
     config = vars(args).copy()
     config["query_raster"] = str(args.query_raster)
     config["map_raster"] = str(args.map_raster)
@@ -3886,6 +4157,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         {"name": name, "roi_radius_m": radius} for name, radius in args.search_modes
     ]
     config["hard_v1_profile"] = HARD_V1_PROFILE
+    config["model_catalog_schema_version"] = MODEL_CATALOG_SCHEMA_VERSION
+    config["model_catalog_stats"] = model_catalog.stats() if model_catalog else None
+    config["model_catalog_file"] = str(model_catalog_path)
+    config["model_catalog_sha256"] = model_catalog_sha
     config["scientific_semantics_version"] = SCIENTIFIC_SEMANTICS_VERSION
     config["resume_signature_payload"] = resume_payload
     config["resume_signature"] = resume_signature
@@ -3897,9 +4172,21 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     started = time.perf_counter()
     try:
-        run_direction(args, run_dir, args.query_raster, args.map_raster)
+        run_direction(
+            args,
+            run_dir,
+            args.query_raster,
+            args.map_raster,
+            model_catalog,
+        )
         if args.bidirectional:
-            run_direction(args, run_dir, args.map_raster, args.query_raster)
+            run_direction(
+                args,
+                run_dir,
+                args.map_raster,
+                args.query_raster,
+                model_catalog,
+            )
         summary_json, summary_csv = write_summary_files(run_dir)
         LOG.info("Özet dosyaları: %s | %s", summary_json, summary_csv)
         workbook = invoke_excel_report(
