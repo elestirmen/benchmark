@@ -180,6 +180,8 @@ Model haritası varsayılan olarak GeoTIFF pencerelerini doğrudan batch RAM'e o
 
 Arama varsayılanı `--search-workers 8` (güvenli aralık 1–8). İşçiler harita ve piramitleri salt-okunur paylaşır; checkpoint tek koordinatörde yazılır. Seri referans için `--search-workers 1`. Ürgüp’te 6 mod / 48 görev ölçümünde ~2.5× hızlanma görülmüş; konum/NCC/başarı alanları seri ile birebir aynı kalmıştır.
 
+Her model denemesinden sonra logda `MODEL TARAMA SÜRESİ` satırı yazılır. Bu satır gerçek model süresini, son beş başarıyla tamamlanan modelin medyanını ve mevcut yön için kalan yaklaşık süreyi gösterir. Tahmin yön bazlıdır; ilk modelin CUDA/PTX soğuk başlangıcı ve farklı model mimarileri nedeniyle özellikle ilk birkaç modelde değişebilir. Model-sonu Excel süresi ayrıca `ARA EXCEL TAMAMLANDI` satırında raporlanır.
+
 Bir model yüklenemezse veya GPU çıkarımı başarısız olursa hata `model_errors.jsonl` içine kaydedilir ve varsayılan olarak sonraki modele geçilir. İlk model hatasında koşuyu durdurmak için `--fail-fast` kullanın. Model başarıyla yüklenmeden boş model çıktı klasörleri oluşturulmaz.
 
 ## Devam ettirme

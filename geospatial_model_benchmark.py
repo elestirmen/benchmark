@@ -3627,7 +3627,9 @@ def run_direction(
         model_catalog.conflicting_name_groups,
     )
     LOG.info("MODEL LİSTESİ | çalıştırılacak=%d", len(models))
+    completed_model_seconds: list[float] = []
     for position, model_spec in enumerate(models, start=1):
+        model_started = time.perf_counter()
         model_path = model_spec.path
         model_id = model_spec.model_id
         model_status = "başarısız"
@@ -3804,6 +3806,36 @@ def run_direction(
             model_status = "tamamlandı"
             LOG.info("MODEL TAMAMLANDI | %d/%d | %s", position, len(models), model_path.name)
         finally:
+            model_elapsed = time.perf_counter() - model_started
+            if model_status == "tamamlandı":
+                completed_model_seconds.append(model_elapsed)
+            recent_median = (
+                float(np.median(completed_model_seconds[-5:]))
+                if completed_model_seconds
+                else None
+            )
+            remaining_models = len(models) - position
+            if recent_median is None:
+                LOG.info(
+                    "MODEL TARAMA SÜRESİ | %d/%d | durum=%s | süre=%.2f dk | "
+                    "kalan_tahmini=hesaplanamadı",
+                    position,
+                    len(models),
+                    model_status,
+                    model_elapsed / 60.0,
+                )
+            else:
+                LOG.info(
+                    "MODEL TARAMA SÜRESİ | %d/%d | durum=%s | süre=%.2f dk | "
+                    "son_%d_medyan=%.2f dk | bu_yönde_kalan_tahmini=%.2f saat",
+                    position,
+                    len(models),
+                    model_status,
+                    model_elapsed / 60.0,
+                    min(5, len(completed_model_seconds)),
+                    recent_median / 60.0,
+                    (recent_median * remaining_models) / 3600.0,
+                )
             if excel_refresh_needed:
                 refresh_excel_after_model(
                     run_dir,
