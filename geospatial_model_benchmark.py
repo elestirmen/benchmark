@@ -3064,6 +3064,10 @@ def aggregate_results(
                 "query_variant": query_variant,
                 "search_mode": search_mode,
                 "model_id": model_id,
+                "result_completed_at_utc": max(
+                    (str(row["created_at_utc"]) for row in group if row.get("created_at_utc")),
+                    default=None,
+                ),
                 "total_queries": len(group),
                 "ok_queries": len(ok),
                 "rejected_queries": sum(row.get("status") == "rejected" for row in group),
@@ -3099,6 +3103,7 @@ SUMMARY_COMPACT_COLUMNS = (
     "error_m",
     "search_seconds",
     "top1_score",
+    "created_at_utc",
 )
 
 

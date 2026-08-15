@@ -659,6 +659,15 @@ class AggregateTests(unittest.TestCase):
         self.assertEqual(summary[0]["success_25m"], 1.0)
         self.assertEqual(summary[1]["success_25m"], 0.0)
 
+    def test_summary_records_latest_result_timestamp_for_each_group(self) -> None:
+        rows = [
+            {"direction": "A", "model_id": "M", "status": "ok", "error_m": 2.0,
+             "created_at_utc": stamp}
+            for stamp in ("2026-08-15T10:00:00+00:00", "2026-08-15T10:05:00+00:00")
+        ]
+        summary = aggregate_results(rows, bootstrap_iterations=0)
+        self.assertEqual(summary[0]["result_completed_at_utc"], "2026-08-15T10:05:00+00:00")
+
     def test_summary_order_is_roi_small_to_global_within_each_model(self) -> None:
         rows = []
         for mode in ("global", "roi_8000m", "roi_500m", "roi_2000m", "roi_1000m"):

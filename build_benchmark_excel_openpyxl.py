@@ -36,6 +36,7 @@ MAX_CELL_TEXT = 32_700
 STATE_SHEET = "_ExcelState"
 STATE_SCHEMA_VERSION = 1
 LATEST_POINTER = "excel_latest.json"
+RESULT_TIME_INDEX = "excel_result_times.json"
 REQUIRED_SHEETS = [
     "Özet",
     "Model Özeti",
@@ -116,6 +117,7 @@ MODEL_SUMMARY_COLUMNS = [
     "model_label",
     "model_id",
     "model_epoch",
+    "result_completed_at_utc",
     "total_queries",
     "ok_queries",
     "coverage",
@@ -134,6 +136,7 @@ MODEL_SUMMARY_HEADERS = {
     "model_label": "Model",
     "model_id": "Model ID",
     "model_epoch": "Epoch",
+    "result_completed_at_utc": "Sonuç alınma tarihi (UTC)",
     "total_queries": "N",
     "ok_queries": "Başarılı N",
     "coverage": "Kapsam",
@@ -176,6 +179,7 @@ QUERY_COLUMNS = [
 ]
 
 SUMMARY_FORMATS = {
+    "result_completed_at_utc": "yyyy-mm-dd hh:mm:ss",
     "coverage": "0.0%",
     "success_25m": "0.0%",
     "success_25m_ci95_low": "0.0%",
@@ -280,6 +284,83 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def enrich_summary_result_times(
+    run_dir: Path, rows: Sequence[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Incrementally index the latest raw-result timestamp for each summary group."""
+    results_path = run_dir / "results.jsonl"
+    index_path = run_dir / RESULT_TIME_INDEX
+    state = read_json(index_path, {})
+    if not isinstance(state, dict) or state.get("schema_version") != 1:
+        state = {}
+    times = state.get("times", {}) if isinstance(state.get("times"), dict) else {}
+    offset = int(state.get("offset", 0) or 0)
+    size = results_path.stat().st_size if results_path.is_file() else 0
+    if offset < 0 or offset > size:
+        offset, times = 0, {}
+    if results_path.is_file() and offset < size:
+        with results_path.open("rb") as handle:
+            handle.seek(offset)
+            while True:
+                line_start = handle.tell()
+                raw = handle.readline()
+                if not raw:
+                    break
+                if not raw.endswith(b"\n"):
+                    handle.seek(line_start)
+                    break
+                try:
+                    result = json.loads(raw)
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    continue
+                stamp = result.get("created_at_utc")
+                if not stamp:
+                    continue
+                key = "\x1f".join(
+                    str(result.get(name, default))
+                    for name, default in (
+                        ("direction", ""),
+                        ("query_variant", "clean"),
+                        ("search_mode", "global"),
+                        ("model_id", ""),
+                    )
+                )
+                if str(stamp) > str(times.get(key, "")):
+                    times[key] = str(stamp)
+            offset = handle.tell()
+        temporary = index_path.with_name(f".{index_path.name}.{os.getpid()}.tmp")
+        temporary.write_text(
+            json.dumps({"schema_version": 1, "offset": offset, "times": times}, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        os.replace(temporary, index_path)
+    enriched = []
+    for source in rows:
+        row = dict(source)
+        key = "\x1f".join(
+            str(row.get(name, default))
+            for name, default in (
+                ("direction", ""),
+                ("query_variant", "clean"),
+                ("search_mode", "global"),
+                ("model_id", ""),
+            )
+        )
+        stamp = row.get("result_completed_at_utc") or times.get(key)
+        if stamp:
+            try:
+                parsed = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+                if parsed.tzinfo is not None:
+                    parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
+                row["result_completed_at_utc"] = parsed
+            except ValueError:
+                row["result_completed_at_utc"] = None
+        else:
+            row["result_completed_at_utc"] = None
+        enriched.append(row)
+    return enriched
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     if not path.is_file():
@@ -365,7 +446,7 @@ def utc_now_iso() -> str:
 
 
 def excel_value(value: Any) -> Any:
-    if value is None or isinstance(value, (bool, int, float)):
+    if value is None or isinstance(value, (bool, int, float, datetime)):
         return value
     if isinstance(value, (dict, list, tuple)):
         value = json.dumps(value, ensure_ascii=False, sort_keys=True)
@@ -946,7 +1027,7 @@ def locked_copy_path(output_path: Path) -> Path:
 
 
 def save_workbook_safely(wb: Workbook, output_path: Path) -> tuple[Path, str]:
-    """Save atomically; if Excel locks the target, preserve it and publish a copy."""
+    """Save atomically; if Excel locks the target, skip without creating a second workbook."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = output_path.with_name(
         f".{output_path.name}.{os.getpid()}.{datetime.now().strftime('%Y%m%d%H%M%S%f')}.tmp"
@@ -960,13 +1041,12 @@ def save_workbook_safely(wb: Workbook, output_path: Path) -> tuple[Path, str]:
         except PermissionError:
             if not output_path.exists():
                 raise
-            alternate = locked_copy_path(output_path)
-            os.replace(temporary, alternate)
             LOG.warning(
-                "ANA EXCEL KİLİTLİ | benchmark devam ediyor | güncel rapor kopyaya yazıldı: %s",
-                alternate,
+                "ANA EXCEL KİLİTLİ | benchmark devam ediyor | ikinci dosya oluşturulmadı; "
+                "Excel kapandığında sonraki kayıtta ana dosya güncellenecek: %s",
+                output_path,
             )
-            return alternate, "locked_copy"
+            return output_path, "locked_skip"
     finally:
         if temporary.exists():
             try:
@@ -1038,6 +1118,7 @@ def build_workbook(
     query_rows = [] if lightweight else find_query_rows(run_dir)
     if not isinstance(summary_rows, list):
         raise ValueError("summary.json bir liste içermelidir.")
+    summary_rows = enrich_summary_result_times(run_dir, summary_rows)
     summary_rows = enrich_summary_model_identity(run_dir, summary_rows)
     summary_display_rows = prepare_model_summary_rows(summary_rows)
     model_catalog_rows = build_model_catalog_rows(run_dir, summary_rows)
@@ -1087,6 +1168,7 @@ def build_workbook(
             "model_label": 28,
             "model_id": 48,
             "model_epoch": 10,
+            "result_completed_at_utc": 22,
             "total_queries": 10,
             "ok_queries": 12,
             "coverage": 11,
@@ -1482,6 +1564,7 @@ def rebuild_small_sheets(
             "model_label": 28,
             "model_id": 48,
             "model_epoch": 10,
+            "result_completed_at_utc": 22,
             "total_queries": 10,
             "ok_queries": 12,
             "coverage": 11,
@@ -1632,6 +1715,7 @@ def update_workbook_incremental(
         raise IncrementalUpdateUnavailable("run_config.json bir nesne içermelidir.")
     if not isinstance(summary_rows, list):
         raise IncrementalUpdateUnavailable("summary.json bir liste içermelidir.")
+    summary_rows = enrich_summary_result_times(run_dir, summary_rows)
     summary_rows = enrich_summary_model_identity(run_dir, summary_rows)
     rebuild_small_sheets(
         wb,

@@ -136,7 +136,7 @@ class OpenpyxlReportTests(unittest.TestCase):
                 [workbook["Özet"].cell(14, column).value for column in range(1, 8)],
                 ["Sıra", "Model", "Senaryo", "Yön", "Başarı ≤25 m", "AUC@25 m", "Medyan hata (m)"],
             )
-            self.assertEqual([workbook["Model Özeti"].cell(1, column).value for column in range(1, 16)], ["Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "N", "Başarılı N", "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)", "P90 hata (m)", "Ort. arama (sn)"])
+            self.assertEqual([workbook["Model Özeti"].cell(1, column).value for column in range(1, 17)], ["Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "Sonuç alınma tarihi (UTC)", "N", "Başarılı N", "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)", "P90 hata (m)", "Ort. arama (sn)"])
             self.assertFalse(workbook["Model Özeti"].column_dimensions["F"].hidden)
             self.assertEqual([workbook["Model Kataloğu"].cell(1, column).value for column in range(1, 6)], ["Model ID (kanonik)", "Model", "Epoch", "Göreli yol", "SHA256"])
             self.assertIn("success_25m", SUMMARY_COLUMNS)
@@ -192,7 +192,7 @@ class OpenpyxlReportTests(unittest.TestCase):
             self.assertNotIn("Ham Sonuçlar", workbook.sheetnames)
             self.assertEqual(
                 workbook["Özet"]["B5"].value,
-                "=SUM('Model Özeti'!H2:H3)",
+                "=SUM('Model Özeti'!I2:I3)",
             )
             self.assertEqual(workbook["Özet"]["A15"].value, 1)
             self.assertEqual(workbook["Özet"]["B15"].value, "model_01")
@@ -321,7 +321,7 @@ class OpenpyxlReportTests(unittest.TestCase):
                 full_workbook["Ham Sonuçlar"]["A1"].fill.fgColor.rgb,
             )
 
-    def test_locked_primary_is_preserved_and_a_timestamped_copy_is_created(self):
+    def test_locked_primary_is_preserved_without_creating_a_second_workbook(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             output = directory / "benchmark_results.xlsx"
@@ -345,14 +345,14 @@ class OpenpyxlReportTests(unittest.TestCase):
             ):
                 actual, mode = save_workbook_safely(workbook, output)
 
-            self.assertEqual(mode, "locked_copy")
-            self.assertNotEqual(actual, output)
-            self.assertIn("kilitli_kopya", actual.name)
+            self.assertEqual(mode, "locked_skip")
+            self.assertEqual(actual, output)
             self.assertEqual(output.read_bytes(), original_bytes)
             self.assertTrue(actual.is_file())
+            self.assertEqual(list(directory.glob("benchmark_results*.xlsx")), [output])
 
     @unittest.skipUnless(sys.platform == "win32", "Windows file-sharing lock test")
-    def test_real_windows_excel_style_lock_creates_copy_without_touching_primary(self):
+    def test_real_windows_excel_style_lock_skips_without_creating_copy(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             output = directory / "benchmark_results.xlsx"
@@ -381,10 +381,11 @@ class OpenpyxlReportTests(unittest.TestCase):
             finally:
                 ctypes.windll.kernel32.CloseHandle(ctypes.c_void_p(handle))
 
-            self.assertEqual(mode, "locked_copy")
-            self.assertNotEqual(actual, output)
+            self.assertEqual(mode, "locked_skip")
+            self.assertEqual(actual, output)
             self.assertEqual(output.read_bytes(), original_hash)
-            self.assertEqual(load_workbook(actual).active["A1"].value, "new checkpoint")
+            self.assertEqual(load_workbook(actual).active["A1"].value, "open in Excel")
+            self.assertEqual(list(directory.glob("benchmark_results*.xlsx")), [output])
 
 
 if __name__ == "__main__":

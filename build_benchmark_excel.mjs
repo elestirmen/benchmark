@@ -79,6 +79,7 @@ function enrichSummaryRows(rows, catalog) {
     row.model_sequence = modelId === "RAW_BASELINE" ? 0 : (sequenceById.get(modelId) ?? null);
     row.model_label = modelLabel(identity, modelId);
     row.model_epoch = identity?.checkpoint_number ?? null;
+    row.result_completed_at_utc = row.result_completed_at_utc ? new Date(row.result_completed_at_utc) : null;
     row.model_relative_path = identity?.relative_path ?? null;
     row.model_sha256 = identity?.sha256 ?? null;
     return row;
@@ -376,12 +377,12 @@ if (chartRows.length > 0) {
 dashboard.freezePanes.freezeRows(2);
 // Compact human-facing model summary.
 const summaryColumns = [
-  "model_sequence", "direction", "query_variant", "search_mode", "model_label", "model_id", "model_epoch",
+  "model_sequence", "direction", "query_variant", "search_mode", "model_label", "model_id", "model_epoch", "result_completed_at_utc",
   "total_queries", "ok_queries", "coverage", "success_25m", "auc_25m",
   "median_error_under_25m", "p90_error_m", "mean_search_seconds",
 ];
 const summaryHeaders = [
-  "Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "N", "Başarılı N",
+  "Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "Sonuç alınma tarihi (UTC)", "N", "Başarılı N",
   "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)",
   "P90 hata (m)", "Ort. arama (sn)",
 ];
@@ -391,17 +392,19 @@ styleFlatSheet(summarySheet, summaryBlock.range);
 numberFormatColumns(summarySheet, summaryColumns, {
   coverage: "0.0%", success_25m: "0.0%", auc_25m: "0.0%",
   median_error_under_25m: "0.00", p90_error_m: "0.00", mean_search_seconds: "0.000",
-  model_sequence: "0", model_epoch: "0", total_queries: "#,##0", ok_queries: "#,##0",
+  model_sequence: "0", model_epoch: "0", result_completed_at_utc: "yyyy-mm-dd hh:mm:ss", total_queries: "#,##0", ok_queries: "#,##0",
 }, 1, summaryDisplayRows.length);
 summarySheet.getRangeByIndexes(0, 0, summaryDisplayRows.length + 1, 1).format.columnWidth = 10;
 summarySheet.getRangeByIndexes(0, 1, summaryDisplayRows.length + 1, 1).format.columnWidth = 18;
 summarySheet.getRangeByIndexes(0, 2, summaryDisplayRows.length + 1, 2).format.columnWidth = 14;
 summarySheet.getRangeByIndexes(0, 4, summaryDisplayRows.length + 1, 1).format.columnWidth = 28;
 summarySheet.getRangeByIndexes(0, 5, summaryDisplayRows.length + 1, 1).format.columnWidth = 48;
-summarySheet.getRangeByIndexes(0, 6, summaryDisplayRows.length + 1, 4).format.columnWidth = 11;
-summarySheet.getRangeByIndexes(0, 10, summaryDisplayRows.length + 1, 2).format.columnWidth = 14;
-summarySheet.getRangeByIndexes(0, 12, summaryDisplayRows.length + 1, 1).format.columnWidth = 20;
-summarySheet.getRangeByIndexes(0, 13, summaryDisplayRows.length + 1, 2).format.columnWidth = 16;
+summarySheet.getRangeByIndexes(0, 6, summaryDisplayRows.length + 1, 1).format.columnWidth = 10;
+summarySheet.getRangeByIndexes(0, 7, summaryDisplayRows.length + 1, 1).format.columnWidth = 20;
+summarySheet.getRangeByIndexes(0, 8, summaryDisplayRows.length + 1, 3).format.columnWidth = 11;
+summarySheet.getRangeByIndexes(0, 11, summaryDisplayRows.length + 1, 2).format.columnWidth = 14;
+summarySheet.getRangeByIndexes(0, 13, summaryDisplayRows.length + 1, 1).format.columnWidth = 20;
+summarySheet.getRangeByIndexes(0, 14, summaryDisplayRows.length + 1, 2).format.columnWidth = 16;
 
 // Technical model identity and audit fields.
 const catalogColumns = ["model_id", "model_label", "model_epoch", "model_relative_path", "model_sha256"];
