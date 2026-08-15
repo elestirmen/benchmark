@@ -610,6 +610,8 @@ def prepare_model_summary_rows(rows: Sequence[dict[str, Any]]) -> list[dict[str,
         prepared.append(row)
     prepared.sort(
         key=lambda row: (
+            row.get("result_completed_at_utc") is None,
+            row.get("result_completed_at_utc") or datetime.max,
             row.get("model_sequence") is None,
             row.get("model_sequence") if row.get("model_sequence") is not None else float("inf"),
         )

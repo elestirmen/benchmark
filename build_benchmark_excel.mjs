@@ -123,6 +123,13 @@ function prepareModelSummaryRows(rows) {
     query_variant: displayVariant(source.query_variant),
     search_mode: displaySearchMode(source.search_mode),
   })).sort((a, b) => {
+    const aTime = a.result_completed_at_utc instanceof Date
+      ? a.result_completed_at_utc.getTime()
+      : Number.POSITIVE_INFINITY;
+    const bTime = b.result_completed_at_utc instanceof Date
+      ? b.result_completed_at_utc.getTime()
+      : Number.POSITIVE_INFINITY;
+    if (aTime !== bTime) return aTime - bTime;
     const aSequence = a.model_sequence ?? Number.POSITIVE_INFINITY;
     const bSequence = b.model_sequence ?? Number.POSITIVE_INFINITY;
     return aSequence - bSequence;

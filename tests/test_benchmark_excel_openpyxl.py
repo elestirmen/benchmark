@@ -4,6 +4,7 @@ import sys
 import tempfile
 import time
 import unittest
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -20,6 +21,7 @@ from build_benchmark_excel_openpyxl import (  # noqa: E402
     build_workbook,
     enrich_summary_model_identity,
     excel_values_equal,
+    prepare_model_summary_rows,
     resolve_incremental_base,
     save_workbook_safely,
     update_workbook_incremental,
@@ -27,6 +29,18 @@ from build_benchmark_excel_openpyxl import (  # noqa: E402
 
 
 class OpenpyxlReportTests(unittest.TestCase):
+    def test_model_summary_defaults_to_oldest_result_first(self):
+        rows = [
+            {"model_sequence": 1, "model_id": "older-sequence", "result_completed_at_utc": datetime(2026, 8, 16, 12, 0)},
+            {"model_sequence": 2, "model_id": "oldest-result", "result_completed_at_utc": datetime(2026, 8, 15, 12, 0)},
+            {"model_sequence": 0, "model_id": "missing-date", "result_completed_at_utc": None},
+        ]
+        prepared = prepare_model_summary_rows(rows)
+        self.assertEqual(
+            [row["model_id"] for row in prepared],
+            ["oldest-result", "older-sequence", "missing-date"],
+        )
+
     def test_epoch_sweep_catalog_adds_readable_lineage_and_epoch_columns(self):
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = Path(temporary)
