@@ -66,7 +66,9 @@ RAW_MODEL_ID = "RAW_BASELINE"
 SCIENTIFIC_SEMANTICS_VERSION = 2
 QUERY_MANIFEST_SCHEMA_VERSION = 2
 SUMMARY_STATE_SCHEMA_VERSION = 2
-MODEL_CATALOG_SCHEMA_VERSION = 1
+MODEL_CATALOG_SCHEMA_VERSION = 2
+QUERY_VARIANT_MANIFEST_SCHEMA_VERSION = 2
+MODEL_CHECKPOINT_PATTERN = re.compile(r"(?i)(epoch|step)([_ -]*)(\d+)")
 
 DEFAULT_SEARCH_MODE_ORDER = {
     "roi_500m": 0,
@@ -270,6 +272,11 @@ class ModelSpec:
     model_id: str
     size_bytes: int
     mtime_ns: int
+    series_id: str
+    series_key: str
+    checkpoint_number: int
+    selection_points: tuple[str, ...]
+    selection_origins: tuple[str, ...]
     duplicate_paths: tuple[str, ...] = ()
 
     def signature_entry(self) -> dict[str, Any]:
@@ -285,6 +292,11 @@ class ModelSpec:
             "path": str(self.path.resolve()),
             "size_bytes": self.size_bytes,
             "mtime_ns": self.mtime_ns,
+            "series_id": self.series_id,
+            "series_key": self.series_key,
+            "checkpoint_number": self.checkpoint_number,
+            "selection_points": list(self.selection_points),
+            "selection_origins": list(self.selection_origins),
             "duplicate_paths": list(self.duplicate_paths),
         }
 
@@ -292,16 +304,22 @@ class ModelSpec:
 @dataclass(frozen=True)
 class ModelCatalog:
     models: tuple[ModelSpec, ...]
+    sampling_mode: str
     discovered_files: int
     unique_content_files: int
+    series_count: int
+    sampled_files: int
     identical_files_skipped: int
     duplicate_name_groups: int
     conflicting_name_groups: int
 
-    def stats(self) -> dict[str, int]:
+    def stats(self) -> dict[str, Any]:
         return {
+            "sampling_mode": self.sampling_mode,
             "discovered_files": self.discovered_files,
             "unique_content_files": self.unique_content_files,
+            "series_count": self.series_count,
+            "sampled_files_before_content_dedup": self.sampled_files,
             "selected_models": len(self.models),
             "identical_files_skipped": self.identical_files_skipped,
             "duplicate_name_groups": self.duplicate_name_groups,
@@ -441,38 +459,133 @@ def model_id_for_path(model_path: Path, model_dir: Path, model_sha256: str) -> s
     return f"{readable}__{model_sha256[:12]}"
 
 
+def model_series_key(model_path: Path, model_dir: Path) -> str:
+    """Identify one checkpoint series without conflating architectures in a folder."""
+    relative = model_path.resolve().relative_to(model_dir.resolve())
+    normalized_stem = MODEL_CHECKPOINT_PATTERN.sub(r"\1\2{N}", relative.stem)
+    parent = relative.parent.as_posix()
+    return f"{parent}/{normalized_stem}".casefold()
+
+
+def model_checkpoint_number(model_path: Path, *, required: bool = True) -> int:
+    matches = list(MODEL_CHECKPOINT_PATTERN.finditer(model_path.stem))
+    if not matches:
+        if not required:
+            return -1
+        raise ValueError(
+            f"Model adında epoch/step numarası bulunamadı: {model_path.name}. "
+            "five-point seçimi için checkpoint numarası zorunludur."
+        )
+    return int(matches[-1].group(3))
+
+
+def model_series_id(series_key: str) -> str:
+    readable = safe_slug(series_key.replace("/", "__"), max_len=72)
+    digest = hashlib.sha256(series_key.encode("utf-8")).hexdigest()[:10]
+    return f"{readable}__{digest}"
+
+
+def five_point_indices(length: int) -> dict[int, tuple[str, ...]]:
+    """Return nearest first/q25/middle/q75/last positions, merging short-series ties."""
+    if length < 1:
+        return {}
+    labels = ("first", "q25", "middle", "q75", "last")
+    selected: dict[int, list[str]] = {}
+    for quarter, label in enumerate(labels):
+        index = ((length - 1) * quarter + 2) // 4
+        selected.setdefault(index, []).append(label)
+    return {index: tuple(point_labels) for index, point_labels in selected.items()}
+
+
 def build_model_catalog(
     model_dir: Path,
     patterns: Sequence[str],
     max_models: int | None,
+    sampling_mode: str = "full",
 ) -> ModelCatalog:
-    """Hash recursive model inputs, remove byte-identical copies, and assign stable IDs."""
+    """Hash recursive inputs, optionally sample each checkpoint series, and deduplicate."""
+    if sampling_mode not in {"full", "five-point"}:
+        raise ValueError(f"Bilinmeyen model örnekleme modu: {sampling_mode}")
     candidates = select_models(model_dir, patterns, None)
     name_groups: dict[str, list[tuple[Path, str]]] = {}
     content_groups: dict[str, list[Path]] = {}
-    ordered_hashes: list[str] = []
+    path_hashes: dict[Path, str] = {}
+    path_checkpoints: dict[Path, int] = {}
+    series_groups: dict[str, list[Path]] = {}
 
     for path in candidates:
         model_sha = sha256_file(path)
+        path_hashes[path] = model_sha
+        path_checkpoints[path] = model_checkpoint_number(
+            path,
+            required=sampling_mode == "five-point",
+        )
         name_groups.setdefault(path.name.casefold(), []).append((path, model_sha))
         if model_sha not in content_groups:
-            ordered_hashes.append(model_sha)
             content_groups[model_sha] = []
         content_groups[model_sha].append(path)
+        series_groups.setdefault(model_series_key(path, model_dir), []).append(path)
 
     duplicate_name_groups = sum(1 for items in name_groups.values() if len(items) > 1)
     conflicting_name_groups = sum(
         1 for items in name_groups.values() if len({model_sha for _, model_sha in items}) > 1
     )
-    selected_hashes = ordered_hashes[:max_models] if max_models is not None else ordered_hashes
+    selection_by_path: dict[Path, tuple[str, int, tuple[str, ...]]] = {}
+    selected_paths: list[Path] = []
+    for series_key in sorted(series_groups):
+        series_paths = sorted(
+            series_groups[series_key],
+            key=lambda path: (
+                path_checkpoints[path],
+                path.name.casefold(),
+                str(path).casefold(),
+            ),
+        )
+        selected_indices = (
+            five_point_indices(len(series_paths))
+            if sampling_mode == "five-point"
+            else {index: ("full",) for index in range(len(series_paths))}
+        )
+        for index, selection_points in selected_indices.items():
+            path = series_paths[index]
+            selected_paths.append(path)
+            selection_by_path[path] = (
+                series_key,
+                path_checkpoints[path],
+                selection_points,
+            )
+
+    selected_content_groups: dict[str, list[Path]] = {}
+    ordered_selected_hashes: list[str] = []
+    for path in selected_paths:
+        model_sha = path_hashes[path]
+        if model_sha not in selected_content_groups:
+            ordered_selected_hashes.append(model_sha)
+            selected_content_groups[model_sha] = []
+        selected_content_groups[model_sha].append(path)
+
+    selected_hashes = (
+        ordered_selected_hashes[:max_models]
+        if max_models is not None
+        else ordered_selected_hashes
+    )
     specs: list[ModelSpec] = []
     for model_sha in selected_hashes:
-        paths = content_groups[model_sha]
-        canonical = paths[0]
+        selected_copies = selected_content_groups[model_sha]
+        canonical = selected_copies[0]
         stat = canonical.stat()
         relative = canonical.resolve().relative_to(model_dir.resolve()).as_posix()
+        series_key, checkpoint_number, selection_points = selection_by_path[canonical]
         duplicate_paths = tuple(
-            path.resolve().relative_to(model_dir.resolve()).as_posix() for path in paths[1:]
+            path.resolve().relative_to(model_dir.resolve()).as_posix()
+            for path in content_groups[model_sha]
+            if path != canonical
+        )
+        selection_origins = tuple(
+            f"{model_series_id(selection_by_path[path][0])}:"
+            f"{','.join(selection_by_path[path][2])}:"
+            f"{path.resolve().relative_to(model_dir.resolve()).as_posix()}"
+            for path in selected_copies
         )
         specs.append(
             ModelSpec(
@@ -482,6 +595,11 @@ def build_model_catalog(
                 model_id=model_id_for_path(canonical, model_dir, model_sha),
                 size_bytes=stat.st_size,
                 mtime_ns=stat.st_mtime_ns,
+                series_id=model_series_id(series_key),
+                series_key=series_key,
+                checkpoint_number=checkpoint_number,
+                selection_points=selection_points,
+                selection_origins=selection_origins,
                 duplicate_paths=duplicate_paths,
             )
         )
@@ -494,9 +612,12 @@ def build_model_catalog(
 
     return ModelCatalog(
         models=tuple(specs),
+        sampling_mode=sampling_mode,
         discovered_files=len(candidates),
         unique_content_files=len(content_groups),
-        identical_files_skipped=sum(len(paths) - 1 for paths in content_groups.values()),
+        series_count=len(series_groups),
+        sampled_files=len(selected_paths),
+        identical_files_skipped=len(selected_paths) - len(ordered_selected_hashes),
         duplicate_name_groups=duplicate_name_groups,
         conflicting_name_groups=conflicting_name_groups,
     )
@@ -749,7 +870,12 @@ def generate_query_manifest(
     max_dark_fraction: float,
     edge_buffer_m: float | None,
     force: bool,
+    sampling_strategy: str = "block_sequential",
 ) -> list[QueryRecord]:
+    if sampling_strategy not in {"block_sequential", "balanced_exact"}:
+        raise ValueError(f"Bilinmeyen sorgu örnekleme stratejisi: {sampling_strategy}")
+    if sampling_strategy == "balanced_exact" and max_queries is None:
+        raise ValueError("balanced_exact örnekleme için max_queries zorunludur.")
     manifest_json = output_dir / "query_manifest.json"
     manifest_csv = output_dir / "query_manifest.csv"
     raw_dir = output_dir / "raw_tiles"
@@ -778,6 +904,10 @@ def generate_query_manifest(
         "max_dark_fraction": max_dark_fraction,
         "effective_edge_buffer_m": effective_edge_buffer_m,
     }
+    # Preserve compatibility with existing/default manifests. Only the opt-in
+    # epoch-sweep strategy adds a new scientific selection key.
+    if sampling_strategy != "block_sequential":
+        selection_config["sampling_strategy"] = sampling_strategy
     if manifest_json.exists() and not force:
         payload = json.loads(manifest_json.read_text(encoding="utf-8"))
         previous_edge_buffer_m = payload.get("effective_edge_buffer_m")
@@ -852,64 +982,134 @@ def generate_query_manifest(
             seed,
         )
 
+        block_bounds: dict[tuple[int, int], tuple[float, float, float, float]] = {}
         for block_row, block_col in block_order:
             bx0 = left + block_col * block_size_m
             bx1 = min(right, bx0 + block_size_m)
             by1 = top - block_row * block_size_m
             by0 = max(bottom, by1 - block_size_m)
+            block_bounds[(block_row, block_col)] = (bx0, bx1, by0, by1)
+
+        accepted_by_block = {block: 0 for block in block_order}
+        seen_windows: set[tuple[int, int]] = set()
+
+        def try_accept(block_row: int, block_col: int) -> bool:
+            bx0, bx1, by0, by1 = block_bounds[(block_row, block_col)]
+            x = float(rng.uniform(bx0, bx1))
+            y = float(rng.uniform(by0, by1))
+            row, col = rowcol(query_ds.transform, x, y)
+            row0 = int(row - tile_size // 2)
+            col0 = int(col - tile_size // 2)
+            if (
+                row0 < 0
+                or col0 < 0
+                or row0 + tile_size > query_ds.height
+                or col0 + tile_size > query_ds.width
+            ):
+                return False
+            window_key = (row0, col0)
+            if sampling_strategy == "balanced_exact" and window_key in seen_windows:
+                return False
+            rgb = read_rgb_window(query_ds, Window(col0, row0, tile_size, tile_size))
+            if rgb.shape[:2] != (tile_size, tile_size):
+                return False
+            gray = to_gray(rgb)
+            std, ent, dark = tile_quality(gray)
+            if std < min_std or ent < min_entropy or dark > max_dark_fraction:
+                return False
+
+            # The scientific truth remains the geometric centre of the exact
+            # even-sized extracted window.
+            center_col = col0 + tile_size / 2.0
+            center_row = row0 + tile_size / 2.0
+            center_easting_m, center_northing_m = pixel_center_to_geo(
+                query_ds.transform, center_col, center_row
+            )
+
+            query_id = f"Q{len(records) + 1:05d}"
+            block_id = f"B{block_row:02d}_{block_col:02d}"
+            tile_path = raw_dir / f"{query_id}.png"
+            write_png(tile_path, rgb)
+            records.append(
+                QueryRecord(
+                    query_id=query_id,
+                    block_id=block_id,
+                    center_easting_m=center_easting_m,
+                    center_northing_m=center_northing_m,
+                    source_row=int(center_row),
+                    source_col=int(center_col),
+                    query_std=std,
+                    query_entropy=ent,
+                    dark_fraction=dark,
+                    raw_tile_file=str(tile_path.resolve()),
+                )
+            )
+            accepted_by_block[(block_row, block_col)] += 1
+            seen_windows.add(window_key)
+            return True
+
+        if sampling_strategy == "balanced_exact":
+            assert max_queries is not None
+            base_quota, extra = divmod(max_queries, len(block_order))
+            block_targets = {
+                block: base_quota + int(index < extra)
+                for index, block in enumerate(block_order)
+            }
+        else:
+            block_targets = {block: samples_per_block for block in block_order}
+
+        for block_row, block_col in block_order:
+            target = block_targets[(block_row, block_col)]
             accepted_in_block = 0
             attempts = 0
-            max_attempts = max(20, samples_per_block * 30)
-            while accepted_in_block < samples_per_block and attempts < max_attempts:
+            max_attempts = max(20, target * 30)
+            while accepted_in_block < target and attempts < max_attempts:
                 attempts += 1
-                x = float(rng.uniform(bx0, bx1))
-                y = float(rng.uniform(by0, by1))
-                row, col = rowcol(query_ds.transform, x, y)
-                row0 = int(row - tile_size // 2)
-                col0 = int(col - tile_size // 2)
-                if row0 < 0 or col0 < 0 or row0 + tile_size > query_ds.height or col0 + tile_size > query_ds.width:
-                    continue
-                rgb = read_rgb_window(query_ds, Window(col0, row0, tile_size, tile_size))
-                if rgb.shape[:2] != (tile_size, tile_size):
-                    continue
-                gray = to_gray(rgb)
-                std, ent, dark = tile_quality(gray)
-                if std < min_std or ent < min_entropy or dark > max_dark_fraction:
-                    continue
-
-                # The scientific truth is the geometric centre of the exact
-                # even-sized window that was extracted.  Affine coordinates
-                # operate on pixel-corner coordinates, so using rasterio's
-                # offset='center' here would introduce a half-pixel shift.
-                center_col = col0 + tile_size / 2.0
-                center_row = row0 + tile_size / 2.0
-                center_easting_m, center_northing_m = pixel_center_to_geo(
-                    query_ds.transform, center_col, center_row
-                )
-
-                query_id = f"Q{len(records) + 1:05d}"
-                block_id = f"B{block_row:02d}_{block_col:02d}"
-                tile_path = raw_dir / f"{query_id}.png"
-                write_png(tile_path, rgb)
-                records.append(
-                    QueryRecord(
-                        query_id=query_id,
-                        block_id=block_id,
-                        center_easting_m=center_easting_m,
-                        center_northing_m=center_northing_m,
-                        source_row=int(center_row),
-                        source_col=int(center_col),
-                        query_std=std,
-                        query_entropy=ent,
-                        dark_fraction=dark,
-                        raw_tile_file=str(tile_path.resolve()),
-                    )
-                )
-                accepted_in_block += 1
+                if try_accept(block_row, block_col):
+                    accepted_in_block += 1
                 if max_queries is not None and len(records) >= max_queries:
                     break
             if max_queries is not None and len(records) >= max_queries:
                 break
+
+        # If a block cannot meet its ideal quota because of quality gates,
+        # redistribute only the deficit. Always try the least represented
+        # eligible block first, preserving maximal balance where capacity allows.
+        if sampling_strategy == "balanced_exact" and len(records) < max_queries:
+            failed_rounds = {block: 0 for block in block_order}
+            priority = {block: index for index, block in enumerate(block_order)}
+            while len(records) < max_queries:
+                eligible = [block for block in block_order if failed_rounds[block] < 10]
+                if not eligible:
+                    break
+                block_row, block_col = min(
+                    eligible,
+                    key=lambda block: (accepted_by_block[block], priority[block]),
+                )
+                accepted = False
+                for _ in range(30):
+                    if try_accept(block_row, block_col):
+                        accepted = True
+                        break
+                if accepted:
+                    failed_rounds[(block_row, block_col)] = 0
+                else:
+                    failed_rounds[(block_row, block_col)] += 1
+
+            if len(records) != max_queries:
+                raise RuntimeError(
+                    "balanced_exact örnekleme istenen sorgu sayısını üretemedi: "
+                    f"istenen={max_queries}, üretilen={len(records)}. "
+                    "Kalite eşiklerini veya çalışma alanı kapasitesini kontrol edin."
+                )
+            counts = list(accepted_by_block.values())
+            LOG.info(
+                "Dengeli sorgu dağılımı | toplam=%d | blok=%d | min=%d | max=%d",
+                len(records),
+                len(counts),
+                min(counts),
+                max(counts),
+            )
 
     if not records:
         raise RuntimeError("Kalite kapılarından geçen hiçbir sorgu üretilemedi.")
@@ -928,6 +1128,8 @@ def generate_query_manifest(
         "selection_config": selection_config,
         "queries": [asdict(record) for record in records],
     }
+    if sampling_strategy != "block_sequential":
+        payload["sampling_strategy"] = sampling_strategy
     manifest_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
     csv_write(manifest_csv, [asdict(record) for record in records], MANIFEST_COLUMNS)
     LOG.info("Sorgu manifesti üretildi: %d sorgu | %s", len(records), manifest_json)
@@ -1085,7 +1287,32 @@ def prepare_query_variants(
     variants: Sequence[str],
     seed: int,
     force: bool,
+    resume_has_results: bool = False,
 ) -> dict[str, list[QueryRecord]]:
+    base_fingerprint_rows = []
+    for record in queries:
+        base_tile = Path(record.raw_tile_file)
+        if not base_tile.is_file():
+            raise FileNotFoundError(f"Ham sorgu okunamadı: {base_tile}")
+        base_fingerprint_rows.append(
+            {
+                "query_id": record.query_id,
+                "block_id": record.block_id,
+                "center_easting_m": record.center_easting_m,
+                "center_northing_m": record.center_northing_m,
+                "source_row": record.source_row,
+                "source_col": record.source_col,
+                "raw_tile_sha256": sha256_file(base_tile),
+            }
+        )
+    base_queries_sha256 = hashlib.sha256(
+        json.dumps(
+            base_fingerprint_rows,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
     prepared: dict[str, list[QueryRecord]] = {}
     for variant in variants:
         if variant == "clean":
@@ -1105,13 +1332,73 @@ def prepare_query_variants(
                 for row in payload.get("queries", [])
                 if isinstance(row, dict)
             }
-            cache_valid = (
+
+            def legacy_row_matches(item: str, base: QueryRecord) -> bool:
+                row = rows_by_id.get(item, {})
+                try:
+                    return bool(row.get("raw_tile_file")) and all(
+                        (
+                            Path(str(row.get("raw_tile_file"))).is_file(),
+                            str(row.get("block_id")) == base.block_id,
+                            float(row.get("center_easting_m"))
+                            == base.center_easting_m,
+                            float(row.get("center_northing_m"))
+                            == base.center_northing_m,
+                            int(row.get("source_row")) == base.source_row,
+                            int(row.get("source_col")) == base.source_col,
+                        )
+                    )
+                except (TypeError, ValueError):
+                    return False
+
+            legacy_cache_valid = (
                 payload.get("schema_version") == 1
                 and payload.get("query_variant") == variant
                 and payload.get("profile") == HARD_V1_PROFILE
                 and int(payload.get("seed", -1)) == int(seed)
                 and list(rows_by_id) == expected_ids
-                and all(Path(rows_by_id[item]["raw_tile_file"]).is_file() for item in expected_ids)
+                and all(
+                    legacy_row_matches(item, base)
+                    for item, base in zip(expected_ids, queries)
+                )
+            )
+            if legacy_cache_valid:
+                upgraded_rows = []
+                for item in expected_ids:
+                    row = dict(rows_by_id[item])
+                    row["raw_tile_sha256"] = sha256_file(
+                        Path(str(row["raw_tile_file"]))
+                    )
+                    upgraded_rows.append(row)
+                payload = {
+                    **payload,
+                    "schema_version": QUERY_VARIANT_MANIFEST_SCHEMA_VERSION,
+                    "base_queries_sha256": base_queries_sha256,
+                    "queries": upgraded_rows,
+                    "legacy_schema_upgraded_at_utc": utc_now_iso(),
+                }
+                atomic_write_json(manifest_path, payload)
+                rows_by_id = {str(row["query_id"]): row for row in upgraded_rows}
+            cache_valid = (
+                payload.get("schema_version") == QUERY_VARIANT_MANIFEST_SCHEMA_VERSION
+                and payload.get("query_variant") == variant
+                and payload.get("profile") == HARD_V1_PROFILE
+                and int(payload.get("seed", -1)) == int(seed)
+                and payload.get("base_queries_sha256") == base_queries_sha256
+                and list(rows_by_id) == expected_ids
+                and all(
+                    bool(rows_by_id[item].get("raw_tile_file"))
+                    and Path(str(rows_by_id[item].get("raw_tile_file"))).is_file()
+                    and re.fullmatch(
+                        r"[0-9a-f]{64}",
+                        str(rows_by_id[item].get("raw_tile_sha256", "")),
+                    )
+                    and sha256_file(
+                        Path(str(rows_by_id[item].get("raw_tile_file")))
+                    )
+                    == rows_by_id[item]["raw_tile_sha256"]
+                    for item in expected_ids
+                )
             )
             if cache_valid:
                 cached: list[QueryRecord] = []
@@ -1134,6 +1421,12 @@ def prepare_query_variants(
                 LOG.info("Sorgu varyantı yeniden kullanılıyor | varyant=%s | adet=%d", variant, len(cached))
                 prepared[variant] = cached
                 continue
+            if resume_has_results:
+                raise RuntimeError(
+                    "Mevcut hard_v1 sorgu cache'i sonuçlarla kriptografik olarak "
+                    "doğrulanamadı; eski ve yeni sorgu piksellerini karıştırmamak için "
+                    "yeni bir --run-id kullanın."
+                )
 
         raw_dir.mkdir(parents=True, exist_ok=True)
         for old in raw_dir.glob("Q*.png"):
@@ -1165,15 +1458,22 @@ def prepare_query_variants(
                 raw_tile_file=str(target.resolve()),
             )
             variant_records.append(record)
-            manifest_rows.append({**asdict(record), "augmentation": parameters})
+            manifest_rows.append(
+                {
+                    **asdict(record),
+                    "raw_tile_sha256": sha256_file(target),
+                    "augmentation": parameters,
+                }
+            )
         manifest_path.write_text(
             json.dumps(
                 {
-                    "schema_version": 1,
+                    "schema_version": QUERY_VARIANT_MANIFEST_SCHEMA_VERSION,
                     "created_at_utc": utc_now_iso(),
                     "query_variant": variant,
                     "seed": seed,
                     "profile": HARD_V1_PROFILE,
+                    "base_queries_sha256": base_queries_sha256,
                     "queries": manifest_rows,
                 },
                 indent=2,
@@ -3427,7 +3727,7 @@ def refresh_excel_after_model(
     model_status: str,
 ) -> Path | None:
     """Create a non-fatal, model-boundary Excel checkpoint."""
-    if args.excel_update != "model":
+    if args.excel_update != "model" or not getattr(args, "excel_report", True):
         return None
     started = time.perf_counter()
     LOG.info(
@@ -3533,13 +3833,18 @@ def run_direction(
         max_dark_fraction=args.max_dark_fraction,
         edge_buffer_m=args.query_edge_buffer_m,
         force=args.force_queries,
+        sampling_strategy=getattr(args, "query_sampling", "block_sequential"),
     )
+    results_jsonl = run_dir / "results.jsonl"
     query_variants = prepare_query_variants(
         queries,
         direction_dir / "queries",
         variants=args.query_variants,
         seed=args.seed,
         force=args.force_queries,
+        resume_has_results=(
+            results_jsonl.is_file() and results_jsonl.stat().st_size > 0
+        ),
     )
 
     shared_tiles = direction_dir / "map_shared_tiles"
@@ -3551,7 +3856,6 @@ def run_direction(
             overlap=args.overlap,
         )
 
-    results_jsonl = run_dir / "results.jsonl"
     existing_rows = read_jsonl(results_jsonl)
     done = completed_keys(existing_rows)
 
@@ -3615,13 +3919,18 @@ def run_direction(
             args.model_dir,
             parse_patterns(args.models),
             args.max_models,
+            getattr(args, "model_sampling", "full"),
         )
     models = model_catalog.models
     LOG.info(
-        "MODEL KATALOĞU | dosya=%d | benzersiz_içerik=%d | aynı_içerik_atlanan=%d | "
-        "aynı_ad_grubu=%d | aynı_ad_farklı_içerik_grubu=%d",
+        "MODEL KATALOĞU | örnekleme=%s | dosya=%d | seri=%d | örneklenen=%d | "
+        "çalıştırılacak=%d | aynı_içerik_atlanan=%d | aynı_ad_grubu=%d | "
+        "aynı_ad_farklı_içerik_grubu=%d",
+        model_catalog.sampling_mode,
         model_catalog.discovered_files,
-        model_catalog.unique_content_files,
+        model_catalog.series_count,
+        model_catalog.sampled_files,
+        len(models),
         model_catalog.identical_files_skipped,
         model_catalog.duplicate_name_groups,
         model_catalog.conflicting_name_groups,
@@ -3636,9 +3945,12 @@ def run_direction(
         model_sha = model_spec.sha256
         excel_refresh_needed = True
         LOG.info(
-            "MODEL BAŞLIYOR | %d/%d | id=%s | dosya=%s",
+            "MODEL BAŞLIYOR | %d/%d | seri=%s | checkpoint=%d | seçim=%s | id=%s | dosya=%s",
             position,
             len(models),
+            model_spec.series_id,
+            model_spec.checkpoint_number,
+            ",".join(model_spec.selection_points),
             model_id,
             model_spec.relative_path,
         )
@@ -3870,6 +4182,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Model dosya globu; birden çok kez verilebilir. Örn: --models '*f48*'",
     )
     parser.add_argument("--max-models", type=int, default=None)
+    parser.add_argument(
+        "--model-sampling",
+        choices=["full", "five-point"],
+        default="full",
+        help=(
+            "full tüm benzersiz modelleri; five-point her eğitim serisinden "
+            "ilk, %%25, orta, %%75 ve son checkpointi seçer."
+        ),
+    )
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--resume-run", type=Path, default=None)
@@ -3899,6 +4220,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--block-size-m", type=float, default=1000.0)
     parser.add_argument("--samples-per-block", type=int, default=5)
     parser.add_argument("--max-queries", type=int, default=300)
+    parser.add_argument(
+        "--query-sampling",
+        choices=["block_sequential", "balanced_exact"],
+        default="block_sequential",
+        help=(
+            "block_sequential mevcut blok sırasını korur; balanced_exact sabit "
+            "max-queries kotasını bloklara olabildiğince eşit dağıtır."
+        ),
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--min-query-std", type=float, default=12.0)
     parser.add_argument("--min-query-entropy", type=float, default=4.0)
@@ -3973,6 +4303,18 @@ def build_parser() -> argparse.ArgumentParser:
         default="model",
         help="Excel raporunu her model denemesinden sonra veya yalnız koşu sonunda günceller.",
     )
+    parser.add_argument(
+        "--excel-report",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Operasyonel Excel üretimini açar/kapatır; bilimsel sonuçları değiştirmez.",
+    )
+    parser.add_argument(
+        "--results-csv",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Büyük ham results.csv son dışa aktarımını açar/kapatır.",
+    )
     parser.add_argument("--verbose", action="store_true")
     return parser
 
@@ -3988,6 +4330,8 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("Tutarlılık için crop-border = overlap / 2 olmalıdır.")
     if args.samples_per_block < 1 or (args.max_queries is not None and args.max_queries < 1):
         raise ValueError("Sorgu sayıları pozitif olmalıdır.")
+    if args.max_models is not None and args.max_models < 1:
+        raise ValueError("max-models pozitif olmalıdır.")
     if args.top_k < 2:
         raise ValueError("Belirsizlik ölçümü için top-k en az 2 olmalıdır.")
     if args.bootstrap_iterations < 0:
@@ -4033,6 +4377,7 @@ def resume_signature_payload(
         "model_dir": str(args.model_dir.resolve()),
         "models": list(args.models or []),
         "max_models": args.max_models,
+        "model_sampling": args.model_sampling,
         "model_inventory_count": len(model_inventory),
         "model_inventory_sha256": hashlib.sha256(
             inventory_canonical.encode("utf-8")
@@ -4047,6 +4392,7 @@ def resume_signature_payload(
         "block_size_m": args.block_size_m,
         "samples_per_block": args.samples_per_block,
         "max_queries": args.max_queries,
+        "query_sampling": getattr(args, "query_sampling", "block_sequential"),
         "seed": args.seed,
         "min_query_std": args.min_query_std,
         "min_query_entropy": args.min_query_entropy,
@@ -4059,7 +4405,6 @@ def resume_signature_payload(
         "top_k": args.top_k,
         "refine_radius_px": args.refine_radius_px,
         "nms_radius_px": args.nms_radius_px,
-        "batch_size": args.batch_size,
         "normalization": args.normalization,
         "output_value_mode": args.output_value_mode,
         "enhancement": args.enhancement,
@@ -4070,6 +4415,33 @@ def resume_signature_payload(
 def signature_sha256(payload: dict[str, Any]) -> str:
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def resume_payloads_compatible(
+    previous_payload: dict[str, Any],
+    current_payload: dict[str, Any],
+) -> bool:
+    """Accept legacy signatures that differ only by operational batch size."""
+    previous_scientific = dict(previous_payload)
+    current_scientific = dict(current_payload)
+    previous_scientific.pop("batch_size", None)
+    current_scientific.pop("batch_size", None)
+    previous_scientific.setdefault("query_sampling", "block_sequential")
+    current_scientific.setdefault("query_sampling", "block_sequential")
+    previous_scientific.setdefault("model_sampling", "full")
+    current_scientific.setdefault("model_sampling", "full")
+    if (
+        previous_scientific.get("model_catalog_schema_version") == 1
+        and current_scientific.get("model_catalog_schema_version") == 2
+        and previous_scientific["model_sampling"] == "full"
+        and current_scientific["model_sampling"] == "full"
+        and previous_scientific.get("model_inventory_count")
+        == current_scientific.get("model_inventory_count")
+        and previous_scientific.get("model_inventory_sha256")
+        == current_scientific.get("model_inventory_sha256")
+    ):
+        previous_scientific["model_catalog_schema_version"] = 2
+    return previous_scientific == current_scientific
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -4116,11 +4488,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.model_dir,
             parse_patterns(args.models),
             args.max_models,
+            args.model_sampling,
         )
         LOG.info(
-            "MODEL KATALOĞU HAZIR | dosya=%d | çalıştırılacak=%d | aynı_içerik_atlanan=%d | "
+            "MODEL KATALOĞU HAZIR | örnekleme=%s | dosya=%d | seri=%d | "
+            "örneklenen=%d | çalıştırılacak=%d | aynı_içerik_atlanan=%d | "
             "aynı_ad_farklı_içerik_grubu=%d | süre=%.2f sn",
+            model_catalog.sampling_mode,
             model_catalog.discovered_files,
+            model_catalog.series_count,
+            model_catalog.sampled_files,
             len(model_catalog.models),
             model_catalog.identical_files_skipped,
             model_catalog.conflicting_name_groups,
@@ -4131,6 +4508,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     results_path = run_dir / "results.jsonl"
     resume_payload = resume_signature_payload(args, model_catalog)
     resume_signature = signature_sha256(resume_payload)
+    previous_config: dict[str, Any] = {}
     if config_path.is_file() and results_path.is_file():
         previous_config = json.loads(config_path.read_text(encoding="utf-8"))
         previous_semantics = previous_config.get("scientific_semantics_version")
@@ -4142,11 +4520,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         previous_signature = previous_config.get("resume_signature")
         if previous_signature is not None and previous_signature != resume_signature:
-            raise RuntimeError(
-                "Bu koşu klasöründeki bilimsel ayarlar/raster kimliği mevcut komutla "
-                "uyuşmuyor. Eski ve yeni sonuçların karışmaması için aynı ayarları "
-                "kullanın veya yeni bir --run-id verin."
-            )
+            previous_payload = previous_config.get("resume_signature_payload")
+            if isinstance(previous_payload, dict) and resume_payloads_compatible(
+                previous_payload,
+                resume_payload,
+            ):
+                LOG.warning(
+                    "OPERASYONEL RESUME | batch-size değişikliği kabul edildi | önceki=%s | yeni=%s",
+                    previous_config.get("batch_size"),
+                    args.batch_size,
+                )
+            else:
+                raise RuntimeError(
+                    "Bu koşu klasöründeki bilimsel ayarlar/raster kimliği mevcut komutla "
+                    "uyuşmuyor. Eski ve yeni sonuçların karışmaması için aynı ayarları "
+                    "kullanın veya yeni bir --run-id verin."
+                )
         if (
             previous_signature is None
             and "hard_v1" in args.query_variants
@@ -4167,6 +4556,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "model_dir": str(args.model_dir),
         "patterns": list(parse_patterns(args.models)),
         "max_models": args.max_models,
+        "sampling_mode": args.model_sampling,
         "stats": model_catalog.stats() if model_catalog else None,
         "models": [model.config_entry() for model in model_catalog.models]
         if model_catalog
@@ -4196,7 +4586,35 @@ def main(argv: Sequence[str] | None = None) -> int:
     config["scientific_semantics_version"] = SCIENTIFIC_SEMANTICS_VERSION
     config["resume_signature_payload"] = resume_payload
     config["resume_signature"] = resume_signature
-    config["created_at_utc"] = utc_now_iso()
+    operational_history = previous_config.get("operational_history", [])
+    if not isinstance(operational_history, list):
+        operational_history = []
+    else:
+        operational_history = list(operational_history)
+    if previous_config and not operational_history:
+        operational_history.append(
+            {
+                "event": "initial_config_migrated",
+                "at_utc": previous_config.get("created_at_utc"),
+                "batch_size": previous_config.get("batch_size"),
+                "search_workers": previous_config.get("search_workers"),
+                "cleanup_maps": previous_config.get("cleanup_maps"),
+                "excel_update": previous_config.get("excel_update"),
+            }
+        )
+    operational_history.append(
+        {
+            "event": "resume" if previous_config else "initial_start",
+            "at_utc": utc_now_iso(),
+            "batch_size": args.batch_size,
+            "search_workers": args.search_workers,
+            "cleanup_maps": args.cleanup_maps,
+            "excel_update": args.excel_update,
+        }
+    )
+    config["operational_history"] = operational_history
+    config["created_at_utc"] = previous_config.get("created_at_utc", utc_now_iso())
+    config["last_started_at_utc"] = operational_history[-1]["at_utc"]
     config["system"] = system_info()
     config_path.write_text(
         json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8"
@@ -4219,22 +4637,31 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.query_raster,
                 model_catalog,
             )
-        summary_json, summary_csv = write_summary_files(run_dir)
-        LOG.info("Özet dosyaları: %s | %s", summary_json, summary_csv)
-        workbook = invoke_excel_report(
-            run_dir, strict=args.strict_excel, engine=args.excel_engine
+        summary_json, summary_csv = write_summary_files(
+            run_dir, write_results_csv=getattr(args, "results_csv", True)
         )
+        LOG.info("Özet dosyaları: %s | %s", summary_json, summary_csv)
+        workbook = None
+        if getattr(args, "excel_report", True):
+            workbook = invoke_excel_report(
+                run_dir, strict=args.strict_excel, engine=args.excel_engine
+            )
+        else:
+            LOG.info("Excel raporu operasyonel seçenek nedeniyle atlandı.")
         LOG.info("=" * 88)
         LOG.info("BENCHMARK TAMAMLANDI | toplam süre=%.2f dk", (time.perf_counter() - started) / 60.0)
         LOG.info("Sonuç JSONL: %s", run_dir / "results.jsonl")
-        LOG.info("Sonuç CSV: %s", run_dir / "results.csv")
+        LOG.info(
+            "Sonuç CSV: %s",
+            run_dir / "results.csv" if getattr(args, "results_csv", True) else "atlanıldı",
+        )
         LOG.info("Excel: %s", workbook or "üretilemedi")
         LOG.info("=" * 88)
         return 0
     except KeyboardInterrupt:
         LOG.warning("Kullanıcı tarafından durduruldu. Checkpointler korundu; --resume-run ile devam edilebilir.")
         write_summary_files(run_dir, write_results_csv=False)
-        if args.excel_update == "end":
+        if args.excel_update == "end" and getattr(args, "excel_report", True):
             try:
                 invoke_excel_report(
                     run_dir,
@@ -4254,13 +4681,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         LOG.exception("BENCHMARK BAŞARISIZ. Mevcut checkpointler korunmuştur.")
         try:
             write_summary_files(run_dir, write_results_csv=False)
-            invoke_excel_report(
-                run_dir,
-                strict=False,
-                engine=args.excel_engine,
-                lightweight=True,
-                validation_mode="checkpoint",
-            )
+            if getattr(args, "excel_report", True):
+                invoke_excel_report(
+                    run_dir,
+                    strict=False,
+                    engine=args.excel_engine,
+                    lightweight=True,
+                    validation_mode="checkpoint",
+                )
         except Exception:
             LOG.exception("Hata sonrası kısmi rapor üretilemedi.")
         return 1

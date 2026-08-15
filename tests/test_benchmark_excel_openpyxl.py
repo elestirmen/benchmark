@@ -18,6 +18,7 @@ if str(BENCHMARK_DIR) not in sys.path:
 from build_benchmark_excel_openpyxl import (  # noqa: E402
     SUMMARY_COLUMNS,
     build_workbook,
+    enrich_summary_model_identity,
     excel_values_equal,
     resolve_incremental_base,
     save_workbook_safely,
@@ -26,6 +27,36 @@ from build_benchmark_excel_openpyxl import (  # noqa: E402
 
 
 class OpenpyxlReportTests(unittest.TestCase):
+    def test_epoch_sweep_catalog_adds_readable_lineage_and_epoch_columns(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            model_id = "long_truncated_identity__abcdef123456"
+            catalog = {
+                "models": [
+                    {
+                        "model_id": model_id,
+                        "relative_path": "01_long_training_lineage/epoch_00008.h5",
+                        "checkpoint_number": 8,
+                        "sha256": "a" * 64,
+                    }
+                ]
+            }
+            (run_dir / "model_catalog.json").write_text(
+                json.dumps(catalog), encoding="utf-8"
+            )
+            rows = enrich_summary_model_identity(
+                run_dir,
+                [{"model_id": model_id}, {"model_id": "RAW_BASELINE"}],
+            )
+            self.assertEqual(rows[0]["model_label"], "Lineage 01 | epoch_00008")
+            self.assertEqual(rows[0]["model_epoch"], 8)
+            self.assertEqual(
+                rows[0]["model_relative_path"],
+                "01_long_training_lineage/epoch_00008.h5",
+            )
+            self.assertEqual(rows[1]["model_label"], "RAW_BASELINE")
+            self.assertIsNone(rows[1]["model_epoch"])
+
     def test_excel_empty_cell_and_json_empty_string_are_losslessly_equivalent(self):
         self.assertTrue(excel_values_equal(None, ""))
         self.assertTrue(excel_values_equal("", None))
@@ -97,19 +128,28 @@ class OpenpyxlReportTests(unittest.TestCase):
             workbook = load_workbook(output, data_only=False)
             self.assertEqual(
                 [name for name in workbook.sheetnames if name != "_ExcelState"],
-                ["Özet", "Model Özeti", "Ham Sonuçlar", "Sorgu Manifesti", "Yapılandırma", "Hatalar"],
+                ["Özet", "Model Özeti", "Model Kataloğu", "Ham Sonuçlar", "Sorgu Manifesti", "Yapılandırma", "Hatalar"],
             )
             self.assertEqual(workbook["_ExcelState"].sheet_state, "veryHidden")
             self.assertEqual(workbook["Özet"]["B5"].value, "=COUNTA('Ham Sonuçlar'!A2:A2)")
             self.assertEqual(
-                [workbook["Özet"].cell(14, column).value for column in range(1, 5)],
-                ["Model (global arama)", "25 m başarı", "25 m içi medyan hata", "AUC@25m"],
+                [workbook["Özet"].cell(14, column).value for column in range(1, 8)],
+                ["Sıra", "Model", "Senaryo", "Yön", "Başarı ≤25 m", "AUC@25 m", "Medyan hata (m)"],
             )
+            self.assertEqual([workbook["Model Özeti"].cell(1, column).value for column in range(1, 16)], ["Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "N", "Başarılı N", "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)", "P90 hata (m)", "Ort. arama (sn)"])
+            self.assertFalse(workbook["Model Özeti"].column_dimensions["F"].hidden)
+            self.assertEqual([workbook["Model Kataloğu"].cell(1, column).value for column in range(1, 6)], ["Model ID (kanonik)", "Model", "Epoch", "Göreli yol", "SHA256"])
             self.assertIn("success_25m", SUMMARY_COLUMNS)
             self.assertIn("auc_25m", SUMMARY_COLUMNS)
             self.assertIn("median_error_under_25m", SUMMARY_COLUMNS)
             self.assertFalse(any("30m" in column for column in SUMMARY_COLUMNS))
             self.assertEqual(len(workbook["Özet"]._charts), 1)
+            chart = workbook["Özet"]._charts[0]
+            self.assertTrue(chart.series[0].val.numRef.f.startswith("'Özet'!$J$15"))
+            self.assertTrue(chart.series[0].cat.numRef.f.startswith("'Özet'!$I$15"))
+            self.assertEqual(workbook["Özet"]["J15"].value, "=E15*100")
+            self.assertEqual(chart.y_axis.scaling.max, 100.0)
+            self.assertIsNone(chart.dataLabels)
             self.assertEqual(workbook["Hatalar"].max_row, 2)
             self.assertEqual(len(workbook["Hatalar"].tables), 1)
 
@@ -148,13 +188,14 @@ class OpenpyxlReportTests(unittest.TestCase):
             )
             self.assertEqual(report["report_scope"], "lightweight")
             workbook = load_workbook(output, data_only=False)
-            self.assertEqual(workbook.sheetnames, ["Özet", "Model Özeti", "Yapılandırma", "Hatalar"])
+            self.assertEqual(workbook.sheetnames, ["Özet", "Model Özeti", "Model Kataloğu", "Yapılandırma", "Hatalar"])
             self.assertNotIn("Ham Sonuçlar", workbook.sheetnames)
             self.assertEqual(
                 workbook["Özet"]["B5"].value,
-                "=SUM('Model Özeti'!E2:E3)",
+                "=SUM('Model Özeti'!H2:H3)",
             )
-            self.assertIn("'Model Özeti'!D2", workbook["Özet"]["A15"].value)
+            self.assertEqual(workbook["Özet"]["A15"].value, 1)
+            self.assertEqual(workbook["Özet"]["B15"].value, "model_01")
             self.assertIsNone(workbook["Özet"]["A16"].value)
             self.assertIn("yalnız global aramayı", workbook["Özet"]["A10"].value)
             self.assertIn("ham sonuçlar yoktur", workbook["Özet"]["A10"].value)
@@ -238,6 +279,12 @@ class OpenpyxlReportTests(unittest.TestCase):
             self.assertEqual(raw.tables["RawResults_01"].ref.split(":")[-1][-1], "3")
             self.assertEqual(workbook["Özet"]["B5"].value, "=COUNTA('Ham Sonuçlar'!A2:A3)")
             self.assertEqual(len(workbook["Özet"]._charts), 1)
+            chart = workbook["Özet"]._charts[0]
+            self.assertTrue(chart.series[0].val.numRef.f.startswith("'Özet'!$J$15"))
+            self.assertTrue(chart.series[0].cat.numRef.f.startswith("'Özet'!$I$15"))
+            self.assertEqual(workbook["Özet"]["J15"].value, "=E15*100")
+            self.assertEqual(chart.y_axis.scaling.max, 100.0)
+            self.assertIsNone(chart.dataLabels)
             self.assertEqual(workbook["Model Özeti"].max_row, 3)
 
             full_output = run_dir / "benchmark_results_full_reference.xlsx"

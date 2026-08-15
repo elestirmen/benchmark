@@ -49,6 +49,117 @@ async function readJsonl(filePath) {
 }
 
 
+function modelLabel(identity, modelId) {
+  if (modelId === "RAW_BASELINE") return "RAW_BASELINE";
+  if (!identity) return modelId;
+  const relativePath = String(identity.relative_path ?? "");
+  const parts = relativePath.split(/[\\/]/).filter(Boolean);
+  const parent = parts.length > 1 ? parts[parts.length - 2] : "";
+  const rank = parent.match(/^(\d{2})_/);
+  const lineage = rank ? `Lineage ${rank[1]}` : (parent || "Model");
+  const checkpoint = identity.checkpoint_number;
+  const epoch = checkpoint !== undefined && checkpoint !== null
+    ? `epoch_${String(Number(checkpoint)).padStart(5, "0")}`
+    : (parts.length > 0 ? parts[parts.length - 1].replace(/\.[^.]+$/, "") : modelId);
+  return `${lineage} | ${epoch}`;
+}
+
+function enrichSummaryRows(rows, catalog) {
+  const models = Array.isArray(catalog?.models) ? catalog.models : [];
+  const byId = new Map(models.filter((item) => item?.model_id).map((item) => [String(item.model_id), item]));
+  const sequenceById = new Map(
+    models
+      .filter((item) => item?.model_id)
+      .map((item, index) => [String(item.model_id), index + 1]),
+  );
+  return rows.map((source) => {
+    const row = { ...source };
+    const modelId = String(row.model_id ?? "");
+    const identity = byId.get(modelId);
+    row.model_sequence = modelId === "RAW_BASELINE" ? 0 : (sequenceById.get(modelId) ?? null);
+    row.model_label = modelLabel(identity, modelId);
+    row.model_epoch = identity?.checkpoint_number ?? null;
+    row.model_relative_path = identity?.relative_path ?? null;
+    row.model_sha256 = identity?.sha256 ?? null;
+    return row;
+  });
+}
+
+function displayDirection(value) {
+  if (value == null) return null;
+  const text = String(value);
+  const lowered = text.toLowerCase();
+  const gmapsIndex = lowered.indexOf("gmaps");
+  const bingIndex = lowered.indexOf("bingmap");
+  if (gmapsIndex >= 0 && bingIndex >= 0) return gmapsIndex < bingIndex ? "Google → Bing" : "Bing → Google";
+  return text.replaceAll("__TO__", " → ");
+}
+
+function compactDirectionLabel(value) {
+  const text = String(value ?? "").toLowerCase();
+  const gmapsIndex = text.includes("gmaps") ? text.indexOf("gmaps") : text.indexOf("google");
+  const bingIndex = text.includes("bingmap") ? text.indexOf("bingmap") : text.indexOf("bing");
+  if (gmapsIndex >= 0 && bingIndex >= 0) return gmapsIndex < bingIndex ? "G→B" : "B→G";
+  return "Yön";
+}
+
+function displayVariant(value) {
+  return { clean: "Temiz", hard_v1: "Hard" }[String(value)] ?? value;
+}
+
+function displaySearchMode(value) {
+  if (value == null) return null;
+  const text = String(value);
+  if (text === "global") return "Global";
+  const match = text.match(/^roi[_-]?(\d+)(?:m)?$/i);
+  return match ? `ROI ${Number(match[1])} m` : text;
+}
+
+function prepareModelSummaryRows(rows) {
+  return rows.map((source) => ({
+    ...source,
+    direction: displayDirection(source.direction),
+    query_variant: displayVariant(source.query_variant),
+    search_mode: displaySearchMode(source.search_mode),
+  })).sort((a, b) => {
+    const aSequence = a.model_sequence ?? Number.POSITIVE_INFINITY;
+    const bSequence = b.model_sequence ?? Number.POSITIVE_INFINITY;
+    return aSequence - bSequence;
+  });
+}
+
+function compactModelLabel(row) {
+  const label = String(row.model_label ?? row.model_id ?? "Model");
+  if (label === "RAW_BASELINE") return "RAW";
+  const match = label.match(/Lineage\s+(\d+)/);
+  const epoch = row.model_epoch;
+  if (match && epoch !== null && epoch !== undefined) {
+    return "L" + String(Number(match[1])).padStart(2, "0")
+      + " | E" + String(Number(epoch)).padStart(3, "0");
+  }
+  return epoch !== null && epoch !== undefined
+    ? label.slice(0, 14) + " | E" + String(Number(epoch)).padStart(3, "0")
+    : label.slice(0, 24);
+}
+
+
+function buildModelCatalogRows(catalog, summaryRows) {
+  const models = Array.isArray(catalog?.models) ? catalog.models : [];
+  const ids = [...models.map((item) => item?.model_id).filter(Boolean), ...summaryRows.map((row) => row.model_id).filter(Boolean)];
+  const uniqueIds = [...new Set(ids.map((value) => String(value)))];
+  const byId = new Map(models.filter((item) => item?.model_id).map((item) => [String(item.model_id), item]));
+  return uniqueIds.map((modelId) => {
+    const identity = byId.get(modelId);
+    return {
+      model_id: modelId,
+      model_label: modelLabel(identity, modelId),
+      model_epoch: identity?.checkpoint_number ?? null,
+      model_relative_path: identity?.relative_path ?? null,
+      model_sha256: identity?.sha256 ?? null,
+    };
+  });
+}
+
 async function findFiles(root, targetName) {
   const found = [];
   async function walk(directory) {
@@ -129,7 +240,11 @@ const outputPath = path.resolve(args.output ?? path.join(runDir, "benchmark_resu
 const previewDir = path.join(runDir, "excel_previews");
 
 const config = await readJson(path.join(runDir, "run_config.json"), {});
-const summaryRows = await readJson(path.join(runDir, "summary.json"), []);
+const rawSummaryRows = await readJson(path.join(runDir, "summary.json"), []);
+const modelCatalog = await readJson(path.join(runDir, "model_catalog.json"), {});
+const summaryRows = enrichSummaryRows(rawSummaryRows, modelCatalog);
+const summaryDisplayRows = prepareModelSummaryRows(summaryRows);
+const catalogRows = buildModelCatalogRows(modelCatalog, summaryRows);
 const resultRows = await readJsonl(path.join(runDir, "results.jsonl"));
 const errorRows = await readJsonl(path.join(runDir, "model_errors.jsonl"));
 const manifestFiles = [
@@ -149,6 +264,7 @@ for (const manifestPath of manifestFiles) {
 const workbook = Workbook.create();
 const dashboard = workbook.worksheets.add("Özet");
 const summarySheet = workbook.worksheets.add("Model Özeti");
+const catalogSheet = workbook.worksheets.add("Model Kataloğu");
 const rawSheet = workbook.worksheets.add("Ham Sonuçlar");
 const querySheet = workbook.worksheets.add("Sorgu Manifesti");
 const configSheet = workbook.worksheets.add("Yapılandırma");
@@ -192,9 +308,9 @@ dashboard.getRange("A10:H11").format = {
   borders: { preset: "outside", style: "thin", color: "#D1D5DB" },
 };
 
-const ranked = [...summaryRows]
+const ranked = [...summaryDisplayRows]
   .filter((row) =>
-    row.search_mode === "global"
+    row.search_mode === "Global"
     && row.success_25m !== null
     && row.success_25m !== undefined
   )
@@ -204,74 +320,101 @@ const ranked = [...summaryRows]
     || Number(a.median_error_under_25m ?? Number.POSITIVE_INFINITY)
       - Number(b.median_error_under_25m ?? Number.POSITIVE_INFINITY)
   )
-  .slice(0, 15);
-dashboard.getRange("A14:D14").values = [["Model (global arama)", "25 m başarı", "25 m içi medyan hata", "AUC@25m"]];
-dashboard.getRange("A15:D29").values = Array.from({ length: 15 }, (_, index) => {
+  .slice(0, 10);
+
+dashboard.getRange("A14:G14").values = [[
+  "Sıra", "Model", "Senaryo", "Yön", "Başarı ≤25 m", "AUC@25 m", "Medyan hata (m)",
+]];
+dashboard.getRange("A15:G24").values = Array.from({ length: 10 }, (_, index) => {
   const row = ranked[index];
   return row
     ? [
-        `${row.model_id} [${row.query_variant ?? "clean"} | ${row.search_mode ?? "global"}]`,
+        index + 1,
+        compactModelLabel(row),
+        row.query_variant,
+        row.direction,
         row.success_25m,
-        row.median_error_under_25m,
         row.auc_25m,
+        row.median_error_under_25m,
       ]
-    : [null, null, null, null];
+    : [null, null, null, null, null, null, null];
 });
-applyHeader(dashboard.getRange("A14:D14"));
-dashboard.getRange("B15:B29").format.numberFormat = "0.0%";
-dashboard.getRange("C15:C29").format.numberFormat = "0.00";
-dashboard.getRange("D15:D29").format.numberFormat = "0.0%";
-dashboard.getRange("A14:D29").format.borders = {
+applyHeader(dashboard.getRange("A14:G14"));
+dashboard.getRange("E15:F24").format.numberFormat = "0.0%";
+dashboard.getRange("G15:G24").format.numberFormat = "0.00";
+dashboard.getRange("A14:G24").format.borders = {
   insideHorizontal: { style: "thin", color: "#E5E7EB" },
   bottom: { style: "thin", color: "#D1D5DB" },
 };
-if (ranked.length > 0) {
-  const chartEnd = 14 + ranked.length;
-  const chart = dashboard.charts.add("bar", dashboard.getRange(`A14:B${chartEnd}`));
-  chart.title = "Global aramada 25 m başarısı - en iyi modeller";
+
+const chartRows = ranked.slice(0, 5);
+dashboard.getRange("I14:J14").values = [["Model | Senaryo", "Başarı (%)"]];
+if (chartRows.length > 0) {
+  dashboard.getRange(`I15:I${14 + chartRows.length}`).values = chartRows.map((row) => [
+    `${compactModelLabel(row)} | ${row.query_variant} | ${compactDirectionLabel(row.direction)}`,
+  ]);
+  dashboard.getRange(`J15:J${14 + chartRows.length}`).formulas = chartRows.map((_, index) => {
+    const row = 15 + index;
+    return [`=E${row}*100`];
+  });
+}
+applyHeader(dashboard.getRange("I14:J14"));
+dashboard.getRange("J15:J19").format.numberFormat = "0.0";
+dashboard.getRange("I14:J19").format.borders = {
+  insideHorizontal: { style: "thin", color: "#E5E7EB" },
+  bottom: { style: "thin", color: "#D1D5DB" },
+};
+if (chartRows.length > 0) {
+  const chartEnd = 14 + chartRows.length;
+  const chart = dashboard.charts.add("bar", dashboard.getRange("I14:J" + chartEnd));
+  chart.title = "En iyi 5 model | 25 m başarı (%)";
   chart.hasLegend = false;
-  chart.xAxis = { axisType: "textAxis", textStyle: { fontSize: 9 } };
-  chart.yAxis = { numberFormatCode: "0.0%" };
-  chart.setPosition("F14", "M31");
+  chart.xAxis = { numberFormatCode: "0", min: 0, max: 100, textStyle: { fontSize: 9 } };
+  chart.yAxis = { axisType: "textAxis", textStyle: { fontSize: 9 } };
+  chart.setPosition("L14", "R29");
 }
 dashboard.freezePanes.freezeRows(2);
-dashboard.getRange("A1:M31").format.font = { name: "Aptos", size: 10, color: "#111827" };
-dashboard.getRange("A1:A31").format.columnWidth = 42;
-dashboard.getRange("B1:D31").format.columnWidth = 17;
-dashboard.getRange("E1:E31").format.columnWidth = 3;
-dashboard.getRange("E1:M31").format.columnWidth = 12;
-
-// Model summary sheet
+// Compact human-facing model summary.
 const summaryColumns = [
-  "direction", "query_variant", "search_mode", "model_id", "total_queries", "ok_queries", "rejected_queries",
-  "error_queries", "coverage", "success_25m_queries", "success_25m",
-  "success_25m_ci95_low", "success_25m_ci95_high", "success_25m_failure_rate",
-  "auc_25m", "mean_error_under_25m", "median_error_under_25m",
-  "mean_error_m", "median_error_m",
-  "median_error_ci95_low", "median_error_ci95_high", "p90_error_m", "p95_error_m",
-  "success_5m", "success_10m", "success_10m_ci95_low", "success_10m_ci95_high",
-  "success_50m",
-  "mean_top1_score", "mean_search_seconds", "total_search_seconds",
+  "model_sequence", "direction", "query_variant", "search_mode", "model_label", "model_id", "model_epoch",
+  "total_queries", "ok_queries", "coverage", "success_25m", "auc_25m",
+  "median_error_under_25m", "p90_error_m", "mean_search_seconds",
 ];
-const summaryMatrix = matrixFromRows(summaryRows, summaryColumns);
+const summaryHeaders = [
+  "Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "N", "Başarılı N",
+  "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)",
+  "P90 hata (m)", "Ort. arama (sn)",
+];
+const summaryMatrix = [summaryHeaders, ...summaryDisplayRows.map((row) => summaryColumns.map((column) => row?.[column] ?? null))];
 const summaryBlock = addTable(summarySheet, summaryMatrix, 0, 0, "ModelSummaryTable");
 styleFlatSheet(summarySheet, summaryBlock.range);
 numberFormatColumns(summarySheet, summaryColumns, {
-  coverage: "0.0%", success_25m: "0.0%", success_25m_ci95_low: "0.0%",
-  success_25m_ci95_high: "0.0%", success_25m_failure_rate: "0.0%", auc_25m: "0.0%",
-  mean_error_under_25m: "0.00", median_error_under_25m: "0.00",
-  mean_error_m: "0.00", median_error_m: "0.00",
-  median_error_ci95_low: "0.00", median_error_ci95_high: "0.00",
-  success_10m_ci95_low: "0.0%", success_10m_ci95_high: "0.0%",
-  p90_error_m: "0.00", p95_error_m: "0.00", success_5m: "0.0%",
-  success_10m: "0.0%", success_50m: "0.0%",
-  mean_top1_score: "0.0000", mean_search_seconds: "0.000",
-  total_search_seconds: "0.0",
-}, 1, summaryRows.length);
-summarySheet.getRangeByIndexes(0, 0, summaryRows.length + 1, 1).format.columnWidth = 36;
-summarySheet.getRangeByIndexes(0, 1, summaryRows.length + 1, 2).format.columnWidth = 18;
-summarySheet.getRangeByIndexes(0, 3, summaryRows.length + 1, 1).format.columnWidth = 48;
-summarySheet.getRangeByIndexes(0, 4, summaryRows.length + 1, summaryColumns.length - 4).format.columnWidth = 16;
+  coverage: "0.0%", success_25m: "0.0%", auc_25m: "0.0%",
+  median_error_under_25m: "0.00", p90_error_m: "0.00", mean_search_seconds: "0.000",
+  model_sequence: "0", model_epoch: "0", total_queries: "#,##0", ok_queries: "#,##0",
+}, 1, summaryDisplayRows.length);
+summarySheet.getRangeByIndexes(0, 0, summaryDisplayRows.length + 1, 1).format.columnWidth = 10;
+summarySheet.getRangeByIndexes(0, 1, summaryDisplayRows.length + 1, 1).format.columnWidth = 18;
+summarySheet.getRangeByIndexes(0, 2, summaryDisplayRows.length + 1, 2).format.columnWidth = 14;
+summarySheet.getRangeByIndexes(0, 4, summaryDisplayRows.length + 1, 1).format.columnWidth = 28;
+summarySheet.getRangeByIndexes(0, 5, summaryDisplayRows.length + 1, 1).format.columnWidth = 48;
+summarySheet.getRangeByIndexes(0, 6, summaryDisplayRows.length + 1, 4).format.columnWidth = 11;
+summarySheet.getRangeByIndexes(0, 10, summaryDisplayRows.length + 1, 2).format.columnWidth = 14;
+summarySheet.getRangeByIndexes(0, 12, summaryDisplayRows.length + 1, 1).format.columnWidth = 20;
+summarySheet.getRangeByIndexes(0, 13, summaryDisplayRows.length + 1, 2).format.columnWidth = 16;
+
+// Technical model identity and audit fields.
+const catalogColumns = ["model_id", "model_label", "model_epoch", "model_relative_path", "model_sha256"];
+const catalogHeaders = ["Model ID (kanonik)", "Model", "Epoch", "Göreli yol", "SHA256"];
+const catalogMatrix = [catalogHeaders, ...catalogRows.map((row) => catalogColumns.map((column) => row?.[column] ?? null))];
+const catalogBlock = addTable(catalogSheet, catalogMatrix, 0, 0, "ModelCatalogTable");
+styleFlatSheet(catalogSheet, catalogBlock.range);
+numberFormatColumns(catalogSheet, catalogColumns, { model_epoch: "0" }, 1, catalogRows.length);
+catalogSheet.getRangeByIndexes(0, 0, catalogRows.length + 1, 1).format.columnWidth = 48;
+catalogSheet.getRangeByIndexes(0, 1, catalogRows.length + 1, 1).format.columnWidth = 28;
+catalogSheet.getRangeByIndexes(0, 2, catalogRows.length + 1, 1).format.columnWidth = 10;
+catalogSheet.getRangeByIndexes(0, 3, catalogRows.length + 1, 1).format.columnWidth = 60;
+catalogSheet.getRangeByIndexes(0, 4, catalogRows.length + 1, 1).format.columnWidth = 68;
 
 // Raw results sheet
 const resultColumns = resultRows.length > 0 ? Object.keys(resultRows[0]) : ["run_id", "status"];

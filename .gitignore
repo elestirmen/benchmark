@@ -9,6 +9,7 @@
 # Trained model weights are local runtime assets
 models/*
 !models/README.md
+models_epoch_sweep/
 
 # Generated benchmark artifacts
 outputs/
@@ -36,4 +37,3 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
-

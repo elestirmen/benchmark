@@ -42,6 +42,7 @@ from geospatial_model_benchmark import (  # noqa: E402
     parse_patterns,
     read_jsonl,
     refresh_excel_after_model,
+    resume_payloads_compatible,
     run_direction,
     run_searches_for_representation,
     run_searches_for_variants,
@@ -59,6 +60,14 @@ class ExcelCheckpointTests(unittest.TestCase):
 
     def test_eight_search_workers_are_enabled_by_default(self) -> None:
         self.assertEqual(build_parser().parse_args([]).search_workers, 8)
+
+    def test_batch_size_is_operational_for_resume_compatibility(self) -> None:
+        previous = {"schema_version": 2, "batch_size": 64, "seed": 42}
+        current = {"schema_version": 2, "seed": 42}
+        self.assertTrue(resume_payloads_compatible(previous, current))
+        self.assertFalse(
+            resume_payloads_compatible(previous, {"schema_version": 2, "seed": 43})
+        )
 
     def test_model_checkpoint_is_non_strict_and_refreshes_summary_first(self) -> None:
         args = argparse.Namespace(excel_update="model", excel_engine="openpyxl")
@@ -322,6 +331,64 @@ class CorrectnessGuardTests(unittest.TestCase):
             self.assertEqual(len(catalog.models), 1)
             self.assertEqual(catalog.identical_files_skipped, 1)
             self.assertEqual(len(catalog.models[0].duplicate_paths), 1)
+
+    def test_five_point_sampling_uses_checkpoint_quartiles_per_series(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            for epoch in range(1, 10):
+                path = model_dir / f"GPU_model_f32_k3_epoch_{epoch:05d}_sigmoid.h5"
+                path.write_bytes(f"weights-{epoch}".encode())
+
+            catalog = build_model_catalog(
+                model_dir,
+                parse_patterns(None),
+                None,
+                "five-point",
+            )
+
+            self.assertEqual(catalog.sampling_mode, "five-point")
+            self.assertEqual(catalog.series_count, 1)
+            self.assertEqual(catalog.sampled_files, 5)
+            self.assertEqual(
+                [model.checkpoint_number for model in catalog.models],
+                [1, 3, 5, 7, 9],
+            )
+            self.assertEqual(
+                [model.selection_points for model in catalog.models],
+                [("first",), ("q25",), ("middle",), ("q75",), ("last",)],
+            )
+
+    def test_five_point_sampling_separates_architectures_in_same_folder(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            for architecture in ("f32_k3", "f48_k5"):
+                for epoch in range(1, 10):
+                    path = model_dir / f"GPU_model_{architecture}_epoch_{epoch:05d}.h5"
+                    path.write_bytes(f"{architecture}-{epoch}".encode())
+
+            catalog = build_model_catalog(
+                model_dir,
+                parse_patterns(None),
+                None,
+                "five-point",
+            )
+
+            self.assertEqual(catalog.series_count, 2)
+            self.assertEqual(catalog.sampled_files, 10)
+            self.assertEqual(len(catalog.models), 10)
+            self.assertEqual(len({model.series_id for model in catalog.models}), 2)
+
+    def test_five_point_sampling_requires_epoch_or_step_in_filename(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            (model_dir / "model.h5").write_bytes(b"weights")
+            with self.assertRaisesRegex(ValueError, "epoch/step"):
+                build_model_catalog(
+                    model_dir,
+                    parse_patterns(None),
+                    None,
+                    "five-point",
+                )
 
     def test_output_conversion_modes_are_non_overlapping_and_explicit(self) -> None:
         from goruntu_islemleri import prediction_to_uint8

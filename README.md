@@ -163,9 +163,30 @@ python geospatial_model_benchmark.py `
   --run-id pilot_uc_model
 ```
 
-### 4. Tüm modeller, 300 sorgu
+### 4. Eğitim serisi başına beş checkpoint ile hızlı eleme
 
-`--models` yoksa `models/` alt klasörleri dahil tüm uygun dosyalar işlenir. Başlangıçta bütün adaylar SHA-256 ile kataloglanır: birebir aynı içerikli kopyalar yalnız bir kez çalıştırılır; aynı dosya adına sahip fakat içeriği farklı modeller göreli klasör yolu ve kısa SHA içeren ayrı `model_id` değerleri alır. Ayrıntılı liste `model_catalog.json`, sayımlar ve katalog özeti `run_config.json` ile başlangıç loguna yazılır. `--max-models`, SHA tekilleştirmesinden sonraki gerçek model sayısına uygulanır.
+`--model-sampling five-point`, aynı klasördeki dosya adlarını `epoch/step` numarasını yok sayarak eğitim serilerine ayırır. Her seri checkpoint numarasına göre sıralanır ve ilk, %25, orta, %75 ve son model seçilir. Böylece aynı fiziksel klasörde bulunan farklı mimariler birbirine karışmaz. Seçim noktası, seri kimliği ve checkpoint numarası `model_catalog.json` içinde saklanır.
+
+Mevcut `models/diger` ağacında 2.273 dosya 126 eğitim serisine ayrılır; beş nokta seçimi 556 checkpoint üretir ve aynı içerikli 11 seçim elendikten sonra 545 benzersiz model çalıştırılır.
+
+Önerilen ilk eleme koşusu 100 deterministik sorgu, yalnız global arama, clean + hard varyantları ve çift yön kullanır:
+
+```powershell
+python geospatial_model_benchmark.py `
+  --model-dir "models\diger" `
+  --model-sampling five-point `
+  --max-queries 100 `
+  --search-modes global `
+  --cleanup-maps `
+  --batch-size 64 `
+  --run-id urgup_bes_nokta_global_100
+```
+
+İlk eleme bittikten sonra global `success_25m`, `AUC@25m` ve `median_error_under_25m` sıralamasındaki finalistler tam protokolle yeniden çalıştırılabilir.
+
+### 5. Tüm modeller, 300 sorgu
+
+Varsayılan `--model-sampling full` davranışında `--models` yoksa `models/` alt klasörleri dahil tüm uygun dosyalar işlenir. Başlangıçta bütün adaylar SHA-256 ile kataloglanır: birebir aynı içerikli kopyalar yalnız bir kez çalıştırılır; aynı dosya adına sahip fakat içeriği farklı modeller göreli klasör yolu ve kısa SHA içeren ayrı `model_id` değerleri alır. Ayrıntılı liste `model_catalog.json`, sayımlar ve katalog özeti `run_config.json` ile başlangıç loguna yazılır. `--max-models`, örnekleme ve SHA tekilleştirmesinden sonraki gerçek model sayısına uygulanır.
 
 ```powershell
 python geospatial_model_benchmark.py `
@@ -195,9 +216,69 @@ python geospatial_model_benchmark.py `
 
 Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları, model kataloğunun göreli yol/SHA özetini ve `SCIENTIFIC_SEMANTICS_VERSION=2` merkez konvansiyonunu kilitler; `--search-workers` imzada değildir.
 
+`--batch-size` bilimsel değil operasyonel bir resume ayarıdır; VRAM durumuna göre devam sırasında değiştirilebilir. İlk ve sonraki batch değerleri `run_config.json` içindeki `operational_history` alanında korunur. Batch değişikliği yalnız henüz tamamlanmamış model çıkarımlarına uygulanır; bitmiş model sonuçları checkpointten yeniden kullanılmaya devam eder.
+
 Semantik v1 veya sürümsüz eski bir sonuç klasörü v2 koduyla resume edilmez; eski/yeni merkez gerçeklerinin karışmaması için açık hata verilir ve yeni `--run-id` gerekir.
 
 Farklı `hard_v1` profiliyle üretilmiş bir klasöre devam edilirse benchmark karıştırmamak için yeni `--run-id` ister.
+
+## Başarılı lineage'lar için 2000 sorguluk epoch sweep
+
+`epoch_sweep_2000.py`, tamamlanmış bir benchmark koşusundaki global clean +
+hard_v1 sonuçlarından ilk 10 checkpointi seçer. İki yön tamamsa ikisini eşit
+ağırlıkla kullanır; sıralama `success_25m` → `AUC@25m` → `success_5m` → düşük
+`median_error_under_25m` şeklindedir. İlk 10 seçildikten sonra training lineage
+tekilleştirilir; aynı lineage birden fazla kez seçilmişse sıra 11'den backfill
+yapılmaz.
+
+Önce yalnız planı görmek için:
+
+```powershell
+python epoch_sweep_2000.py `
+  --benchmark-run outputs\<tamamlanmis_run> `
+  --model-archive-dir "D:\...\tum_modeller" `
+  --dry-run
+```
+
+Gerçek çalışma aynı komuttan `--dry-run` çıkarılarak başlatılır:
+
+```powershell
+python epoch_sweep_2000.py `
+  --benchmark-run outputs\<tamamlanmis_run> `
+  --model-archive-dir "D:\...\tum_modeller"
+```
+
+Script yalnız `epoch` checkpointlerini recursive tarar; `step_*` ve `batch_*`
+dosyalarını dışarıda bırakır. SHA-256 ankrajıyla kaynak training lineage'ı bulur,
+aynı adlı fakat farklı koşuların kaynak klasör kimliğini korur ve checkpointleri
+`models_epoch_sweep/` altında doğrulanmış manifestlerle toplar. Aynı SHA bir kez
+kopyalanıp/çalıştırılır; mantıksal epoch aliasları raporda korunur.
+
+Her yön için sabit seed ile tam 2000 merkez `balanced_exact` blok kotasıyla bir
+kez üretilir. Üst düzey `query_manifest_2000.json`, yön bazlı gerçek manifestleri
+ve bilimsel SHA-256 parmak izlerini indeksler. Manifest, model inventory veya
+bilimsel ayarlar sonuç başladıktan sonra değişirse resume açık hatayla reddedilir.
+Core benchmark; RAW, GPU zorunluluğu, `minus1_1`, 544→512 kırpma,
+`TM_CCOEFF_NORMED`, UTM hata ve per-query resume semantiğini aynen yürütür.
+Ana benchmarktaki model-sınırı raporlama stratejisi de korunur: her model
+tamamlandığında artımlı özet yenilenir ve `benchmark_results.xlsx` güncellenir.
+Excel dosyası açık/kilitliyse benchmark durmaz; zaman damgalı kilitli kopya
+üretilir ve güncel dosya `excel_latest.json` içinde belirtilir.
+
+Ana çıktılar `outputs/epoch_sweep_2000/` altındadır:
+
+```text
+selected_top10_models.csv
+selected_lineages.csv
+query_manifest_2000.json
+benchmark_results.xlsx
+excel_latest.json
+all_epoch_results.csv
+best_epoch_per_lineage.csv
+raw_baseline_results.csv
+epoch_sweep_errors.jsonl
+plots\<lineage>_success25.png
+```
 
 ## Çıktılar
 
@@ -223,7 +304,7 @@ excel_previews\*.png          # yalnız Artifact motoru
 
 Paylaşılan CUDA derleme önbelleği koşu klasörünün dışında `outputs/cuda_cache/` altında tutulur.
 
-Model sonu hafif Excel sayfaları: `Özet`, `Model Özeti`, `Yapılandırma`, `Hatalar`. Final Excel bunlara `Ham Sonuçlar` ve `Sorgu Manifesti` sayfalarını ekler.
+Model sonu hafif Excel sayfaları: Özet, Model Özeti, Model Kataloğu, Yapılandırma, Hatalar. Model Özeti insan-okur 13 görünür alanlı rapor görünümüdür; model_id artık doğrudan bu sayfada görünür, kanonik model ID, göreli yol ve SHA256 Model Kataloğu sayfasında da korunur. Final Excel bunlara Ham Sonuçlar ve Sorgu Manifesti sayfalarını ekler.
 
 Model sonu checkpointlerinde büyük `results.csv` yeniden yazılmaz ve ham sonuçlar XLSX içine alınmaz. Yalnız tamamlanan sonuçlardan üretilen özet, global sıralama, yapılandırma ve model hataları küçük bir ara rapora yazılır. Benchmark normal tamamlandığında `results.csv` bir kez üretilir; ham sonuçları ve sorgu manifestini içeren tam Excel baştan oluşturulup derin doğrulanır.
 
@@ -253,19 +334,20 @@ Sorgu başına ayrıca: UTM/piksel hata, Top-1/Top-2 NCC, peak margin, PSR, sür
 ## Önemli CLI bayrakları
 
 ```text
---query-raster / --map-raster / --model-dir / --models
+--query-raster / --map-raster / --model-dir / --models / --model-sampling
 --max-models / --run-id / --resume-run / --output-root
 --bidirectional / --no-bidirectional
 --include-raw / --no-include-raw
 --include-models / --no-include-models
 --query-variants clean,hard_v1
 --search-modes roi500,roi1000,...,global
---max-queries / --samples-per-block / --block-size-m / --seed
+--max-queries / --samples-per-block / --block-size-m / --query-sampling / --seed
 --min-query-std / --min-query-entropy / --max-dark-fraction / --query-edge-buffer-m
 --tile-size 544 / --overlap 32 / --crop-border 16
 --search-workers 8 / --batch-size / --pyramid-factors
 --normalization minus1_1 / --enhancement none / --output-value-mode auto
---excel-engine auto / --excel-update model / --strict-excel / --no-strict-excel
+--excel-engine auto / --excel-update model / --excel-report / --results-csv
+--strict-excel / --no-strict-excel
 --force-queries / --force-maps / --keep-intermediate / --fail-fast / --verbose
 ```
 

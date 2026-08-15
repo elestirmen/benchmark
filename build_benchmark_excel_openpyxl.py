@@ -14,7 +14,6 @@ import logging
 import math
 import os
 import re
-import sys
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -40,6 +39,7 @@ LATEST_POINTER = "excel_latest.json"
 REQUIRED_SHEETS = [
     "Özet",
     "Model Özeti",
+    "Model Kataloğu",
     "Ham Sonuçlar",
     "Sorgu Manifesti",
     "Yapılandırma",
@@ -48,6 +48,7 @@ REQUIRED_SHEETS = [
 LIGHTWEIGHT_SHEETS = [
     "Özet",
     "Model Özeti",
+    "Model Kataloğu",
     "Yapılandırma",
     "Hatalar",
 ]
@@ -72,6 +73,10 @@ SUMMARY_COLUMNS = [
     "query_variant",
     "search_mode",
     "model_id",
+    "model_label",
+    "model_epoch",
+    "model_relative_path",
+    "model_sha256",
     "total_queries",
     "ok_queries",
     "rejected_queries",
@@ -100,6 +105,60 @@ SUMMARY_COLUMNS = [
     "mean_search_seconds",
     "total_search_seconds",
 ]
+
+# SUMMARY_COLUMNS remains the canonical complete schema for JSON/CSV compatibility.
+# This compact projection is the human-facing Excel view.
+MODEL_SUMMARY_COLUMNS = [
+    "model_sequence",
+    "direction",
+    "query_variant",
+    "search_mode",
+    "model_label",
+    "model_id",
+    "model_epoch",
+    "total_queries",
+    "ok_queries",
+    "coverage",
+    "success_25m",
+    "auc_25m",
+    "median_error_under_25m",
+    "p90_error_m",
+    "mean_search_seconds",
+]
+
+MODEL_SUMMARY_HEADERS = {
+    "model_sequence": "Sıra No",
+    "direction": "Yön",
+    "query_variant": "Senaryo",
+    "search_mode": "Arama",
+    "model_label": "Model",
+    "model_id": "Model ID",
+    "model_epoch": "Epoch",
+    "total_queries": "N",
+    "ok_queries": "Başarılı N",
+    "coverage": "Kapsam",
+    "success_25m": "Başarı ≤25 m",
+    "auc_25m": "AUC@25 m",
+    "median_error_under_25m": "Medyan hata ≤25 m (m)",
+    "p90_error_m": "P90 hata (m)",
+    "mean_search_seconds": "Ort. arama (sn)",
+}
+
+MODEL_CATALOG_COLUMNS = [
+    "model_id",
+    "model_label",
+    "model_epoch",
+    "model_relative_path",
+    "model_sha256",
+]
+
+MODEL_CATALOG_HEADERS = {
+    "model_id": "Model ID (kanonik)",
+    "model_label": "Model",
+    "model_epoch": "Epoch",
+    "model_relative_path": "Göreli yol",
+    "model_sha256": "SHA256",
+}
 
 QUERY_COLUMNS = [
     "direction",
@@ -349,6 +408,169 @@ def ordered_columns(rows: Sequence[dict[str, Any]], fallback: Sequence[str]) -> 
     return columns
 
 
+def enrich_summary_model_identity(
+    run_dir: Path, rows: Sequence[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Add human-readable epoch identity without changing canonical model IDs."""
+    catalog = read_json(run_dir / "model_catalog.json", {})
+    models = catalog.get("models", []) if isinstance(catalog, dict) else []
+    sequence_by_model_id = {
+        str(item["model_id"]): index + 1
+        for index, item in enumerate(models)
+        if isinstance(item, dict) and item.get("model_id")
+    }
+    by_model_id = {
+        str(item["model_id"]): item
+        for item in models
+        if isinstance(item, dict) and item.get("model_id")
+    }
+    enriched: list[dict[str, Any]] = []
+    for source in rows:
+        row = dict(source)
+        model_id = str(row.get("model_id", ""))
+        if model_id == "RAW_BASELINE":
+            row.update(
+                {
+                    "model_label": "RAW_BASELINE",
+                    "model_sequence": 0,
+                    "model_epoch": None,
+                    "model_relative_path": None,
+                    "model_sha256": None,
+                }
+            )
+            enriched.append(row)
+            continue
+        identity = by_model_id.get(model_id, {})
+        if not identity:
+            row.update(
+                {
+                    "model_label": model_id,
+                    "model_sequence": sequence_by_model_id.get(model_id),
+                    "model_epoch": None,
+                    "model_relative_path": None,
+                    "model_sha256": None,
+                }
+            )
+            enriched.append(row)
+            continue
+        relative_path = str(identity.get("relative_path") or "")
+        checkpoint = identity.get("checkpoint_number")
+        parent_name = Path(relative_path).parent.name if relative_path else ""
+        rank_match = re.match(r"^(\d{2})_", parent_name)
+        lineage_label = (
+            f"Lineage {rank_match.group(1)}"
+            if rank_match
+            else (parent_name or "Model")
+        )
+        epoch_label = (
+            f"epoch_{int(checkpoint):05d}"
+            if checkpoint is not None
+            else Path(relative_path).stem
+        )
+        row.update(
+            {
+                "model_label": f"{lineage_label} | {epoch_label}",
+                "model_sequence": sequence_by_model_id.get(model_id),
+                "model_epoch": int(checkpoint) if checkpoint is not None else None,
+                "model_relative_path": relative_path or None,
+                "model_sha256": identity.get("sha256"),
+            }
+        )
+        enriched.append(row)
+    return enriched
+
+
+def display_direction(value: Any) -> Any:
+    if value is None:
+        return None
+    text = str(value)
+    lowered = text.lower()
+    gmaps_index = lowered.find("gmaps")
+    bing_index = lowered.find("bingmap")
+    if gmaps_index >= 0 and bing_index >= 0:
+        return "Google → Bing" if gmaps_index < bing_index else "Bing → Google"
+    return text.replace("__TO__", " → ")
+
+
+def compact_direction_label(value: Any) -> str:
+    text = str(value or "").lower()
+    gmaps_index = text.find("gmaps") if "gmaps" in text else text.find("google")
+    bing_index = text.find("bingmap") if "bingmap" in text else text.find("bing")
+    if gmaps_index >= 0 and bing_index >= 0:
+        return "G→B" if gmaps_index < bing_index else "B→G"
+    return "Yön"
+
+
+def display_query_variant(value: Any) -> Any:
+    if value is None:
+        return None
+    return {"clean": "Temiz", "hard_v1": "Hard"}.get(str(value), value)
+
+
+def display_search_mode(value: Any) -> Any:
+    if value is None:
+        return None
+    text = str(value)
+    if text == "global":
+        return "Global"
+    match = re.fullmatch(r"roi[_-]?(\d+)(?:m)?", text, flags=re.IGNORECASE)
+    if match:
+        return f"ROI {int(match.group(1))} m"
+    return text
+
+
+def prepare_model_summary_rows(rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    prepared: list[dict[str, Any]] = []
+    for source in rows:
+        row = dict(source)
+        row["direction"] = display_direction(row.get("direction"))
+        row["query_variant"] = display_query_variant(row.get("query_variant"))
+        row["search_mode"] = display_search_mode(row.get("search_mode"))
+        prepared.append(row)
+    prepared.sort(
+        key=lambda row: (
+            row.get("model_sequence") is None,
+            row.get("model_sequence") if row.get("model_sequence") is not None else float("inf"),
+        )
+    )
+    return prepared
+
+
+def compact_model_label(row: dict[str, Any]) -> str:
+    model_label = str(row.get("model_label") or row.get("model_id") or "Model")
+    if model_label == "RAW_BASELINE":
+        return "RAW"
+    match = re.search(r"Lineage\s+(\d+)", model_label)
+    epoch = row.get("model_epoch")
+    if match and epoch is not None:
+        return f"L{int(match.group(1)):02d} | E{int(epoch):03d}"
+    if epoch is not None:
+        return f"{model_label[:14]} | E{int(epoch):03d}"
+    return model_label[:24]
+
+
+def build_model_catalog_rows(
+    run_dir: Path, summary_rows: Sequence[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    catalog = read_json(run_dir / "model_catalog.json", {})
+    models = catalog.get("models", []) if isinstance(catalog, dict) else []
+    model_ids: list[str] = []
+    for item in models:
+        if isinstance(item, dict) and item.get("model_id"):
+            model_ids.append(str(item["model_id"]))
+    for row in summary_rows:
+        if row.get("model_id"):
+            model_ids.append(str(row["model_id"]))
+    unique_ids = list(dict.fromkeys(model_ids))
+    enriched = enrich_summary_model_identity(
+        run_dir, [{"model_id": model_id} for model_id in unique_ids]
+    )
+    return [
+        {column: row.get(column) for column in MODEL_CATALOG_COLUMNS}
+        for row in enriched
+    ]
+
+
 def find_query_rows(run_dir: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     manifest_paths = sorted(run_dir.rglob("query_manifest.json")) + sorted(
@@ -432,8 +654,11 @@ def write_table(
     *,
     table_name: str,
     number_formats: dict[str, str] | None = None,
+    headers: Sequence[str] | None = None,
 ) -> None:
-    ws.append(list(columns))
+    if headers is not None and len(headers) != len(columns):
+        raise ValueError("Excel başlıkları sütun sayısıyla aynı olmalıdır.")
+    ws.append(list(headers or columns))
     for row in rows:
         ws.append([excel_value(row.get(column)) for column in columns])
     # Excel desktop rejects a table whose reference contains only its header.
@@ -544,7 +769,7 @@ def write_dashboard(
 
     ws["B4"] = config.get("run_id") or "benchmark"
     summary_column_letters = {
-        name: get_column_letter(index + 1) for index, name in enumerate(SUMMARY_COLUMNS)
+        name: get_column_letter(index + 1) for index, name in enumerate(MODEL_SUMMARY_COLUMNS)
     }
     count_formulas: list[str] = []
     ok_formulas: list[str] = []
@@ -592,103 +817,114 @@ def write_dashboard(
     ws.row_dimensions[11].height = 18
 
     ranking_headers = [
-        "Model (global arama)",
-        "25 m başarı",
-        "25 m içi medyan hata",
-        "AUC@25m",
+        "Sıra",
+        "Model",
+        "Senaryo",
+        "Yön",
+        "Başarı ≤25 m",
+        "AUC@25 m",
+        "Medyan hata (m)",
     ]
     for column, header in enumerate(ranking_headers, start=1):
         ws.cell(row=14, column=column, value=header)
-    style_header(ws[14][:4])
+    style_header(ws[14][: len(ranking_headers)])
     ws.row_dimensions[14].height = 32
 
     summary_positions = sorted(
         [
-            (index + 2, row)
-            for index, row in enumerate(summary_rows)
-            if row.get("search_mode") == "global"
+            row
+            for row in summary_rows
+            if str(row.get("search_mode") or "").lower() == "global"
             and row.get("success_25m") is not None
         ],
         key=lambda item: (
-            -float(item[1].get("success_25m") or 0.0),
-            -float(item[1].get("auc_25m") or 0.0),
+            -float(item.get("success_25m") or 0.0),
+            -float(item.get("auc_25m") or 0.0),
             (
-                float(item[1]["median_error_under_25m"])
-                if item[1].get("median_error_under_25m") is not None
+                float(item["median_error_under_25m"])
+                if item.get("median_error_under_25m") is not None
                 else float("inf")
             ),
         ),
-    )[:15]
-    for offset, (source_row, _) in enumerate(summary_positions, start=15):
-        model_letter = summary_column_letters["model_id"]
-        variant_letter = summary_column_letters["query_variant"]
-        mode_letter = summary_column_letters["search_mode"]
-        ws.cell(
-            row=offset,
-            column=1,
-            value=(
-                f"=IF(LEN('Model Özeti'!{model_letter}{source_row})>24,"
-                f"LEFT('Model Özeti'!{model_letter}{source_row},24)&\"...\","
-                f"'Model Özeti'!{model_letter}{source_row})&\" [\"&"
-                f"'Model Özeti'!{variant_letter}{source_row}&\" | \"&"
-                f"'Model Özeti'!{mode_letter}{source_row}&\"]\""
-            ),
-        )
-        ws.cell(
-            row=offset,
-            column=2,
-            value=f"='Model Özeti'!{summary_column_letters['success_25m']}{source_row}",
-        )
-        ws.cell(
-            row=offset,
-            column=3,
-            value=(
-                f"='Model Özeti'!"
-                f"{summary_column_letters['median_error_under_25m']}{source_row}"
-            ),
-        )
-        ws.cell(
-            row=offset,
-            column=4,
-            value=f"='Model Özeti'!{summary_column_letters['auc_25m']}{source_row}",
-        )
-        for column in range(1, 5):
-            ws.cell(row=offset, column=column).border = SUBTLE_BORDER
-            ws.cell(row=offset, column=column).font = Font(name="Aptos", size=9, color=TEXT)
-    for row in range(15 + len(summary_positions), 30):
-        for column in range(1, 5):
+    )[:10]
+    chart_positions = summary_positions[:5]
+    for offset, row in enumerate(summary_positions, start=15):
+        values = [
+            offset - 14,
+            compact_model_label(row),
+            display_query_variant(row.get("query_variant")),
+            display_direction(row.get("direction")),
+            row.get("success_25m"),
+            row.get("auc_25m"),
+            row.get("median_error_under_25m"),
+        ]
+        for column, value in enumerate(values, start=1):
+            ws.cell(row=offset, column=column, value=excel_value(value))
+    for row in range(15, 25):
+        for column in range(1, len(ranking_headers) + 1):
             ws.cell(row=row, column=column).border = SUBTLE_BORDER
-    for row in range(15, 30):
-        ws.cell(row=row, column=2).number_format = "0.0%"
-        ws.cell(row=row, column=3).number_format = "0.00"
-        ws.cell(row=row, column=4).number_format = "0.0%"
+            ws.cell(row=row, column=column).font = Font(name="Aptos", size=9, color=TEXT)
+        ws.cell(row=row, column=5).number_format = "0.0%"
+        ws.cell(row=row, column=6).number_format = "0.0%"
+        ws.cell(row=row, column=7).number_format = "0.00"
 
-    if summary_positions:
+    if chart_positions:
+        # Keep a compact, formula-backed Top-5 block beside the ranking table.
+        # Values are converted to 0-100 for reliable percent-axis rendering.
+        # This block is rebuilt on every full, lightweight and incremental save.
+        ws["I13"] = "Grafik: En iyi 5"
+        ws["I13"].font = Font(name="Aptos", size=10, bold=True, color=TEXT)
+        ws["I14"] = "Model | Senaryo"
+        ws["J14"] = "Başarı (%)"
+        for cell in ws["I14:J14"][0]:
+            cell.fill = PatternFill("solid", fgColor=DARK)
+            cell.font = Font(name="Aptos", size=9, bold=True, color=WHITE)
+            cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        for row, item in enumerate(chart_positions, start=15):
+            ws.cell(
+                row=row,
+                column=9,
+                value=(
+                    f"{compact_model_label(item)} | "
+                    f"{display_query_variant(item.get('query_variant'))} | "
+                    f"{compact_direction_label(item.get('direction'))}"
+                ),
+            )
+            ws.cell(row=row, column=10, value=f"=E{row}*100")
+            for column in range(9, 11):
+                cell = ws.cell(row=row, column=column)
+                cell.font = Font(name="Aptos", size=9, color=TEXT)
+                cell.border = SUBTLE_BORDER
+                cell.alignment = Alignment(vertical="center")
+            ws.cell(row=row, column=10).number_format = "0.0"
+        ws.column_dimensions["I"].width = 22
+        ws.column_dimensions["J"].width = 12
         chart = BarChart()
-        chart.type = "bar"
+        chart.type = "col"
         chart.style = 10
-        chart.title = "Global aramada 25 m başarısı - en iyi modeller"
-        chart.height = 8.5
-        chart.width = 17.0
+        chart.title = "En iyi 5 model | 25 m başarı (%)"
+        chart.height = 10.0
+        chart.width = 15.0
         chart.varyColors = False
-        data = Reference(ws, min_col=2, min_row=14, max_row=14 + len(summary_positions))
-        categories = Reference(ws, min_col=1, min_row=15, max_row=14 + len(summary_positions))
+        data = Reference(ws, min_col=10, min_row=14, max_row=14 + len(chart_positions))
+        categories = Reference(ws, min_col=9, min_row=15, max_row=14 + len(chart_positions))
         chart.add_data(data, titles_from_data=True)
         chart.set_categories(categories)
         chart.legend = None
-        chart.y_axis.scaling.orientation = "maxMin"
-        chart.y_axis.numFmt = "0%"
+        chart.y_axis.title = "Başarı (%)"
+        chart.y_axis.scaling.min = 0
+        chart.y_axis.scaling.max = 100
+        chart.y_axis.numFmt = "0"
         if chart.series:
             chart.series[0].graphicalProperties.solidFill = ACCENT
             chart.series[0].graphicalProperties.line.solidFill = ACCENT
-        ws.add_chart(chart, "F14")
-
-    widths = {"A": 42, "B": 18, "C": 16, "D": 16, "E": 3}
+        ws.add_chart(chart, "L14")
+    widths = {"A": 8, "B": 14, "C": 12, "D": 38, "E": 14, "F": 12, "G": 18, "H": 3}
     for column, width in widths.items():
         ws.column_dimensions[column].width = width
-    for column in range(6, 14):
+    for column in range(11, 19):
         ws.column_dimensions[get_column_letter(column)].width = 12
-    ws.print_area = "A1:M31"
+    ws.print_area = "A1:R30"
     ws.page_setup.orientation = "landscape"
     ws.sheet_properties.pageSetUpPr.fitToPage = True
     ws.page_setup.fitToWidth = 1
@@ -802,6 +1038,9 @@ def build_workbook(
     query_rows = [] if lightweight else find_query_rows(run_dir)
     if not isinstance(summary_rows, list):
         raise ValueError("summary.json bir liste içermelidir.")
+    summary_rows = enrich_summary_model_identity(run_dir, summary_rows)
+    summary_display_rows = prepare_model_summary_rows(summary_rows)
+    model_catalog_rows = build_model_catalog_rows(run_dir, summary_rows)
     LOG.info(
         "Kayıt sayıları | sonuç=%s | özet=%d | sorgu=%s | model_hatası=%d | kapsam=%s",
         len(result_rows) if not lightweight else "atlanıyor",
@@ -815,6 +1054,7 @@ def build_workbook(
     wb.remove(wb.active)
     wb.create_sheet("Özet")
     summary_ws = wb.create_sheet("Model Özeti")
+    catalog_ws = wb.create_sheet("Model Kataloğu")
     raw_ws = wb.create_sheet("Ham Sonuçlar") if not lightweight else None
     query_ws = wb.create_sheet("Sorgu Manifesti") if not lightweight else None
     config_ws = wb.create_sheet("Yapılandırma")
@@ -826,20 +1066,40 @@ def build_workbook(
     except AttributeError:
         pass
 
-    summary_columns = ordered_columns(summary_rows, SUMMARY_COLUMNS)
-    LOG.info("Model Özeti sayfası yazılıyor (%d satır).", len(summary_rows))
+    summary_columns = MODEL_SUMMARY_COLUMNS
+    LOG.info("Model Özeti sayfası yazılıyor (%d satır, %d görünür alan).", len(summary_display_rows), len(summary_columns) - 1)
     write_table(
         summary_ws,
-        summary_rows,
+        summary_display_rows,
         summary_columns,
         table_name="ModelSummary_01",
         number_formats=SUMMARY_FORMATS,
+        headers=[MODEL_SUMMARY_HEADERS[column] for column in summary_columns],
     )
     set_widths(
         summary_ws,
         summary_columns,
-        overrides={"direction": 38, "query_variant": 16, "search_mode": 18, "model_id": 48},
+        overrides={
+            "model_sequence": 10,
+            "direction": 22,
+            "query_variant": 12,
+            "search_mode": 14,
+            "model_label": 28,
+            "model_id": 48,
+            "model_epoch": 10,
+            "total_queries": 10,
+            "ok_queries": 12,
+            "coverage": 11,
+            "success_25m": 14,
+            "auc_25m": 12,
+            "median_error_under_25m": 20,
+            "p90_error_m": 14,
+            "mean_search_seconds": 16,
+        },
     )
+    summary_ws.column_dimensions[
+        get_column_letter(summary_columns.index("ok_queries") + 1)
+    ].hidden = True
     if summary_ws.max_row >= 2 and "coverage" in summary_columns:
         coverage_letter = get_column_letter(summary_columns.index("coverage") + 1)
         summary_ws.conditional_formatting.add(
@@ -860,7 +1120,27 @@ def build_workbook(
                 end_color="BBF7D0",
             ),
         )
-    add_error_conditional_formatting(summary_ws, summary_columns)
+
+    LOG.info("Model Kataloğu sayfası yazılıyor (%d model).", len(model_catalog_rows))
+    write_table(
+        catalog_ws,
+        model_catalog_rows,
+        MODEL_CATALOG_COLUMNS,
+        table_name="ModelCatalog_01",
+        number_formats={"model_epoch": "0"},
+        headers=[MODEL_CATALOG_HEADERS[column] for column in MODEL_CATALOG_COLUMNS],
+    )
+    set_widths(
+        catalog_ws,
+        MODEL_CATALOG_COLUMNS,
+        overrides={
+            "model_id": 48,
+            "model_label": 28,
+            "model_epoch": 10,
+            "model_relative_path": 60,
+            "model_sha256": 68,
+        },
+    )
 
     result_columns = ordered_columns(result_rows, ["run_id", "status"])
     raw_chunks: list[tuple[str, int, Sequence[str]]] = []
@@ -953,7 +1233,7 @@ def build_workbook(
                 error_ws.cell(row=row, column=index).alignment = Alignment(vertical="top", wrap_text=True)
 
     LOG.info("Özet panosu ve formül bağlı grafik hazırlanıyor.")
-    write_dashboard(wb, config, summary_rows, raw_chunks, lightweight=lightweight)
+    write_dashboard(wb, config, summary_display_rows, raw_chunks, lightweight=lightweight)
     wb.active = wb.sheetnames.index("Özet")
 
     if not lightweight:
@@ -1179,20 +1459,42 @@ def rebuild_small_sheets(
     result_count: int,
     result_columns: Sequence[str],
 ) -> None:
+    summary_display_rows = prepare_model_summary_rows(summary_rows)
+    model_catalog_rows = build_model_catalog_rows(run_dir, summary_rows)
     summary_ws = replace_sheet(wb, "Model Özeti")
-    summary_columns = ordered_columns(summary_rows, SUMMARY_COLUMNS)
+    summary_columns = MODEL_SUMMARY_COLUMNS
     write_table(
         summary_ws,
-        summary_rows,
+        summary_display_rows,
         summary_columns,
         table_name="ModelSummary_01",
         number_formats=SUMMARY_FORMATS,
+        headers=[MODEL_SUMMARY_HEADERS[column] for column in summary_columns],
     )
     set_widths(
         summary_ws,
         summary_columns,
-        overrides={"direction": 38, "query_variant": 16, "search_mode": 18, "model_id": 48},
+        overrides={
+            "model_sequence": 10,
+            "direction": 22,
+            "query_variant": 12,
+            "search_mode": 14,
+            "model_label": 28,
+            "model_id": 48,
+            "model_epoch": 10,
+            "total_queries": 10,
+            "ok_queries": 12,
+            "coverage": 11,
+            "success_25m": 14,
+            "auc_25m": 12,
+            "median_error_under_25m": 20,
+            "p90_error_m": 14,
+            "mean_search_seconds": 16,
+        },
     )
+    summary_ws.column_dimensions[
+        get_column_letter(summary_columns.index("ok_queries") + 1)
+    ].hidden = True
     if summary_ws.max_row >= 2 and "coverage" in summary_columns:
         letter = get_column_letter(summary_columns.index("coverage") + 1)
         summary_ws.conditional_formatting.add(
@@ -1213,6 +1515,27 @@ def rebuild_small_sheets(
                 end_color="BBF7D0",
             ),
         )
+
+    catalog_ws = replace_sheet(wb, "Model Kataloğu")
+    write_table(
+        catalog_ws,
+        model_catalog_rows,
+        MODEL_CATALOG_COLUMNS,
+        table_name="ModelCatalog_01",
+        number_formats={"model_epoch": "0"},
+        headers=[MODEL_CATALOG_HEADERS[column] for column in MODEL_CATALOG_COLUMNS],
+    )
+    set_widths(
+        catalog_ws,
+        MODEL_CATALOG_COLUMNS,
+        overrides={
+            "model_id": 48,
+            "model_label": 28,
+            "model_epoch": 10,
+            "model_relative_path": 60,
+            "model_sha256": 68,
+        },
+    )
 
     query_rows = find_query_rows(run_dir)
     query_columns = ordered_columns(query_rows, QUERY_COLUMNS)
@@ -1258,7 +1581,7 @@ def rebuild_small_sheets(
     write_dashboard(
         wb,
         config,
-        summary_rows,
+        summary_display_rows,
         [("Ham Sonuçlar", result_count, result_columns)],
     )
     wb.active = wb.sheetnames.index("Özet")
@@ -1309,6 +1632,7 @@ def update_workbook_incremental(
         raise IncrementalUpdateUnavailable("run_config.json bir nesne içermelidir.")
     if not isinstance(summary_rows, list):
         raise IncrementalUpdateUnavailable("summary.json bir liste içermelidir.")
+    summary_rows = enrich_summary_model_identity(run_dir, summary_rows)
     rebuild_small_sheets(
         wb,
         run_dir,
@@ -1396,7 +1720,7 @@ def validate_workbook_checkpoint(
             name = root.attrib.get("displayName") or root.attrib.get("name") or member
             table_names.append(name)
             table_refs[name] = root.attrib.get("ref", "")
-        expected_tables = {"ModelSummary_01", "RunConfig_01", "ModelErrors_01"}
+        expected_tables = {"ModelSummary_01", "ModelCatalog_01", "RunConfig_01", "ModelErrors_01"}
         if not lightweight:
             expected_tables.update({"RawResults_01", "QueryManifest_01"})
         missing_tables = sorted(expected_tables - set(table_names))
