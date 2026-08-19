@@ -39,9 +39,12 @@ from geospatial_model_benchmark import (  # noqa: E402
     generate_query_manifest,
     invoke_excel_report,
     model_prediction_to_legacy_gray,
+    nms_top_candidates,
     parse_patterns,
     read_jsonl,
     refresh_excel_after_model,
+    resolve_run_directory,
+    resume_signature_payload,
     resume_payloads_compatible,
     run_direction,
     run_searches_for_representation,
@@ -55,11 +58,53 @@ from geospatial_model_benchmark import (  # noqa: E402
 
 
 class ExcelCheckpointTests(unittest.TestCase):
+    def test_existing_explicit_run_id_auto_resumes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output_root = Path(temporary).resolve()
+            run_dir = output_root / "same_parameters"
+            run_dir.mkdir()
+            (run_dir / "run_config.json").write_text("{}", encoding="utf-8")
+            args = build_parser().parse_args(
+                ["--output-root", str(output_root), "--run-id", "same_parameters"]
+            )
+            args.output_root = args.output_root.resolve()
+            resolved, automatic = resolve_run_directory(args)
+            self.assertTrue(automatic)
+            self.assertEqual(resolved, run_dir)
+            self.assertEqual(args.resume_run, run_dir)
+
+    def test_new_explicit_run_id_does_not_auto_resume(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output_root = Path(temporary).resolve()
+            args = build_parser().parse_args(
+                ["--output-root", str(output_root), "--run-id", "new_run"]
+            )
+            args.output_root = args.output_root.resolve()
+            resolved, automatic = resolve_run_directory(args)
+            self.assertFalse(automatic)
+            self.assertEqual(resolved, output_root / "new_run")
+            self.assertIsNone(args.resume_run)
+
     def test_model_is_the_default_excel_update_boundary(self) -> None:
         self.assertEqual(build_parser().parse_args([]).excel_update, "model")
 
     def test_eight_search_workers_are_enabled_by_default(self) -> None:
         self.assertEqual(build_parser().parse_args([]).search_workers, 8)
+
+    def test_worker_controls_are_operational_not_scientific(self) -> None:
+        base = build_parser().parse_args([])
+        worker = build_parser().parse_args(
+            [
+                "--worker-model-id",
+                "MODEL_1",
+                "--worker-direction",
+                "forward",
+                "--worker-skip-final-export",
+            ]
+        )
+        with patch.object(Path, "stat") as stat:
+            stat.return_value = SimpleNamespace(st_size=1, st_mtime_ns=2)
+            self.assertEqual(resume_signature_payload(base), resume_signature_payload(worker))
 
     def test_batch_size_is_operational_for_resume_compatibility(self) -> None:
         previous = {"schema_version": 2, "batch_size": 64, "seed": 42}
@@ -593,6 +638,48 @@ class DefaultBenchmarkModeTests(unittest.TestCase):
 
 
 class CoarseToFineSearchTests(unittest.TestCase):
+    @staticmethod
+    def reference_nms(response: np.ndarray, top_k: int, radius: int):
+        work = response.astype(np.float32, copy=True)
+        candidates = []
+        for _ in range(top_k):
+            _, max_value, _, max_location = cv2.minMaxLoc(work)
+            if not np.isfinite(max_value):
+                break
+            x, y = int(max_location[0]), int(max_location[1])
+            candidates.append((x, y, float(max_value)))
+            x0, x1 = max(0, x - radius), min(work.shape[1], x + radius + 1)
+            y0, y1 = max(0, y - radius), min(work.shape[0], y + radius + 1)
+            work[y0:y1, x0:x1] = -np.inf
+        return candidates
+
+    def test_block_heap_nms_matches_full_rescan_exactly(self) -> None:
+        rng = np.random.default_rng(20260818)
+        for shape, radius, top_k in (
+            ((31, 47), 3, 12),
+            ((257, 513), 17, 30),
+            ((620, 781), 41, 30),
+        ):
+            response = rng.normal(size=shape).astype(np.float32)
+            expected = self.reference_nms(response, top_k, radius)
+            actual = [
+                (candidate.x, candidate.y, candidate.score)
+                for candidate in nms_top_candidates(response, top_k, radius)
+            ]
+            self.assertEqual(actual, expected)
+
+    def test_block_heap_nms_preserves_row_major_ties(self) -> None:
+        response = np.zeros((530, 530), dtype=np.float32)
+        response[10, 300] = 1.0
+        response[10, 20] = 1.0
+        response[300, 10] = 1.0
+        expected = self.reference_nms(response, top_k=8, radius=64)
+        actual = [
+            (candidate.x, candidate.y, candidate.score)
+            for candidate in nms_top_candidates(response, top_k=8, radius=64)
+        ]
+        self.assertEqual(actual, expected)
+
     def test_exact_unique_patch_is_recovered(self) -> None:
         rng = np.random.default_rng(7)
         image = rng.integers(0, 256, size=(768, 896), dtype=np.uint8)

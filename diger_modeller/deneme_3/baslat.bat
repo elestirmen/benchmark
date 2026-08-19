@@ -1,0 +1,2 @@
+python template_match_siwstopo_bingmap_combo.py
+pause

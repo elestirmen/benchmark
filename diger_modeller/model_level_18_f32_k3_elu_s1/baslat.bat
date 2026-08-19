@@ -1,0 +1,2 @@
+python template_matching_dongu.py
+pause

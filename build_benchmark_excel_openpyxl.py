@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 from xml.etree import ElementTree
+from zoneinfo import ZoneInfo
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.chart import BarChart, Reference
@@ -31,6 +32,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 
 LOG = logging.getLogger("benchmark_excel")
+DISPLAY_TIMEZONE = ZoneInfo("Europe/Istanbul")
 MAX_EXCEL_ROWS = 1_048_576
 MAX_CELL_TEXT = 32_700
 STATE_SHEET = "_ExcelState"
@@ -136,7 +138,7 @@ MODEL_SUMMARY_HEADERS = {
     "model_label": "Model",
     "model_id": "Model ID",
     "model_epoch": "Epoch",
-    "result_completed_at_utc": "Sonuç alınma tarihi (UTC)",
+    "result_completed_at_utc": "Sonuç alınma tarihi (İstanbul)",
     "total_queries": "N",
     "ok_queries": "Başarılı N",
     "coverage": "Kapsam",
@@ -347,18 +349,25 @@ def enrich_summary_result_times(
             )
         )
         stamp = row.get("result_completed_at_utc") or times.get(key)
-        if stamp:
-            try:
-                parsed = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
-                if parsed.tzinfo is not None:
-                    parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
-                row["result_completed_at_utc"] = parsed
-            except ValueError:
-                row["result_completed_at_utc"] = None
-        else:
-            row["result_completed_at_utc"] = None
+        row["result_completed_at_utc"] = to_istanbul_naive(stamp)
         enriched.append(row)
     return enriched
+
+
+def to_istanbul_naive(value: Any) -> datetime | None:
+    """Convert stored UTC stamps to Istanbul wall time for Excel display."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        try:
+            parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(DISPLAY_TIMEZONE).replace(tzinfo=None)
 
 
 def sha256_file(path: Path) -> str:
@@ -886,7 +895,8 @@ def write_dashboard(
         "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına "
         "uygulanır. Ana başarı ölçütü tüm sorgular üzerinden 25 m içinde konumlamadır; "
         "clean ve hard_v1 koşulları ayrı raporlanır; aşağıdaki sıralama yalnız global aramayı "
-        "gösterir; tüm-hata ortalaması yalnız tanısaldır."
+        "gösterir; tüm-hata ortalaması yalnız tanısaldır. "
+        "Model Özeti tarihler İstanbul saatidir (UTC+3)."
     )
     if lightweight:
         ws["A10"].value += (
@@ -1029,7 +1039,7 @@ def locked_copy_path(output_path: Path) -> Path:
 
 
 def save_workbook_safely(wb: Workbook, output_path: Path) -> tuple[Path, str]:
-    """Save atomically; if Excel locks the target, skip without creating a second workbook."""
+    """Save atomically; if Excel locks the target, write a dated locked copy."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = output_path.with_name(
         f".{output_path.name}.{os.getpid()}.{datetime.now().strftime('%Y%m%d%H%M%S%f')}.tmp"
@@ -1043,12 +1053,14 @@ def save_workbook_safely(wb: Workbook, output_path: Path) -> tuple[Path, str]:
         except PermissionError:
             if not output_path.exists():
                 raise
+            copy_path = locked_copy_path(output_path)
+            os.replace(temporary, copy_path)
             LOG.warning(
-                "ANA EXCEL KİLİTLİ | benchmark devam ediyor | ikinci dosya oluşturulmadı; "
+                "ANA EXCEL KİLİTLİ | güncel rapor kopyaya yazıldı | "
                 "Excel kapandığında sonraki kayıtta ana dosya güncellenecek: %s",
-                output_path,
+                copy_path,
             )
-            return output_path, "locked_skip"
+            return copy_path, "locked_copy"
     finally:
         if temporary.exists():
             try:

@@ -1,0 +1,2 @@
+   epochs  dogru_tahmin  yanlis_tahmin
+0   100.0          38.0         1331.0

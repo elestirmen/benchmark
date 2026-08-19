@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import csv
 import fnmatch
+import heapq
 import hashlib
 import json
 import logging
@@ -1993,19 +1994,65 @@ def nms_top_candidates(
     top_k: int,
     radius: int,
 ) -> list[Candidate]:
+    """Return greedy square-NMS peaks without rescanning the full response.
+
+    The previous implementation called ``minMaxLoc`` over the complete response
+    once per candidate.  This block heap preserves the same greedy ordering but
+    only rescans blocks touched by the latest suppression window.
+    """
     if response.size == 0:
         return []
     work = response.astype(np.float32, copy=True)
-    candidates: list[Candidate] = []
-    for _ in range(top_k):
-        _, max_value, _, max_location = cv2.minMaxLoc(work)
+    block_size = 256
+    block_rows = (work.shape[0] + block_size - 1) // block_size
+    block_cols = (work.shape[1] + block_size - 1) // block_size
+    versions = np.zeros((block_rows, block_cols), dtype=np.int32)
+    heap: list[tuple[float, int, int, int, int, int]] = []
+
+    def push_block(block_y: int, block_x: int) -> None:
+        y0 = block_y * block_size
+        x0 = block_x * block_size
+        view = work[
+            y0 : min(work.shape[0], y0 + block_size),
+            x0 : min(work.shape[1], x0 + block_size),
+        ]
+        _, max_value, _, max_location = cv2.minMaxLoc(view)
         if not np.isfinite(max_value):
-            break
-        x, y = int(max_location[0]), int(max_location[1])
+            return
+        x = x0 + int(max_location[0])
+        y = y0 + int(max_location[1])
+        heapq.heappush(
+            heap,
+            (
+                -float(max_value),
+                y,
+                x,
+                block_y,
+                block_x,
+                int(versions[block_y, block_x]),
+            ),
+        )
+
+    for block_y in range(block_rows):
+        for block_x in range(block_cols):
+            push_block(block_y, block_x)
+
+    candidates: list[Candidate] = []
+    while heap and len(candidates) < top_k:
+        negative_value, y, x, block_y, block_x, version = heapq.heappop(heap)
+        if version != int(versions[block_y, block_x]):
+            continue
+        max_value = -negative_value
         candidates.append(Candidate(x=x, y=y, score=float(max_value)))
         x0, x1 = max(0, x - radius), min(work.shape[1], x + radius + 1)
         y0, y1 = max(0, y - radius), min(work.shape[0], y + radius + 1)
         work[y0:y1, x0:x1] = -np.inf
+        first_block_x, last_block_x = x0 // block_size, (x1 - 1) // block_size
+        first_block_y, last_block_y = y0 // block_size, (y1 - 1) // block_size
+        for affected_y in range(first_block_y, last_block_y + 1):
+            for affected_x in range(first_block_x, last_block_x + 1):
+                versions[affected_y, affected_x] += 1
+                push_block(affected_y, affected_x)
     return candidates
 
 
@@ -3927,6 +3974,11 @@ def run_direction(
             getattr(args, "model_sampling", "full"),
         )
     models = model_catalog.models
+    if getattr(args, "worker_model_id", None):
+        models = tuple(model for model in models if model.model_id == args.worker_model_id)
+        if not models:
+            raise ValueError(f"Worker model katalogda bulunamadı: {args.worker_model_id}")
+        LOG.info("İZOLE MODEL İŞÇİSİ | model=%s", args.worker_model_id)
     LOG.info(
         "MODEL KATALOĞU | örnekleme=%s | dosya=%d | seri=%d | örneklenen=%d | "
         "çalıştırılacak=%d | aynı_içerik_atlanan=%d | aynı_ad_grubu=%d | "
@@ -4320,6 +4372,15 @@ def build_parser() -> argparse.ArgumentParser:
         default=True,
         help="Büyük ham results.csv son dışa aktarımını açar/kapatır.",
     )
+    parser.add_argument("--worker-model-id", default=None, help=argparse.SUPPRESS)
+    parser.add_argument(
+        "--worker-direction",
+        choices=["forward", "reverse"],
+        default=None,
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument("--worker-skip-final-export", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--worker-finalize-only", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--verbose", action="store_true")
     return parser
 
@@ -4347,6 +4408,14 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("query-edge-buffer-m negatif olamaz.")
     if not args.include_raw and not args.include_models:
         raise ValueError("En az RAW veya model kanalı etkin olmalıdır.")
+    if args.worker_model_id and not args.include_models:
+        raise ValueError("worker-model-id için model kanalı etkin olmalıdır.")
+    if args.worker_direction == "reverse" and not args.bidirectional:
+        raise ValueError("reverse worker için bidirectional etkin olmalıdır.")
+    if args.worker_finalize_only and (
+        args.worker_model_id or args.worker_direction or args.worker_skip_final_export
+    ):
+        raise ValueError("worker-finalize-only diğer worker seçenekleriyle kullanılamaz.")
 
 
 def resume_signature_payload(
@@ -4449,6 +4518,21 @@ def resume_payloads_compatible(
     return previous_scientific == current_scientific
 
 
+def resolve_run_directory(args: argparse.Namespace) -> tuple[Path, bool]:
+    """Resolve explicit resume or auto-resume an existing explicit run-id."""
+    if args.resume_run:
+        run_dir = args.resume_run.resolve()
+        args.run_id = run_dir.name
+        return run_dir, False
+    explicit_run_id = args.run_id is not None
+    args.run_id = args.run_id or datetime.now().strftime("run_%Y%m%d_%H%M%S")
+    run_dir = args.output_root / safe_slug(args.run_id)
+    auto_resume = explicit_run_id and (run_dir / "run_config.json").is_file()
+    if auto_resume:
+        args.resume_run = run_dir
+    return run_dir, auto_resume
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -4457,18 +4541,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     args.map_raster = args.map_raster.resolve()
     args.model_dir = args.model_dir.resolve()
     args.output_root = args.output_root.resolve()
-    if args.resume_run:
-        run_dir = args.resume_run.resolve()
-        args.run_id = run_dir.name
-    else:
-        args.run_id = args.run_id or datetime.now().strftime("run_%Y%m%d_%H%M%S")
-        run_dir = args.output_root / safe_slug(args.run_id)
+    run_dir, auto_resume = resolve_run_directory(args)
     log_path = configure_logging(run_dir, args.verbose)
     LOG.info("=" * 88)
     LOG.info("JEOREFERANSLI ORTAK-TEMSİL BENCHMARKI")
     LOG.info("=" * 88)
     LOG.info("Run klasörü: %s", run_dir)
     LOG.info("Log: %s", log_path)
+    if auto_resume:
+        LOG.info(
+            "AUTO RESUME | mevcut run-id ve run_config bulundu; bilimsel imza doğrulanacak: %s",
+            run_dir,
+        )
     LOG.info("Sistem: %s", json.dumps(system_info(), ensure_ascii=False))
 
     cache_path = Path(os.environ["CUDA_CACHE_PATH"])
@@ -4514,7 +4598,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     resume_payload = resume_signature_payload(args, model_catalog)
     resume_signature = signature_sha256(resume_payload)
     previous_config: dict[str, Any] = {}
-    if config_path.is_file() and results_path.is_file():
+    if config_path.is_file():
         previous_config = json.loads(config_path.read_text(encoding="utf-8"))
         previous_semantics = previous_config.get("scientific_semantics_version")
         if previous_semantics != SCIENTIFIC_SEMANTICS_VERSION:
@@ -4627,14 +4711,28 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     started = time.perf_counter()
     try:
-        run_direction(
-            args,
-            run_dir,
-            args.query_raster,
-            args.map_raster,
-            model_catalog,
-        )
-        if args.bidirectional:
+        if args.worker_finalize_only:
+            summary_json, summary_csv = write_summary_files(
+                run_dir, write_results_csv=getattr(args, "results_csv", True)
+            )
+            LOG.info("Özet dosyaları: %s | %s", summary_json, summary_csv)
+            workbook = None
+            if getattr(args, "excel_report", True):
+                workbook = invoke_excel_report(
+                    run_dir, strict=args.strict_excel, engine=args.excel_engine
+                )
+            LOG.info("İZOLE KOŞU SON RAPORU TAMAMLANDI | Excel=%s", workbook or "üretilmedi")
+            return 0
+
+        if args.worker_direction in (None, "forward"):
+            run_direction(
+                args,
+                run_dir,
+                args.query_raster,
+                args.map_raster,
+                model_catalog,
+            )
+        if args.bidirectional and args.worker_direction in (None, "reverse"):
             run_direction(
                 args,
                 run_dir,
@@ -4642,6 +4740,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.query_raster,
                 model_catalog,
             )
+        if args.worker_skip_final_export:
+            LOG.info(
+                "İZOLE MODEL İŞÇİSİ TAMAMLANDI | model=%s | yön=%s | son tam export üst sürece bırakıldı",
+                args.worker_model_id,
+                args.worker_direction,
+            )
+            return 0
         summary_json, summary_csv = write_summary_files(
             run_dir, write_results_csv=getattr(args, "results_csv", True)
         )

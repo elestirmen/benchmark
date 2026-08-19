@@ -24,6 +24,7 @@ from build_benchmark_excel_openpyxl import (  # noqa: E402
     prepare_model_summary_rows,
     resolve_incremental_base,
     save_workbook_safely,
+    to_istanbul_naive,
     update_workbook_incremental,
 )
 
@@ -39,6 +40,16 @@ class OpenpyxlReportTests(unittest.TestCase):
         self.assertEqual(
             [row["model_id"] for row in prepared],
             ["oldest-result", "older-sequence", "missing-date"],
+        )
+
+    def test_excel_result_times_use_istanbul_clock(self):
+        self.assertEqual(
+            to_istanbul_naive("2026-08-19T09:01:44+00:00"),
+            datetime(2026, 8, 19, 12, 1, 44),
+        )
+        self.assertEqual(
+            to_istanbul_naive(datetime(2026, 8, 19, 9, 1, 44)),
+            datetime(2026, 8, 19, 12, 1, 44),
         )
 
     def test_epoch_sweep_catalog_adds_readable_lineage_and_epoch_columns(self):
@@ -150,7 +161,8 @@ class OpenpyxlReportTests(unittest.TestCase):
                 [workbook["Özet"].cell(14, column).value for column in range(1, 8)],
                 ["Sıra", "Model", "Senaryo", "Yön", "Başarı ≤25 m", "AUC@25 m", "Medyan hata (m)"],
             )
-            self.assertEqual([workbook["Model Özeti"].cell(1, column).value for column in range(1, 17)], ["Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "Sonuç alınma tarihi (UTC)", "N", "Başarılı N", "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)", "P90 hata (m)", "Ort. arama (sn)"])
+            self.assertEqual([workbook["Model Özeti"].cell(1, column).value for column in range(1, 17)], ["Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "Sonuç alınma tarihi (İstanbul)", "N", "Başarılı N", "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)", "P90 hata (m)", "Ort. arama (sn)"])
+            self.assertIn("İstanbul saatidir (UTC+3)", workbook["Özet"]["A10"].value)
             self.assertFalse(workbook["Model Özeti"].column_dimensions["F"].hidden)
             self.assertEqual([workbook["Model Kataloğu"].cell(1, column).value for column in range(1, 6)], ["Model ID (kanonik)", "Model", "Epoch", "Göreli yol", "SHA256"])
             self.assertIn("success_25m", SUMMARY_COLUMNS)
@@ -335,7 +347,7 @@ class OpenpyxlReportTests(unittest.TestCase):
                 full_workbook["Ham Sonuçlar"]["A1"].fill.fgColor.rgb,
             )
 
-    def test_locked_primary_is_preserved_without_creating_a_second_workbook(self):
+    def test_locked_primary_writes_dated_copy_instead_of_skipping(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             output = directory / "benchmark_results.xlsx"
@@ -359,14 +371,18 @@ class OpenpyxlReportTests(unittest.TestCase):
             ):
                 actual, mode = save_workbook_safely(workbook, output)
 
-            self.assertEqual(mode, "locked_skip")
-            self.assertEqual(actual, output)
+            self.assertEqual(mode, "locked_copy")
+            self.assertNotEqual(actual, output)
+            self.assertIn("kilitli_kopya", actual.name)
             self.assertEqual(output.read_bytes(), original_bytes)
-            self.assertTrue(actual.is_file())
-            self.assertEqual(list(directory.glob("benchmark_results*.xlsx")), [output])
+            self.assertEqual(load_workbook(actual).active["A1"].value, "new report")
+            self.assertEqual(
+                sorted(path.name for path in directory.glob("benchmark_results*.xlsx")),
+                sorted([output.name, actual.name]),
+            )
 
     @unittest.skipUnless(sys.platform == "win32", "Windows file-sharing lock test")
-    def test_real_windows_excel_style_lock_skips_without_creating_copy(self):
+    def test_real_windows_excel_style_lock_writes_copy(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             output = directory / "benchmark_results.xlsx"
@@ -395,11 +411,12 @@ class OpenpyxlReportTests(unittest.TestCase):
             finally:
                 ctypes.windll.kernel32.CloseHandle(ctypes.c_void_p(handle))
 
-            self.assertEqual(mode, "locked_skip")
-            self.assertEqual(actual, output)
+            self.assertEqual(mode, "locked_copy")
+            self.assertNotEqual(actual, output)
+            self.assertIn("kilitli_kopya", actual.name)
             self.assertEqual(output.read_bytes(), original_hash)
-            self.assertEqual(load_workbook(actual).active["A1"].value, "open in Excel")
-            self.assertEqual(list(directory.glob("benchmark_results*.xlsx")), [output])
+            self.assertEqual(load_workbook(output).active["A1"].value, "open in Excel")
+            self.assertEqual(load_workbook(actual).active["A1"].value, "new checkpoint")
 
 
 if __name__ == "__main__":

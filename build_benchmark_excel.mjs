@@ -79,11 +79,29 @@ function enrichSummaryRows(rows, catalog) {
     row.model_sequence = modelId === "RAW_BASELINE" ? 0 : (sequenceById.get(modelId) ?? null);
     row.model_label = modelLabel(identity, modelId);
     row.model_epoch = identity?.checkpoint_number ?? null;
-    row.result_completed_at_utc = row.result_completed_at_utc ? new Date(row.result_completed_at_utc) : null;
+    row.result_completed_at_utc = toIstanbulDate(row.result_completed_at_utc);
     row.model_relative_path = identity?.relative_path ?? null;
     row.model_sha256 = identity?.sha256 ?? null;
     return row;
   });
+}
+
+function toIstanbulDate(value) {
+  if (value == null || value === "") return null;
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Istanbul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const read = (type) => Number(parts.find((part) => part.type === type)?.value);
+  return new Date(read("year"), read("month") - 1, read("day"), read("hour"), read("minute"), read("second"));
 }
 
 function displayDirection(value) {
@@ -306,7 +324,7 @@ dashboard.getRange("B4:B8").format = {
 };
 dashboard.getRange("A10:H11").merge();
 dashboard.getRange("A10").values = [[
-  "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına uygulanır. clean ve hard_v1 koşulları ayrı raporlanır; ana başarı ölçütü tüm sorgular üzerinden 25 m içinde konumlamadır. Aşağıdaki sıralama yalnız global aramayı gösterir.",
+  "Ana değerlendirme: aynı model hem sorgu parçasına hem arama haritasına uygulanır. clean ve hard_v1 koşulları ayrı raporlanır; ana başarı ölçütü tüm sorgular üzerinden 25 m içinde konumlamadır. Aşağıdaki sıralama yalnız global aramayı gösterir. Model Özeti tarihler İstanbul saatidir (UTC+3).",
 ]];
 dashboard.getRange("A10:H11").format = {
   fill: "#F3F4F6",
@@ -389,7 +407,7 @@ const summaryColumns = [
   "median_error_under_25m", "p90_error_m", "mean_search_seconds",
 ];
 const summaryHeaders = [
-  "Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "Sonuç alınma tarihi (UTC)", "N", "Başarılı N",
+  "Sıra No", "Yön", "Senaryo", "Arama", "Model", "Model ID", "Epoch", "Sonuç alınma tarihi (İstanbul)", "N", "Başarılı N",
   "Kapsam", "Başarı ≤25 m", "AUC@25 m", "Medyan hata ≤25 m (m)",
   "P90 hata (m)", "Ort. arama (sn)",
 ];

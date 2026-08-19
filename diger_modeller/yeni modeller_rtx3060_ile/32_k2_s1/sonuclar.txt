@@ -1,0 +1,2 @@
+                                     model_name dogru_tahmin1 yanlis_tahmin1 dogru_tahmin2 yanlis_tahmin2 ortalama
+0  _GPU_model_f32_k2_epoch_00025_sigmoid_(1, 1)         234.0           55.0         276.0           13.0    255.0

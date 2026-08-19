@@ -1,0 +1,16 @@
+                                      model_name dogru_tahmin1 yanlis_tahmin1 dogru_tahmin2 yanlis_tahmin2 ortalama
+0   _GPU_model_f32_k2_epoch_00001_sigmoid_(1, 1)         233.0           56.0         223.0           66.0    228.0
+1   _GPU_model_f32_k2_epoch_00002_sigmoid_(1, 1)         235.0           54.0         168.0          121.0    201.5
+2   _GPU_model_f32_k2_epoch_00003_sigmoid_(1, 1)         210.0           79.0         275.0           14.0    242.5
+3   _GPU_model_f32_k2_epoch_00004_sigmoid_(1, 1)         218.0           71.0         272.0           17.0    245.0
+4   _GPU_model_f32_k2_epoch_00005_sigmoid_(1, 1)         219.0           70.0         276.0           13.0    247.5
+5   _GPU_model_f32_k2_epoch_00006_sigmoid_(1, 1)         213.0           76.0         267.0           22.0    240.0
+6   _GPU_model_f32_k2_epoch_00007_sigmoid_(1, 1)         207.0           82.0         261.0           28.0    234.0
+7   _GPU_model_f32_k2_epoch_00008_sigmoid_(1, 1)         210.0           79.0         263.0           26.0    236.5
+8   _GPU_model_f32_k2_epoch_00009_sigmoid_(1, 1)         226.0           63.0         269.0           20.0    247.5
+9   _GPU_model_f32_k2_epoch_00010_sigmoid_(1, 1)         230.0           59.0         275.0           14.0    252.5
+10  _GPU_model_f32_k2_epoch_00011_sigmoid_(1, 1)         195.0           94.0         251.0           38.0    223.0
+11  _GPU_model_f32_k2_epoch_00012_sigmoid_(1, 1)         200.0           89.0         257.0           32.0    228.5
+12  _GPU_model_f32_k2_epoch_00013_sigmoid_(1, 1)         218.0           71.0         267.0           22.0    242.5
+13  _GPU_model_f32_k2_epoch_00014_sigmoid_(1, 1)         217.0           72.0         270.0           19.0    243.5
+14  _GPU_model_f32_k2_epoch_00015_sigmoid_(1, 1)         197.0           92.0         275.0           14.0    236.0
