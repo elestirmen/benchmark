@@ -27,6 +27,7 @@ from geospatial_model_benchmark import (  # noqa: E402
     RESULT_COLUMNS,
     PreparedSearchMap,
     QueryRecord,
+    RunDirectoryLock,
     aggregate_results,
     augment_hard_v1,
     build_model_catalog,
@@ -35,17 +36,21 @@ from geospatial_model_benchmark import (  # noqa: E402
     main as benchmark_main,
     build_pyramid,
     coarse_to_fine_search,
+    completed_model_direction_keys,
     compute_starts,
     generate_query_manifest,
     invoke_excel_report,
     model_prediction_to_legacy_gray,
     nms_top_candidates,
+    order_models_by_direction_success,
     parse_patterns,
+    partition_publishable_summary,
     read_jsonl,
     refresh_excel_after_model,
     resolve_run_directory,
     resume_signature_payload,
     resume_payloads_compatible,
+    run_model_isolation_parent,
     run_direction,
     run_searches_for_representation,
     run_searches_for_variants,
@@ -58,6 +63,18 @@ from geospatial_model_benchmark import (  # noqa: E402
 
 
 class ExcelCheckpointTests(unittest.TestCase):
+    def test_run_directory_lock_rejects_a_second_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            first = RunDirectoryLock.acquire(run_dir)
+            try:
+                with self.assertRaisesRegex(RuntimeError, "başka bir benchmark"):
+                    RunDirectoryLock.acquire(run_dir)
+            finally:
+                first.release()
+            second = RunDirectoryLock.acquire(run_dir)
+            second.release()
+
     def test_existing_explicit_run_id_auto_resumes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             output_root = Path(temporary).resolve()
@@ -90,6 +107,157 @@ class ExcelCheckpointTests(unittest.TestCase):
 
     def test_eight_search_workers_are_enabled_by_default(self) -> None:
         self.assertEqual(build_parser().parse_args([]).search_workers, 8)
+
+    def test_model_process_isolation_is_enabled_by_default(self) -> None:
+        parser = build_parser()
+        self.assertTrue(parser.parse_args([]).isolate_models)
+        self.assertFalse(parser.parse_args(["--no-isolate-models"]).isolate_models)
+
+    def test_completed_model_direction_requires_every_variant_and_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            rows = [
+                {
+                    "direction": "A__TO__B",
+                    "model_id": "MODEL_1",
+                    "query_variant": variant,
+                    "search_mode": mode,
+                    "total_queries": 3,
+                    "ok_queries": 3,
+                    "rejected_queries": 0,
+                    "error_queries": 0,
+                }
+                for variant in ("clean", "hard_v1")
+                for mode in ("roi_500m", "global")
+            ]
+            (run_dir / "summary.json").write_text(json.dumps(rows), encoding="utf-8")
+            self.assertEqual(
+                completed_model_direction_keys(
+                    run_dir,
+                    max_queries=3,
+                    query_variants=("clean", "hard_v1"),
+                    search_modes=(("roi_500m", 500.0), ("global", None)),
+                ),
+                {("A__TO__B", "MODEL_1")},
+            )
+
+    def test_isolation_parent_spawns_fresh_model_process_then_finalizes(self) -> None:
+        args = build_parser().parse_args(["--run-id", "test_run"])
+        args.query_raster = args.query_raster.resolve()
+        args.map_raster = args.map_raster.resolve()
+        args.model_dir = args.model_dir.resolve()
+        model = SimpleNamespace(model_id="MODEL_1", path=Path("one.h5"))
+        catalog = SimpleNamespace(models=(model,))
+        forward_id = f"{args.query_raster.stem}__TO__{args.map_raster.stem}"
+        reverse_id = f"{args.map_raster.stem}__TO__{args.query_raster.stem}"
+        with tempfile.TemporaryDirectory() as temporary:
+            with (
+                patch("geospatial_model_benchmark.build_model_catalog", return_value=catalog),
+                patch(
+                    "geospatial_model_benchmark.completed_model_direction_keys",
+                    side_effect=[
+                        set(),
+                        {(forward_id, "MODEL_1")},
+                        {(forward_id, "MODEL_1")},
+                        {(forward_id, "MODEL_1"), (reverse_id, "MODEL_1")},
+                    ],
+                ),
+                patch("geospatial_model_benchmark.write_summary_files"),
+                patch("geospatial_model_benchmark.subprocess.run") as run,
+            ):
+                run.return_value = SimpleNamespace(returncode=0)
+                result = run_model_isolation_parent(
+                    args, ["--run-id", "test_run"], Path(temporary)
+                )
+
+        self.assertEqual(result, 0)
+        self.assertEqual(run.call_count, 3)
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertIn("forward", commands[0])
+        self.assertIn("reverse", commands[1])
+        self.assertIn("--worker-skip-final-export", commands[0])
+        self.assertIn("--worker-finalize-only", commands[2])
+
+    def test_isolation_parent_stops_when_worker_does_not_complete_checkpoint(self) -> None:
+        args = build_parser().parse_args(["--run-id", "test_run", "--no-bidirectional"])
+        args.query_raster = args.query_raster.resolve()
+        args.map_raster = args.map_raster.resolve()
+        args.model_dir = args.model_dir.resolve()
+        model = SimpleNamespace(model_id="MODEL_1", path=Path("one.h5"))
+        catalog = SimpleNamespace(models=(model,))
+        with tempfile.TemporaryDirectory() as temporary:
+            with (
+                patch("geospatial_model_benchmark.build_model_catalog", return_value=catalog),
+                patch(
+                    "geospatial_model_benchmark.completed_model_direction_keys",
+                    side_effect=[set(), set()],
+                ),
+                patch("geospatial_model_benchmark.write_summary_files"),
+                patch(
+                    "geospatial_model_benchmark.subprocess.run",
+                    return_value=SimpleNamespace(returncode=0),
+                ) as run,
+            ):
+                result = run_model_isolation_parent(
+                    args, ["--run-id", "test_run"], Path(temporary)
+                )
+
+        self.assertEqual(result, 2)
+        self.assertEqual(run.call_count, 1)
+
+    def test_reverse_order_uses_complete_forward_success_from_best_to_weakest(self) -> None:
+        models = [
+            SimpleNamespace(model_id="MODEL_A", path=Path("a.h5")),
+            SimpleNamespace(model_id="MODEL_B", path=Path("b.h5")),
+            SimpleNamespace(model_id="MODEL_C", path=Path("c.h5")),
+            SimpleNamespace(model_id="MODEL_INCOMPLETE", path=Path("incomplete.h5")),
+        ]
+        rows = []
+        scores = {
+            "MODEL_A": (0.40, 0.30, 14.0),
+            "MODEL_B": (0.80, 0.50, 10.0),
+            "MODEL_C": (0.80, 0.60, 12.0),
+            "MODEL_INCOMPLETE": (0.99, 0.99, 1.0),
+        }
+        for model_id, (success, auc, median_error) in scores.items():
+            modes = ("roi_500m", "global") if model_id != "MODEL_INCOMPLETE" else ("global",)
+            for variant in ("clean", "hard_v1"):
+                for mode in modes:
+                    rows.append(
+                        {
+                            "direction": "GMAP__TO__BING",
+                            "model_id": model_id,
+                            "query_variant": variant,
+                            "search_mode": mode,
+                            "total_queries": 3,
+                            "ok_queries": 3,
+                            "rejected_queries": 0,
+                            "error_queries": 0,
+                            "success_25m": success,
+                            "auc_25m": auc,
+                            "median_error_m": median_error,
+                        }
+                    )
+
+        ordered, audit = order_models_by_direction_success(
+            models,
+            rows,
+            direction_id="GMAP__TO__BING",
+            max_queries=3,
+            query_variants=("clean", "hard_v1"),
+            search_modes=(("roi_500m", 500.0), ("global", None)),
+        )
+
+        self.assertEqual(
+            [model.model_id for model in ordered],
+            ["MODEL_C", "MODEL_B", "MODEL_A", "MODEL_INCOMPLETE"],
+        )
+        self.assertEqual(
+            [row["reverse_scan_position"] for row in audit], [1, 2, 3, 4]
+        )
+        self.assertEqual(
+            audit[-1]["ranking_status"], "unscored_incomplete_source_direction"
+        )
 
     def test_worker_controls_are_operational_not_scientific(self) -> None:
         base = build_parser().parse_args([])
@@ -232,6 +400,40 @@ class CheckpointWriterTests(unittest.TestCase):
             results_csv.write_text("sentinel", encoding="utf-8")
             write_summary_files(run_dir, write_results_csv=False)
             self.assertEqual(results_csv.read_text(encoding="utf-8"), "sentinel")
+
+    def test_checkpoint_report_hides_partial_groups_until_expected_count(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = Path(temporary)
+            base = {
+                "direction": "A",
+                "query_variant": "clean",
+                "search_mode": "global",
+                "model_id": "M",
+                "block_id": "B1",
+                "status": "ok",
+                "error_m": 4.0,
+                "search_seconds": 1.0,
+                "top1_score": 0.8,
+            }
+            results = run_dir / "results.jsonl"
+            results.write_text(
+                json.dumps({**base, "query_id": "Q1"}) + "\n", encoding="utf-8"
+            )
+            (run_dir / "run_config.json").write_text(
+                json.dumps({"bootstrap_iterations": 0, "seed": 42, "max_queries": 2}),
+                encoding="utf-8",
+            )
+            write_summary_files(run_dir, write_results_csv=False)
+            self.assertEqual(json.loads((run_dir / "summary.json").read_text()), [])
+            hidden = json.loads((run_dir / "summary_incomplete.json").read_text())
+            self.assertEqual(hidden[0]["publication_status"], "incomplete")
+
+            with results.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps({**base, "query_id": "Q2"}) + "\n")
+            write_summary_files(run_dir, write_results_csv=False)
+            published = json.loads((run_dir / "summary.json").read_text())
+            self.assertEqual(published[0]["total_queries"], 2)
+            self.assertEqual(json.loads((run_dir / "summary_incomplete.json").read_text()), [])
 
     def test_partial_final_jsonl_line_is_quarantined_and_valid_prefix_survives(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -723,6 +925,30 @@ class CoarseToFineSearchTests(unittest.TestCase):
 
 
 class AggregateTests(unittest.TestCase):
+    def test_partial_and_duplicate_groups_are_not_publishable(self) -> None:
+        base = {
+            "direction": "A",
+            "query_variant": "clean",
+            "search_mode": "global",
+            "model_id": "M",
+            "ok_queries": 3,
+            "rejected_queries": 0,
+            "error_queries": 0,
+        }
+        complete, incomplete = partition_publishable_summary(
+            [
+                {**base, "model_id": "COMPLETE", "total_queries": 3},
+                {**base, "model_id": "PARTIAL", "total_queries": 2, "ok_queries": 2},
+                {**base, "model_id": "DUPLICATE", "total_queries": 4, "ok_queries": 4},
+            ],
+            3,
+        )
+        self.assertEqual([row["model_id"] for row in complete], ["COMPLETE"])
+        self.assertEqual(
+            [row["publication_status"] for row in incomplete],
+            ["incomplete", "duplicate_rows"],
+        )
+
     def test_raw_result_schema_uses_only_the_25m_threshold(self) -> None:
         self.assertIn("success_25m", RESULT_COLUMNS)
         self.assertNotIn("success_30m", RESULT_COLUMNS)
@@ -983,6 +1209,7 @@ class PerformanceEquivalenceTests(unittest.TestCase):
                 actual = dataset.read(1)
                 self.assertEqual(dataset.transform, Affine(0.3, 0, 600000, 0, -0.3, 4200000))
                 self.assertEqual(str(dataset.crs), "EPSG:32636")
+            self.assertIn(output.read_bytes()[:4], (b"II+\x00", b"MM\x00+"))
             self.assertEqual(actual.dtype, expected.dtype)
             self.assertTrue(np.array_equal(actual, expected))
             self.assertEqual(list((root / "model").rglob("*.png")), [])
@@ -1175,6 +1402,7 @@ class PerformanceEquivalenceTests(unittest.TestCase):
                 output_value_mode="auto",
                 force_maps=False,
                 keep_intermediate=False,
+                cleanup_maps=True,
                 crop_border=8,
                 search_workers=1,
                 fail_fast=True,
@@ -1182,6 +1410,16 @@ class PerformanceEquivalenceTests(unittest.TestCase):
                 excel_engine="openpyxl",
             )
             prepared = PreparedSearchMap(np.zeros((128, 128), dtype=np.uint8), Affine.identity(), {})
+            built_model_roots: list[Path] = []
+
+            def fake_build_model_map(*call_args, **call_kwargs):
+                model_root = Path(call_args[1])
+                model_root.mkdir(parents=True, exist_ok=True)
+                generated_map = model_root / "model_map.tif"
+                generated_map.write_bytes(b"temporary model map")
+                built_model_roots.append(model_root)
+                return generated_map, 1.0
+
             with (
                 patch("geospatial_model_benchmark.generate_query_manifest", return_value=[record]),
                 patch(
@@ -1189,7 +1427,10 @@ class PerformanceEquivalenceTests(unittest.TestCase):
                     return_value={"clean": [record], "hard_v1": [record]},
                 ),
                 patch("geospatial_model_benchmark.import_loaded_model_runtime", return_value=FakeRuntime),
-                patch("geospatial_model_benchmark.build_model_map", return_value=(map_path, 1.0)),
+                patch(
+                    "geospatial_model_benchmark.build_model_map",
+                    side_effect=fake_build_model_map,
+                ),
                 patch("geospatial_model_benchmark.prepare_search_map", return_value=prepared),
                 patch(
                     "geospatial_model_benchmark.build_model_queries",
@@ -1203,6 +1444,8 @@ class PerformanceEquivalenceTests(unittest.TestCase):
             self.assertEqual(FakeRuntime.close_calls, 1)
             self.assertEqual(build_queries.call_count, 2)
             self.assertEqual(shared_search.call_count, 1)
+            self.assertEqual(len(built_model_roots), 1)
+            self.assertFalse(built_model_roots[0].exists())
 
     def test_progress_info_is_throttled_below_result_count(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

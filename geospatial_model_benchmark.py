@@ -19,6 +19,7 @@ The expensive map production stages reuse the repository-local
 from __future__ import annotations
 
 import argparse
+import atexit
 import csv
 import fnmatch
 import heapq
@@ -34,6 +35,7 @@ import subprocess
 import sys
 import time
 import traceback
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -70,6 +72,8 @@ SUMMARY_STATE_SCHEMA_VERSION = 2
 MODEL_CATALOG_SCHEMA_VERSION = 2
 QUERY_VARIANT_MANIFEST_SCHEMA_VERSION = 2
 MODEL_CHECKPOINT_PATTERN = re.compile(r"(?i)(epoch|step)([_ -]*)(\d+)")
+RUN_LOCK_FILENAME = ".benchmark_run.lock"
+RUN_LOCK_TOKEN_ENV = "VISNAV_BENCHMARK_RUN_LOCK_TOKEN"
 
 DEFAULT_SEARCH_MODE_ORDER = {
     "roi_500m": 0,
@@ -110,6 +114,127 @@ HARD_V1_PROFILE = {
 
 LOG = logging.getLogger("geospatial_benchmark")
 _AUTO_EXCEL_ENGINE: str | None = None
+
+
+def process_is_running(pid: int) -> bool:
+    """Return whether a process id is alive without mutating it."""
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        process_query_limited_information = 0x1000
+        still_active = 259
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+        kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+        handle = kernel32.OpenProcess(
+            process_query_limited_information, False, int(pid)
+        )
+        if not handle:
+            return False
+        try:
+            exit_code = wintypes.DWORD()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return False
+            return int(exit_code.value) == still_active
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except (OSError, ValueError):
+        return False
+    return True
+
+
+@dataclass
+class RunDirectoryLock:
+    """Exclusive parent-process ownership for one benchmark run directory."""
+
+    path: Path
+    token: str
+    owner_pid: int
+    released: bool = False
+
+    @classmethod
+    def acquire(cls, run_dir: Path) -> "RunDirectoryLock":
+        run_dir.mkdir(parents=True, exist_ok=True)
+        path = run_dir / RUN_LOCK_FILENAME
+        token = uuid.uuid4().hex
+        payload = {
+            "schema_version": 1,
+            "pid": os.getpid(),
+            "token": token,
+            "created_at_utc": utc_now_iso(),
+            "command": [sys.executable, *sys.argv],
+        }
+        while True:
+            try:
+                descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+            except FileExistsError:
+                try:
+                    existing = json.loads(path.read_text(encoding="utf-8"))
+                    existing_pid = int(existing.get("pid") or 0)
+                except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
+                    raise RuntimeError(
+                        f"Run kilidi okunamıyor; güvenli olmak için koşu başlatılmadı: {path}"
+                    ) from error
+                if process_is_running(existing_pid):
+                    raise RuntimeError(
+                        "Aynı run klasörünü kullanan başka bir benchmark zaten çalışıyor: "
+                        f"pid={existing_pid} | lock={path}"
+                    )
+                stale_path = path.with_name(
+                    f"{path.name}.stale_{datetime.now().strftime('%Y%m%d_%H%M%S')}_pid{existing_pid}"
+                )
+                try:
+                    os.replace(path, stale_path)
+                except FileNotFoundError:
+                    continue
+                LOG.warning("BAYAT RUN KİLİDİ ARŞİVLENDİ | %s", stale_path)
+                continue
+            try:
+                with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+                    json.dump(payload, handle, indent=2, ensure_ascii=False)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+            except Exception:
+                path.unlink(missing_ok=True)
+                raise
+            return cls(path=path, token=token, owner_pid=os.getpid())
+
+    def release(self) -> None:
+        if self.released:
+            return
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            payload = {}
+        if payload.get("token") == self.token and int(payload.get("pid") or 0) == self.owner_pid:
+            self.path.unlink(missing_ok=True)
+        self.released = True
+
+
+def validate_worker_run_lock(run_dir: Path) -> None:
+    """Require isolated workers to inherit the owning parent's lock token."""
+    path = run_dir / RUN_LOCK_FILENAME
+    inherited_token = os.environ.get(RUN_LOCK_TOKEN_ENV)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"İzole işçi için etkin run kilidi bulunamadı: {path}") from error
+    if not inherited_token or payload.get("token") != inherited_token:
+        raise RuntimeError(
+            "İzole işçi geçerli üst-süreç run kilidini devralmamış; eşzamanlı yazma reddedildi."
+        )
+    owner_pid = int(payload.get("pid") or 0)
+    if not process_is_running(owner_pid):
+        raise RuntimeError(f"Run kilidinin üst süreci artık çalışmıyor: pid={owner_pid}")
 
 
 def result_group_sort_key(
@@ -1748,7 +1873,7 @@ def build_model_map(
     timing_path = model_dir / "map_timing.json"
     manifest_path = model_dir / "map_manifest.json"
     expected_manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "scientific_semantics_version": SCIENTIFIC_SEMANTICS_VERSION,
         "model_sha256": model_sha256,
         "source_map": str(source_map.resolve()),
@@ -1759,6 +1884,7 @@ def build_model_map(
         "normalization": normalization,
         "enhancement": enhancement,
         "output_value_mode": getattr(model_runtime, "requested_output_value_mode", "auto"),
+        "geotiff_container": "BigTIFF",
     }
     cached_manifest: dict[str, Any] = {}
     if manifest_path.is_file():
@@ -1810,6 +1936,7 @@ def build_model_map(
                 dtype="uint8",
                 nodata=None,
                 compress="LZW",
+                BIGTIFF="YES",
                 width=source.width,
                 height=source.height,
                 transform=source.transform,
@@ -3144,6 +3271,36 @@ def aggregate_results(
     return summary
 
 
+def partition_publishable_summary(
+    summary: Sequence[dict[str, Any]], expected_queries: int | None
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Keep partial or duplicated groups out of user-facing scientific reports."""
+    if expected_queries is None:
+        return list(summary), []
+    complete: list[dict[str, Any]] = []
+    incomplete: list[dict[str, Any]] = []
+    for row in summary:
+        total = int(row.get("total_queries") or 0)
+        accounted = sum(
+            int(row.get(name) or 0)
+            for name in ("ok_queries", "rejected_queries", "error_queries")
+        )
+        if total == expected_queries and accounted == total:
+            complete.append(row)
+            continue
+        incomplete.append(
+            {
+                **row,
+                "expected_queries": expected_queries,
+                "completion_fraction": total / max(1, expected_queries),
+                "publication_status": (
+                    "duplicate_rows" if total > expected_queries else "incomplete"
+                ),
+            }
+        )
+    return complete, incomplete
+
+
 SUMMARY_COMPACT_COLUMNS = (
     "block_id",
     "status",
@@ -3619,17 +3776,27 @@ def write_summary_files(
             )
         summary = full_summary
 
+    expected_queries_value = config.get("max_queries")
+    expected_queries = (
+        int(expected_queries_value) if expected_queries_value is not None else None
+    )
+    published_summary, incomplete_summary = partition_publishable_summary(
+        summary, expected_queries
+    )
+
     summary_json = run_dir / "summary.json"
     summary_csv = run_dir / "summary.csv"
+    incomplete_summary_json = run_dir / "summary_incomplete.json"
     summary_metadata_path = run_dir / "summary_metadata.json"
-    atomic_write_json(summary_json, summary)
+    atomic_write_json(summary_json, published_summary)
+    atomic_write_json(incomplete_summary_json, incomplete_summary)
     columns = (
-        list(summary[0].keys())
-        if summary
+        list(published_summary[0].keys())
+        if published_summary
         else ["direction", "query_variant", "search_mode", "model_id"]
     )
     summary_csv_tmp = summary_csv.with_name(f".{summary_csv.name}.{os.getpid()}.tmp")
-    csv_write(summary_csv_tmp, summary, columns)
+    csv_write(summary_csv_tmp, published_summary, columns)
     os.replace(summary_csv_tmp, summary_csv)
     atomic_write_json(
         summary_metadata_path,
@@ -3638,7 +3805,9 @@ def write_summary_files(
             "incremental_equivalence": equivalence,
             "state_rebuilt": state_rebuilt,
             "new_rows_processed": new_row_count,
-            "group_count": len(summary),
+            "group_count": len(published_summary),
+            "incomplete_group_count": len(incomplete_summary),
+            "expected_queries_per_group": expected_queries,
             "updated_at_utc": utc_now_iso(),
         },
     )
@@ -4001,6 +4170,7 @@ def run_direction(
         model_status = "başarısız"
         model_sha = model_spec.sha256
         excel_refresh_needed = True
+        model_root = direction_dir / "models" / model_id
         LOG.info(
             "MODEL BAŞLIYOR | %d/%d | seri=%s | checkpoint=%d | seçim=%s | id=%s | dosya=%s",
             position,
@@ -4033,8 +4203,6 @@ def run_direction(
                     f"Model dosyası önceki checkpointten sonra değişmiş: {model_path.name}. "
                     "Sonuçların karışmaması için yeni bir --run-id kullanın veya dosyayı atlayın."
                 )
-            model_root = direction_dir / "models" / model_id
-
             pending_model_variants = [
                 (query_variant, variant_queries)
                 for query_variant, variant_queries in query_variants.items()
@@ -4152,9 +4320,6 @@ def run_direction(
             finally:
                 model_runtime.close()
 
-            if getattr(args, "cleanup_maps", False) and model_root.exists():
-                shutil.rmtree(model_root, ignore_errors=True)
-                LOG.info("TEMİZLİK | %s modelinin geçici klasörü silindi.", model_id)
         except Exception as exc:
             LOG.error("MODEL BAŞARISIZ | %s | %s", model_path.name, exc)
             LOG.debug("Model traceback:\n%s", traceback.format_exc())
@@ -4175,6 +4340,21 @@ def run_direction(
             model_status = "tamamlandı"
             LOG.info("MODEL TAMAMLANDI | %d/%d | %s", position, len(models), model_path.name)
         finally:
+            if getattr(args, "cleanup_maps", False) and model_root.exists():
+                try:
+                    shutil.rmtree(model_root)
+                except OSError as exc:
+                    LOG.warning(
+                        "TEMİZLİK BAŞARISIZ | model=%s | klasör=%s | hata=%s",
+                        model_id,
+                        model_root,
+                        exc,
+                    )
+                else:
+                    LOG.info(
+                        "TEMİZLİK | %s modelinin geçici harita ve sorgu klasörü silindi.",
+                        model_id,
+                    )
             model_elapsed = time.perf_counter() - model_started
             if model_status == "tamamlandı":
                 completed_model_seconds.append(model_elapsed)
@@ -4381,6 +4561,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--worker-skip-final-export", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--worker-finalize-only", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument(
+        "--isolate-models",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Her model/yönünü ayrı bir Python sürecinde çalıştırır. Model değişiminde "
+            "TensorFlow/OpenCV belleği ve işletim sistemi kaynakları tamamen temizlenir."
+        ),
+    )
     parser.add_argument("--verbose", action="store_true")
     return parser
 
@@ -4533,15 +4722,300 @@ def resolve_run_directory(args: argparse.Namespace) -> tuple[Path, bool]:
     return run_dir, auto_resume
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    validate_args(args)
-    args.query_raster = args.query_raster.resolve()
-    args.map_raster = args.map_raster.resolve()
-    args.model_dir = args.model_dir.resolve()
-    args.output_root = args.output_root.resolve()
-    run_dir, auto_resume = resolve_run_directory(args)
+def completed_model_direction_keys(
+    run_dir: Path,
+    *,
+    max_queries: int,
+    query_variants: Sequence[str],
+    search_modes: Sequence[tuple[str, float | None]],
+) -> set[tuple[str, str]]:
+    """Return fully completed direction/model pairs from the incremental summary."""
+    summary_path = run_dir / "summary.json"
+    if not summary_path.is_file():
+        return set()
+    rows = json.loads(summary_path.read_text(encoding="utf-8"))
+    expected_groups = {
+        (str(variant), str(mode_name))
+        for variant in query_variants
+        for mode_name, _ in search_modes
+    }
+    groups: dict[tuple[str, str], set[tuple[str, str]]] = {}
+    for row in rows:
+        total = int(row.get("total_queries") or 0)
+        accounted = sum(
+            int(row.get(name) or 0)
+            for name in ("ok_queries", "rejected_queries", "error_queries")
+        )
+        if total != max_queries or accounted != total:
+            continue
+        key = (str(row.get("direction") or ""), str(row.get("model_id") or ""))
+        groups.setdefault(key, set()).add(
+            (str(row.get("query_variant") or ""), str(row.get("search_mode") or ""))
+        )
+    return {key for key, values in groups.items() if expected_groups <= values}
+
+
+def order_models_by_direction_success(
+    models: Sequence[ModelSpec],
+    summary_rows: Sequence[dict[str, Any]],
+    *,
+    direction_id: str,
+    max_queries: int,
+    query_variants: Sequence[str],
+    search_modes: Sequence[tuple[str, float | None]],
+) -> tuple[list[ModelSpec], list[dict[str, Any]]]:
+    """Rank models by a fully completed direction without changing benchmark science.
+
+    Every expected query-variant/search-mode group has equal weight.  Models
+    without a complete source-direction result remain runnable, but are placed
+    after scored models in their deterministic catalog order.
+    """
+    expected_groups = {
+        (str(variant), str(mode_name))
+        for variant in query_variants
+        for mode_name, _ in search_modes
+    }
+    selected_ids = {model.model_id for model in models}
+    rows_by_model: dict[str, dict[tuple[str, str], dict[str, Any]]] = {}
+    for row in summary_rows:
+        model_id = str(row.get("model_id") or "")
+        if str(row.get("direction") or "") != direction_id or model_id not in selected_ids:
+            continue
+        total = int(row.get("total_queries") or 0)
+        accounted = sum(
+            int(row.get(name) or 0)
+            for name in ("ok_queries", "rejected_queries", "error_queries")
+        )
+        if total != max_queries or accounted != total:
+            continue
+        group_key = (
+            str(row.get("query_variant") or ""),
+            str(row.get("search_mode") or ""),
+        )
+        if group_key in expected_groups:
+            rows_by_model.setdefault(model_id, {})[group_key] = row
+
+    scored: list[tuple[tuple[float, float, float, str], ModelSpec, dict[str, Any]]] = []
+    unscored: list[tuple[ModelSpec, dict[str, Any]]] = []
+    for catalog_position, model in enumerate(models, start=1):
+        group_rows = rows_by_model.get(model.model_id, {})
+        missing_groups = sorted(expected_groups - set(group_rows))
+        audit: dict[str, Any] = {
+            "model_id": model.model_id,
+            "model_file": str(model.path),
+            "source_direction": direction_id,
+            "source_group_count": len(group_rows),
+            "expected_group_count": len(expected_groups),
+            "catalog_position": catalog_position,
+        }
+        if missing_groups:
+            audit.update(
+                {
+                    "ranking_status": "unscored_incomplete_source_direction",
+                    "missing_groups": [
+                        {"query_variant": variant, "search_mode": mode}
+                        for variant, mode in missing_groups
+                    ],
+                    "mean_success_25m": None,
+                    "mean_auc_25m": None,
+                    "mean_median_error_m": None,
+                }
+            )
+            unscored.append((model, audit))
+            continue
+
+        ordered_rows = [group_rows[key] for key in sorted(expected_groups)]
+        mean_success = sum(float(row.get("success_25m") or 0.0) for row in ordered_rows) / len(ordered_rows)
+        mean_auc = sum(float(row.get("auc_25m") or 0.0) for row in ordered_rows) / len(ordered_rows)
+        median_errors = [
+            float(row["median_error_m"])
+            for row in ordered_rows
+            if row.get("median_error_m") is not None
+        ]
+        mean_median_error = (
+            sum(median_errors) / len(median_errors) if median_errors else None
+        )
+        audit.update(
+            {
+                "ranking_status": "scored_complete_source_direction",
+                "missing_groups": [],
+                "mean_success_25m": mean_success,
+                "mean_auc_25m": mean_auc,
+                "mean_median_error_m": mean_median_error,
+            }
+        )
+        scored.append(
+            (
+                (
+                    -mean_success,
+                    -mean_auc,
+                    mean_median_error if mean_median_error is not None else math.inf,
+                    model.model_id,
+                ),
+                model,
+                audit,
+            )
+        )
+
+    scored.sort(key=lambda item: item[0])
+    ordered_models = [item[1] for item in scored] + [item[0] for item in unscored]
+    ordered_audit = [item[2] for item in scored] + [item[1] for item in unscored]
+    for reverse_position, audit in enumerate(ordered_audit, start=1):
+        audit["reverse_scan_position"] = reverse_position
+    return ordered_models, ordered_audit
+
+
+def run_model_isolation_parent(
+    args: argparse.Namespace,
+    original_argv: Sequence[str],
+    run_dir: Path,
+) -> int:
+    """Run every model/direction in a fresh child process, then finalize once."""
+    model_catalog = build_model_catalog(
+        args.model_dir,
+        parse_patterns(args.models),
+        args.max_models,
+        args.model_sampling,
+    )
+    directions = [
+        ("forward", direction_name(args.query_raster, args.map_raster)),
+    ]
+    if args.bidirectional:
+        directions.append(
+            ("reverse", direction_name(args.map_raster, args.query_raster))
+        )
+
+    total_workers = len(model_catalog.models) * len(directions)
+    worker_number = 0
+    script_path = str(Path(__file__).resolve())
+    for worker_direction, direction_id in directions:
+        direction_models = list(model_catalog.models)
+        if worker_direction == "reverse":
+            # Ensure the latest forward worker output is represented even when
+            # per-model Excel checkpoints are disabled.
+            if (run_dir / "results.jsonl").is_file():
+                write_summary_files(run_dir, write_results_csv=False)
+            summary_path = run_dir / "summary.json"
+            summary_rows = (
+                json.loads(summary_path.read_text(encoding="utf-8"))
+                if summary_path.is_file()
+                else []
+            )
+            forward_direction_id = directions[0][1]
+            direction_models, ranking_audit = order_models_by_direction_success(
+                direction_models,
+                summary_rows,
+                direction_id=forward_direction_id,
+                max_queries=args.max_queries,
+                query_variants=args.query_variants,
+                search_modes=args.search_modes,
+            )
+            atomic_write_json(
+                run_dir / "reverse_model_order.json",
+                {
+                    "schema_version": 1,
+                    "created_at_utc": utc_now_iso(),
+                    "target_direction": direction_id,
+                    "source_direction": forward_direction_id,
+                    "ranking_rule": [
+                        "mean_success_25m_desc",
+                        "mean_auc_25m_desc",
+                        "mean_median_error_m_asc",
+                        "model_id_asc",
+                    ],
+                    "complete_source_groups_required": len(args.query_variants)
+                    * len(args.search_modes),
+                    "models": ranking_audit,
+                },
+            )
+            scored_count = sum(
+                row["ranking_status"] == "scored_complete_source_direction"
+                for row in ranking_audit
+            )
+            print(
+                "TERS YON MODEL SIRASI | "
+                f"Google->Bing tamamlanmis sonuclara gore gucluden zayifa | "
+                f"puanlanan={scored_count}/{len(direction_models)}",
+                flush=True,
+            )
+        for model in direction_models:
+            worker_number += 1
+            completed = completed_model_direction_keys(
+                run_dir,
+                max_queries=args.max_queries,
+                query_variants=args.query_variants,
+                search_modes=args.search_modes,
+            )
+            if (direction_id, model.model_id) in completed:
+                print(
+                    f"İZOLE MODEL {worker_number}/{total_workers} | checkpoint tamam, atlandı | "
+                    f"yön={worker_direction} | model={model.path.name}",
+                    flush=True,
+                )
+                continue
+            command = [
+                sys.executable,
+                script_path,
+                *original_argv,
+                "--worker-model-id",
+                model.model_id,
+                "--worker-direction",
+                worker_direction,
+                "--worker-skip-final-export",
+            ]
+            print(
+                f"İZOLE MODEL {worker_number}/{total_workers} | yeni süreç | "
+                f"yön={worker_direction} | model={model.path.name}",
+                flush=True,
+            )
+            child = subprocess.run(command, cwd=Path(__file__).resolve().parent, check=False)
+            if child.returncode != 0:
+                print(
+                    f"İzole model süreci başarısız: exit={child.returncode} | "
+                    f"model={model.path.name}",
+                    file=sys.stderr,
+                )
+                return child.returncode
+            write_summary_files(run_dir, write_results_csv=False)
+            completed_after_worker = completed_model_direction_keys(
+                run_dir,
+                max_queries=args.max_queries,
+                query_variants=args.query_variants,
+                search_modes=args.search_modes,
+            )
+            if (direction_id, model.model_id) not in completed_after_worker:
+                print(
+                    "İzole model süreci tamamlanmış checkpoint üretmedi; "
+                    "sonraki modele geçilmiyor | "
+                    f"yön={worker_direction} | model={model.path.name}",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                return 2
+
+    final_command = [
+        sys.executable,
+        script_path,
+        *original_argv,
+        "--worker-finalize-only",
+    ]
+    print("İZOLE MODELLER TAMAMLANDI | son özet ve Excel hazırlanıyor", flush=True)
+    return subprocess.run(
+        final_command,
+        cwd=Path(__file__).resolve().parent,
+        check=False,
+    ).returncode
+
+
+def _main_prepared(
+    args: argparse.Namespace,
+    original_argv: Sequence[str],
+    run_dir: Path,
+    auto_resume: bool,
+    is_worker: bool,
+) -> int:
+    if args.isolate_models and args.include_models and not is_worker:
+        return run_model_isolation_parent(args, original_argv, run_dir)
     log_path = configure_logging(run_dir, args.verbose)
     LOG.info("=" * 88)
     LOG.info("JEOREFERANSLI ORTAK-TEMSİL BENCHMARKI")
@@ -4802,6 +5276,41 @@ def main(argv: Sequence[str] | None = None) -> int:
         except Exception:
             LOG.exception("Hata sonrası kısmi rapor üretilemedi.")
         return 1
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = build_parser()
+    original_argv = list(sys.argv[1:] if argv is None else argv)
+    args = parser.parse_args(original_argv)
+    validate_args(args)
+    args.query_raster = args.query_raster.resolve()
+    args.map_raster = args.map_raster.resolve()
+    args.model_dir = args.model_dir.resolve()
+    args.output_root = args.output_root.resolve()
+    run_dir, auto_resume = resolve_run_directory(args)
+    is_worker = bool(
+        args.worker_model_id
+        or args.worker_direction
+        or args.worker_skip_final_export
+        or args.worker_finalize_only
+    )
+    if is_worker:
+        validate_worker_run_lock(run_dir)
+        return _main_prepared(args, original_argv, run_dir, auto_resume, is_worker)
+
+    run_lock = RunDirectoryLock.acquire(run_dir)
+    previous_token = os.environ.get(RUN_LOCK_TOKEN_ENV)
+    os.environ[RUN_LOCK_TOKEN_ENV] = run_lock.token
+    atexit.register(run_lock.release)
+    try:
+        return _main_prepared(args, original_argv, run_dir, auto_resume, is_worker)
+    finally:
+        run_lock.release()
+        atexit.unregister(run_lock.release)
+        if previous_token is None:
+            os.environ.pop(RUN_LOCK_TOKEN_ENV, None)
+        else:
+            os.environ[RUN_LOCK_TOKEN_ENV] = previous_token
 
 
 if __name__ == "__main__":

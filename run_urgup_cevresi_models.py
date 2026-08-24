@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 from typing import Sequence
@@ -177,73 +176,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("Dry-run: benchmark başlatılmadı ve çıktı oluşturulmadı.")
         return 0
     import geospatial_model_benchmark as benchmark
-
-    if not args.isolate_models:
-        return benchmark.main(benchmark_argv)
-
-    catalog = benchmark.build_model_catalog(
-        MODEL_DIR,
-        benchmark.parse_patterns(None),
-        None,
-        "full",
+    benchmark_argv.append(
+        "--isolate-models" if args.isolate_models else "--no-isolate-models"
     )
-    directions = [
-        (
-            "forward",
-            benchmark.direction_name(QUERY_RASTER, MAP_RASTER),
-        ),
-        (
-            "reverse",
-            benchmark.direction_name(MAP_RASTER, QUERY_RASTER),
-        ),
-    ]
-    total_workers = len(catalog.models) * len(directions)
-    worker_number = 0
-    for direction, direction_id in directions:
-        for model in catalog.models:
-            worker_number += 1
-            completed_keys = completed_worker_keys(
-                args.output_dir.resolve(), max_queries=args.max_queries
-            )
-            if (direction_id, model.model_id) in completed_keys:
-                print(
-                    f"İZOLE MODEL {worker_number}/{total_workers} | checkpoint tamam, atlandı | "
-                    f"yön={direction} | model={model.path.name}",
-                    flush=True,
-                )
-                continue
-            command = [
-                sys.executable,
-                str(ROOT / "geospatial_model_benchmark.py"),
-                *benchmark_argv,
-                "--worker-model-id",
-                model.model_id,
-                "--worker-direction",
-                direction,
-                "--worker-skip-final-export",
-            ]
-            print(
-                f"İZOLE MODEL {worker_number}/{total_workers} | yön={direction} | "
-                f"model={model.path.name}",
-                flush=True,
-            )
-            completed = subprocess.run(command, cwd=ROOT, check=False)
-            if completed.returncode != 0:
-                print(
-                    f"İzole model süreci başarısız: exit={completed.returncode} | "
-                    f"model={model.path.name}",
-                    file=sys.stderr,
-                )
-                return completed.returncode
-
-    final_command = [
-        sys.executable,
-        str(ROOT / "geospatial_model_benchmark.py"),
-        *benchmark_argv,
-        "--worker-finalize-only",
-    ]
-    print("İZOLE MODELLER TAMAMLANDI | son özet ve Excel hazırlanıyor", flush=True)
-    return subprocess.run(final_command, cwd=ROOT, check=False).returncode
+    return benchmark.main(benchmark_argv)
 
 
 if __name__ == "__main__":

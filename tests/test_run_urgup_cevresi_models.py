@@ -3,7 +3,6 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 
@@ -62,25 +61,17 @@ class WideUrgupLauncherTests(unittest.TestCase):
                 {("A__TO__B", "MODEL_1")},
             )
 
-    def test_isolated_launcher_spawns_one_process_per_model_and_direction_then_finalizes(self):
-        model = SimpleNamespace(model_id="MODEL_1", path=Path("one.h5"))
-        catalog = SimpleNamespace(models=(model,))
+    def test_launcher_delegates_isolation_and_locking_to_the_core(self):
         with (
             patch.object(launcher, "validate_inputs", return_value={"resume": True}),
             patch.object(launcher, "core_arguments", return_value=["--resume-run", "out"]),
-            patch("geospatial_model_benchmark.build_model_catalog", return_value=catalog),
-            patch("run_urgup_cevresi_models.subprocess.run") as run,
+            patch("geospatial_model_benchmark.main", return_value=0) as benchmark_main,
         ):
-            run.return_value = SimpleNamespace(returncode=0)
             result = launcher.main([])
 
         self.assertEqual(result, 0)
-        self.assertEqual(run.call_count, 3)
-        commands = [call.args[0] for call in run.call_args_list]
-        self.assertIn("forward", commands[0])
-        self.assertIn("reverse", commands[1])
-        self.assertIn("--worker-skip-final-export", commands[0])
-        self.assertIn("--worker-finalize-only", commands[2])
+        benchmark_main.assert_called_once()
+        self.assertIn("--isolate-models", benchmark_main.call_args.args[0])
 
 
 if __name__ == "__main__":

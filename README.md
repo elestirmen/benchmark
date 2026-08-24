@@ -75,7 +75,7 @@ python gpu_test.py
 
 Model içeren bir koşudan önce `gpu_test.py` çıktısında en az bir GPU görünmelidir. Benchmark, model haritası ve model sorgusu çıkarımlarında GPU'yu zorunlu kılar; GPU yoksa ilgili model `model_errors.jsonl` dosyasına hata olarak yazılır. Yalnız `RAW_BASELINE` çalıştıran `--no-include-models` koşusu model çıkarımı yapmaz.
 
-RTX 50 serisinde native Windows TensorFlow 2.10 süreci her başlatıldığında CUDA bağlamı ve TensorFlow çalışma grafiği yeniden kurulur. Compute Capability 12.0 için eksik hazır kernel'ler ilk model yüklemesi/ilk batch sırasında PTX'ten JIT derlenebilir; bu maliyet yeni Python sürecinde tekrar görülebilir. Derlenen sürücü kernel'leri varsayılan olarak `outputs/cuda_cache/` altında, en çok 4 GiB olacak şekilde süreçler arasında saklanır; mevcut `CUDA_CACHE_PATH` ve `CUDA_CACHE_MAXSIZE` değerleri korunur. Disk cache JIT yükünü azaltır fakat süreç içi CUDA bağlamını, TensorFlow graph hazırlığını ve model-özel autotuning'i ortadan kaldırmaz. Benchmark logu artık model yükleme ile ilk GPU batch süresini ayrı gösterir; uzun koşuyu yeniden başlatmak yerine aynı süreçte sürdürmek bu başlangıç maliyetini yalnız bir kez öder.
+RTX 50 serisinde native Windows TensorFlow 2.10 süreci her başlatıldığında CUDA bağlamı ve TensorFlow çalışma grafiği yeniden kurulur. Compute Capability 12.0 için eksik hazır kernel'ler ilk model yüklemesi/ilk batch sırasında PTX'ten JIT derlenebilir. Derlenen sürücü kernel'leri varsayılan olarak `outputs/cuda_cache/` altında, en çok 4 GiB olacak şekilde süreçler arasında saklanır; mevcut `CUDA_CACHE_PATH` ve `CUDA_CACHE_MAXSIZE` değerleri korunur. Benchmark model içeren koşularda varsayılan olarak her model/yönü ayrı Python alt sürecinde çalıştırır. Böylece model değişiminde TensorFlow/OpenCV belleği, thread'ler ve işletim sistemi handle'ları süreç kapanışıyla tamamen temizlenir; checkpointler ve disk CUDA cache'i korunur. Yalnız tanılama amacıyla eski tek-süreç davranışı `--no-isolate-models` ile seçilebilir.
 
 Excel yedek motoru olan openpyxl her iki kurulum dosyasında da bulunur. Gerekirse tek başına şu komutla kurulabilir:
 
@@ -128,6 +128,9 @@ Varsayılan `--bidirectional`: Google→Bing, sonra Bing→Google. Tek yön içi
 - ROI ve global sonuçlar birleştirilmez; ayrı özetlenir.
 - Sonuçlar tek doğruluk kaynağı olan `results.jsonl` dosyasına 100 satır veya en geç 2 saniyelik paketlerle yazılır; her model sonunda tampon kesin olarak boşaltılır ve özet + hafif Excel güncellenir.
 - Model sonu özetleri `.summary_state/` altındaki silinebilir artımlı cache ile yalnız yeni JSONL byte aralığından güncellenir. State eksik/bozuk/uyumsuzsa JSONL'den baştan kurulur; normal finalde tam JSONL özetiyle birebir karşılaştırılır.
+- Kullanıcıya gösterilen `summary.json`, `summary.csv` ve Excel yalnız `total_queries == max_queries` olan tam grupları içerir. Eksik veya beklenenden fazla kayıtlı gruplar başarı oranı gibi yayımlanmaz; tanı için `summary_incomplete.json` altında tutulur.
+- Her run klasörü `.benchmark_run.lock` ile tek üst sürece aittir. Aynı `--run-id` için ikinci benchmark açık hatayla reddedilir; izole model işçileri yalnız kilit sahibinden devraldıkları token ile yazabilir.
+- Çift yönlü izole koşuda Google→Bing yönü önce tamamlanır. Bing→Google model sırası, yalnız tam Google→Bing gruplarının tüm varyant ve arama modlarındaki ortalama `success_25m` değeriyle güçlüden zayıfa kurulur; eşitlikte `AUC@25m`, ardından düşük medyan hata kullanılır. Kaynak yönü eksik modeller katalog sırasıyla sona alınır ve uygulanan sıra `reverse_model_order.json` dosyasına yazılır.
 - Kenar tamponu: varsayılan bir tam sorgu karosu (~162 m @ 30 cm GSD); merkezler sınırdan ~244 m içeride. Özel değer: `--query-edge-buffer-m 300`.
 
 ## Çalıştırma
@@ -199,6 +202,8 @@ python geospatial_model_benchmark.py `
 
 Model haritası varsayılan olarak GeoTIFF pencerelerini doğrudan batch RAM'e okuyup final GeoTIFF'e yazar; binlerce ara map PNG'si oluşturmaz. İnceleme için `--keep-intermediate` verilirse kaynak/prediction karoları ve debug mozaiği ayrıca saklanır.
 
+Geniş model haritaları 4 GiB klasik TIFF sınırında kesilmemesi için zorunlu BigTIFF olarak yazılır. İzole bir model işçisi tamamlanmış bütün varyant × arama modu checkpointlerini üretmediyse üst süreç koşuyu hatayla durdurur; tarama oluşmadan sessizce sonraki modele geçmez.
+
 Arama varsayılanı `--search-workers 8` (güvenli aralık 1–8). İşçiler harita ve piramitleri salt-okunur paylaşır; checkpoint tek koordinatörde yazılır. Seri referans için `--search-workers 1`. Ürgüp’te 6 mod / 48 görev ölçümünde ~2.5× hızlanma görülmüş; konum/NCC/başarı alanları seri ile birebir aynı kalmıştır.
 
 Her model denemesinden sonra logda `MODEL TARAMA SÜRESİ` satırı yazılır. Bu satır gerçek model süresini, son beş başarıyla tamamlanan modelin medyanını ve mevcut yön için kalan yaklaşık süreyi gösterir. Tahmin yön bazlıdır; ilk modelin CUDA/PTX soğuk başlangıcı ve farklı model mimarileri nedeniyle özellikle ilk birkaç modelde değişebilir. Model-sonu Excel süresi ayrıca `ARA EXCEL TAMAMLANDI` satırında raporlanır.
@@ -215,6 +220,8 @@ python geospatial_model_benchmark.py `
 ```
 
 Tamamlanmış `direction + query_variant + search_mode + model + query_id` kayıtları atlanır. Bitmiş yön/modelde inference ve harita yükleme de atlanır. `resume_signature` bilimsel ayarları, model kataloğunun göreli yol/SHA özetini ve `SCIENTIFIC_SEMANTICS_VERSION=2` merkez konvansiyonunu kilitler; `--search-workers` imzada değildir.
+
+Yanlışlıkla aynı run klasörüne birden fazla eski süreç yazmışsa süreçler kapatıldıktan sonra `python repair_results_jsonl.py <run-klasörü>` kullanılabilir. Araç önce zaman damgalı tam `results.pre_dedup_*.jsonl` kopyasını alır, checkpoint anahtarını tekilleştirir ve konum/başarı gibi kritik alanlarda çelişki varsa çalışma dosyasını değiştirmeden durur.
 
 `--batch-size` bilimsel değil operasyonel bir resume ayarıdır; VRAM durumuna göre devam sırasında değiştirilebilir. İlk ve sonraki batch değerleri `run_config.json` içindeki `operational_history` alanında korunur. Batch değişikliği yalnız henüz tamamlanmamış model çıkarımlarına uygulanır; bitmiş model sonuçları checkpointten yeniden kullanılmaya devam eder.
 
@@ -292,6 +299,7 @@ results.jsonl                    # çalışma sırasında paketli checkpoint
 results.csv                      # yalnız normal final dışa aktarımı
 summary.json / summary.csv
 summary_metadata.json
+summary_incomplete.json           # eksik/fazla grupların tanı kaydı
 .summary_state\                   # silinebilir artımlı özet cache'i
 model_errors.jsonl              # yalnız model hatası oluşursa
 benchmark_results.xlsx
@@ -345,6 +353,7 @@ Sorgu başına ayrıca: UTM/piksel hata, Top-1/Top-2 NCC, peak margin, PSR, sür
 --min-query-std / --min-query-entropy / --max-dark-fraction / --query-edge-buffer-m
 --tile-size 544 / --overlap 32 / --crop-border 16
 --search-workers 8 / --batch-size / --pyramid-factors
+--isolate-models / --no-isolate-models
 --normalization minus1_1 / --enhancement none / --output-value-mode auto
 --excel-engine auto / --excel-update model / --excel-report / --results-csv
 --strict-excel / --no-strict-excel
