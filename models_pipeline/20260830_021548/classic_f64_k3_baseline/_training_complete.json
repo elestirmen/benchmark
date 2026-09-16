@@ -1,0 +1,27 @@
+{
+  "status": "complete",
+  "completed_at": "2026-08-30T19:17:20.843389",
+  "job": {
+    "name": "classic_f64_k3_baseline",
+    "MODEL_TYPE": "classic",
+    "FILTER_COUNT": 64,
+    "KERNEL_SIZE": [
+      3,
+      3
+    ],
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "tanh",
+    "BATCH_SIZE": 2,
+    "EPOCHS": 20,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "weighted_hybrid",
+    "PRETRAINED_MODEL": null
+  },
+  "model_files": [
+    "_JOB_classic_f64_k3_baseline_30_08_2026__12_29_best_mae_model_f64_k3.h5",
+    "_JOB_classic_f64_k3_baseline_30_08_2026__12_29_best_ssim_model_f64_k3.h5",
+    "_JOB_classic_f64_k3_baseline_30_08_2026__12_29_best_val_loss_model_f64_k3.h5",
+    "_JOB_classic_f64_k3_baseline_30_08_2026__19_15_son_model.h5"
+  ]
+}

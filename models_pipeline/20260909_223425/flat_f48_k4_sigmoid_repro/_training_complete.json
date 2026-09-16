@@ -1,0 +1,35 @@
+{
+  "status": "complete",
+  "completed_at": "2026-09-10T00:29:53.244864",
+  "job": {
+    "name": "flat_f48_k4_sigmoid_repro",
+    "MODEL_TYPE": "flat_bottleneck",
+    "FILTER_COUNT": 48,
+    "KERNEL_SIZE": [
+      4,
+      4
+    ],
+    "STRIDES": [
+      1,
+      1
+    ],
+    "FLAT_DEPTH": 3,
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "sigmoid",
+    "INPUT_NORMALIZATION": "minus1_1",
+    "BATCH_SIZE": 2,
+    "EPOCHS": 20,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "binary_crossentropy",
+    "PRETRAINED_MODEL": null,
+    "EARLY_STOPPING_PATIENCE": 0,
+    "REDUCE_LR_PATIENCE": 0
+  },
+  "model_files": [
+    "_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_mae_model_f48_k4.h5",
+    "_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_ssim_model_f48_k4.h5",
+    "_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_val_loss_model_f48_k4.h5",
+    "_JOB_flat_f48_k4_sigmoid_repro_10_09_2026__00_29_son_model.h5"
+  ]
+}

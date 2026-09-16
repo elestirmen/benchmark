@@ -1,0 +1,27 @@
+{
+  "status": "complete",
+  "completed_at": "2026-08-31T02:30:33.082007",
+  "job": {
+    "name": "classic_f16_k3",
+    "MODEL_TYPE": "classic",
+    "FILTER_COUNT": 16,
+    "KERNEL_SIZE": [
+      3,
+      3
+    ],
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "tanh",
+    "BATCH_SIZE": 2,
+    "EPOCHS": 20,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "weighted_hybrid",
+    "PRETRAINED_MODEL": null
+  },
+  "model_files": [
+    "_JOB_classic_f16_k3_31_08_2026__00_25_best_mae_model_f16_k3.h5",
+    "_JOB_classic_f16_k3_31_08_2026__00_25_best_ssim_model_f16_k3.h5",
+    "_JOB_classic_f16_k3_31_08_2026__00_25_best_val_loss_model_f16_k3.h5",
+    "_JOB_classic_f16_k3_31_08_2026__02_28_son_model.h5"
+  ]
+}

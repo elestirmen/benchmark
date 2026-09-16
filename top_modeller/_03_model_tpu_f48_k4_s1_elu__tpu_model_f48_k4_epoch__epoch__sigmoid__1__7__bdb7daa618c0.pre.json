@@ -1,0 +1,10 @@
+{
+  "input_normalization": "minus1_1",
+  "enhancement": "hist_eq_pil",
+  "color_mode": "grayscale",
+  "image_size": 544,
+  "output_activation": "sigmoid",
+  "output_color_mode": "grayscale",
+  "trained_by": "autoencoder_dinamik_bellek_dosyadan_okuma_tf.data_3_kanal_to_1_kanal.py",
+  "note": "Sozlesme model dosyasindan degil, egitim scriptinin kaynagindan elle cikarildi. Cikis sigmoid olsa da giris [-1, 1] ve PIL/tfa uyumlu histogram esitlemelidir (cv2.equalizeHist DEGIL)."
+}

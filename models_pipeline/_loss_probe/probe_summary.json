@@ -1,0 +1,334 @@
+{
+  "created_at": "2026-09-08T16:42:45.213084",
+  "epochs": 6,
+  "gate_samples": 20,
+  "gate_aoi": "train",
+  "winner_loss": "binary_crossentropy",
+  "baseline_job": {
+    "MODEL_TYPE": "flat_bottleneck",
+    "FILTER_COUNT": 48,
+    "KERNEL_SIZE": [
+      4,
+      4
+    ],
+    "STRIDES": [
+      1,
+      1
+    ],
+    "FLAT_DEPTH": 3,
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "sigmoid",
+    "INPUT_NORMALIZATION": "minus1_1",
+    "BATCH_SIZE": 2,
+    "EPOCHS": 100,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "weighted_hybrid",
+    "PRETRAINED_MODEL": null,
+    "EARLY_STOPPING_PATIENCE": 0,
+    "REDUCE_LR_PATIENCE": 0
+  },
+  "results": [
+    {
+      "name": "bce",
+      "learning_rate": 0.001,
+      "batch_size": 2,
+      "loss_function": "binary_crossentropy",
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.15674141156663318,
+          "false_peak_ratio": 0.469573454358235
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.23808699463348418,
+          "false_peak_ratio": 0.3822299395355596
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.19488487278154368,
+          "false_peak_ratio": 0.4427172577566521
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.21671020168635233,
+          "false_peak_ratio": 0.3989288947102957
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.16320047873778426,
+          "false_peak_ratio": 0.34652236609105647
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.12708478272054663,
+          "false_peak_ratio": 0.5079217440293231
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.16320047873778426,
+          "false_peak_ratio": 0.34652236609105647
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.15674141156663318,
+          "false_peak_ratio": 0.469573454358235
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__13_48_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.12708478272054663,
+          "false_peak_ratio": 0.5079217440293231
+        },
+        {
+          "checkpoint": "_JOB_bce_08_09_2026__14_30_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.12708478272054663,
+          "false_peak_ratio": 0.5079217440293231
+        }
+      ],
+      "collapsed": false,
+      "healthy_checkpoints": 10,
+      "best": {
+        "checkpoint": "_JOB_bce_08_09_2026__13_48_best_mae_model_f48_k4.h5",
+        "epoch": null,
+        "truth_ncc_mean": 0.16320047873778426,
+        "false_peak_ratio": 0.34652236609105647
+      },
+      "status": "ok"
+    },
+    {
+      "name": "weighted_hybrid_kontrol",
+      "learning_rate": 0.001,
+      "batch_size": 2,
+      "loss_function": "weighted_hybrid",
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__14_33_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_weighted_hybrid_kontrol_08_09_2026__15_14_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        }
+      ],
+      "collapsed": true,
+      "healthy_checkpoints": 0,
+      "best": null,
+      "status": "ok"
+    },
+    {
+      "name": "hybrid",
+      "learning_rate": 0.001,
+      "batch_size": 2,
+      "loss_function": "hybrid",
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": -0.00026274491672439017,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": -0.00026274491672439017,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_17_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_hybrid_08_09_2026__15_57_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        }
+      ],
+      "collapsed": true,
+      "healthy_checkpoints": 0,
+      "best": null,
+      "status": "ok"
+    },
+    {
+      "name": "mae",
+      "learning_rate": 0.001,
+      "batch_size": 2,
+      "loss_function": "mae",
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_00_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_mae_08_09_2026__16_42_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        }
+      ],
+      "collapsed": true,
+      "healthy_checkpoints": 0,
+      "best": null,
+      "status": "ok"
+    }
+  ]
+}

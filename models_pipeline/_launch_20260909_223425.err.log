@@ -1,0 +1,52 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+2026-09-10 00:30:05 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_mae_model_f48_k4.h5
+2026-09-10 00:30:05 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:30:20 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_ssim_model_f48_k4.h5
+2026-09-10 00:30:20 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:30:30 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_val_loss_model_f48_k4.h5
+2026-09-10 00:30:30 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:30:40 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_JOB_flat_f48_k4_sigmoid_repro_10_09_2026__00_29_son_model.h5
+2026-09-10 00:30:40 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:30:50 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:30:50 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:30:59 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:30:59 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:31:09 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:31:09 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:31:19 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:31:19 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:31:28 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:31:28 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:31:37 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:31:37 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:31:47 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00007_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:31:47 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:31:57 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:31:57 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:32:07 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00009_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:32:07 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:32:16 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00010_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:32:16 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:32:26 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00011_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:32:26 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:32:35 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00012_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:32:35 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:32:45 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00013_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:32:45 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:32:55 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00014_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:32:55 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:33:05 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00015_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:33:05 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:33:14 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00016_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:33:14 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:33:24 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00017_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:33:24 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:33:34 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00018_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:33:34 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:33:44 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00019_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:33:44 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-09-10 00:33:53 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_epochs\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00020_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:33:53 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+2026-09-10 00:34:10.112547: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.

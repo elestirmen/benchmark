@@ -1,0 +1,417 @@
+{
+  "created_at": "2026-09-05T18:15:24.860860",
+  "epochs": 6,
+  "gate_samples": 20,
+  "gate_aoi": "train",
+  "baseline_job": {
+    "MODEL_TYPE": "flat_bottleneck",
+    "FILTER_COUNT": 48,
+    "KERNEL_SIZE": [
+      4,
+      4
+    ],
+    "STRIDES": [
+      1,
+      1
+    ],
+    "FLAT_DEPTH": 3,
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "sigmoid",
+    "INPUT_NORMALIZATION": "minus1_1",
+    "BATCH_SIZE": 2,
+    "EPOCHS": 100,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "weighted_hybrid",
+    "PRETRAINED_MODEL": null,
+    "EARLY_STOPPING_PATIENCE": 0,
+    "REDUCE_LR_PATIENCE": 0
+  },
+  "results": [
+    {
+      "name": "lr1e-3_b2",
+      "learning_rate": 0.001,
+      "batch_size": 2,
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.17695747953052052,
+          "false_peak_ratio": 0.513091783618828
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.10659123942049167,
+          "false_peak_ratio": 0.7597432836430691
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.10831371757463962,
+          "false_peak_ratio": 0.7585035005248114
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.10020336804340317,
+          "false_peak_ratio": 0.8356037956568534
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.11146171613336867,
+          "false_peak_ratio": 0.7330920817030628
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.10764257239382233,
+          "false_peak_ratio": 0.7750175231636719
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.10764257239382233,
+          "false_peak_ratio": 0.7750175231636719
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.10764257239382233,
+          "false_peak_ratio": 0.7750175231636719
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.10764257239382233,
+          "false_peak_ratio": 0.7750175231636719
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_50_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.10764257239382233,
+          "false_peak_ratio": 0.7750175231636719
+        }
+      ],
+      "collapsed": false,
+      "healthy_checkpoints": 10,
+      "best": {
+        "checkpoint": "_JOB_lr1e-3_b2_05_09_2026__15_11_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+        "epoch": 1,
+        "truth_ncc_mean": 0.17695747953052052,
+        "false_peak_ratio": 0.513091783618828
+      },
+      "status": "ok"
+    },
+    {
+      "name": "lr1e-4_b2",
+      "learning_rate": 0.0001,
+      "batch_size": 2,
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.14505860161077105,
+          "false_peak_ratio": 0.9733326954188696
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.18929334500062392,
+          "false_peak_ratio": 0.5279929694948061
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.13517685862263928,
+          "false_peak_ratio": 0.6423138206421983
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.11371363552047875,
+          "false_peak_ratio": 0.7553744685784438
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.10169340065143054,
+          "false_peak_ratio": 0.8239386047097993
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.09955251052073066,
+          "false_peak_ratio": 0.8477576804331574
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.09955251052073066,
+          "false_peak_ratio": 0.8477576804331574
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.09955251052073066,
+          "false_peak_ratio": 0.8477576804331574
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.09955251052073066,
+          "false_peak_ratio": 0.8477576804331574
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__16_27_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.09955251052073066,
+          "false_peak_ratio": 0.8477576804331574
+        }
+      ],
+      "collapsed": false,
+      "healthy_checkpoints": 10,
+      "best": {
+        "checkpoint": "_JOB_lr1e-4_b2_05_09_2026__15_53_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+        "epoch": 2,
+        "truth_ncc_mean": 0.18929334500062392,
+        "false_peak_ratio": 0.5279929694948061
+      },
+      "status": "ok"
+    },
+    {
+      "name": "lr1e-5_b2",
+      "learning_rate": 1e-05,
+      "batch_size": 2,
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.1621980215715889,
+          "false_peak_ratio": 0.8324118176430335
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.14701661980870157,
+          "false_peak_ratio": 0.8948308951686614
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.14033505647130615,
+          "false_peak_ratio": 0.9365046067227187
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.11247651713421691,
+          "false_peak_ratio": 1.1910162479544681
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.10989299926018395,
+          "false_peak_ratio": 1.214896025216981
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.11733374933520632,
+          "false_peak_ratio": 1.143544139598244
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.1621980215715889,
+          "false_peak_ratio": 0.8324118176430335
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.1621980215715889,
+          "false_peak_ratio": 0.8324118176430335
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.11733374933520632,
+          "false_peak_ratio": 1.143544139598244
+        },
+        {
+          "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__17_05_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.11733374933520632,
+          "false_peak_ratio": 1.143544139598244
+        }
+      ],
+      "collapsed": false,
+      "healthy_checkpoints": 10,
+      "best": {
+        "checkpoint": "_JOB_lr1e-5_b2_05_09_2026__16_29_best_mae_model_f48_k4.h5",
+        "epoch": null,
+        "truth_ncc_mean": 0.1621980215715889,
+        "false_peak_ratio": 0.8324118176430335
+      },
+      "status": "ok"
+    },
+    {
+      "name": "lr1e-3_b8",
+      "learning_rate": 0.001,
+      "batch_size": 8,
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_07_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        },
+        {
+          "checkpoint": "_JOB_lr1e-3_b8_05_09_2026__17_41_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.0,
+          "false_peak_ratio": null
+        }
+      ],
+      "collapsed": true,
+      "healthy_checkpoints": 0,
+      "best": null,
+      "status": "ok"
+    },
+    {
+      "name": "lr1e-4_b8",
+      "learning_rate": 0.0001,
+      "batch_size": 8,
+      "epochs": 6,
+      "raw_false_peak_ratio": 0.3368329664469194,
+      "checkpoints": [
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 1,
+          "truth_ncc_mean": 0.14664427262920046,
+          "false_peak_ratio": 0.8654790052142805
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 2,
+          "truth_ncc_mean": 0.1365086970597537,
+          "false_peak_ratio": 0.9311437775203225
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 3,
+          "truth_ncc_mean": 0.1415839280495086,
+          "false_peak_ratio": 0.9283285139975636
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 4,
+          "truth_ncc_mean": 0.1725795390105242,
+          "false_peak_ratio": 0.7997689685778883
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 5,
+          "truth_ncc_mean": 0.22084331058197443,
+          "false_peak_ratio": 0.5075605348287684
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+          "epoch": 6,
+          "truth_ncc_mean": 0.18367792231368205,
+          "false_peak_ratio": 0.5037341011060102
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_best_mae_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.18367792231368205,
+          "false_peak_ratio": 0.5037341011060102
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_best_ssim_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.22084331058197443,
+          "false_peak_ratio": 0.5075605348287684
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_best_val_loss_model_f48_k4.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.18367792231368205,
+          "false_peak_ratio": 0.5037341011060102
+        },
+        {
+          "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__18_14_son_model.h5",
+          "epoch": null,
+          "truth_ncc_mean": 0.18367792231368205,
+          "false_peak_ratio": 0.5037341011060102
+        }
+      ],
+      "collapsed": false,
+      "healthy_checkpoints": 10,
+      "best": {
+        "checkpoint": "_JOB_lr1e-4_b8_05_09_2026__17_43_best_mae_model_f48_k4.h5",
+        "epoch": null,
+        "truth_ncc_mean": 0.18367792231368205,
+        "false_peak_ratio": 0.5037341011060102
+      },
+      "status": "ok"
+    }
+  ]
+}

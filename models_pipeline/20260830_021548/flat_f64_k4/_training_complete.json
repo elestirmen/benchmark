@@ -1,0 +1,33 @@
+{
+  "status": "complete",
+  "completed_at": "2026-09-04T04:07:40.837171",
+  "job": {
+    "name": "flat_f64_k4",
+    "MODEL_TYPE": "flat_bottleneck",
+    "FILTER_COUNT": 64,
+    "KERNEL_SIZE": [
+      4,
+      4
+    ],
+    "STRIDES": [
+      1,
+      1
+    ],
+    "FLAT_DEPTH": 3,
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "sigmoid",
+    "INPUT_NORMALIZATION": "minus1_1",
+    "BATCH_SIZE": 2,
+    "EPOCHS": 100,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "weighted_hybrid",
+    "PRETRAINED_MODEL": null
+  },
+  "model_files": [
+    "_JOB_flat_f64_k4_04_09_2026__02_23_best_mae_model_f64_k4.h5",
+    "_JOB_flat_f64_k4_04_09_2026__02_23_best_ssim_model_f64_k4.h5",
+    "_JOB_flat_f64_k4_04_09_2026__02_23_best_val_loss_model_f64_k4.h5",
+    "_JOB_flat_f64_k4_04_09_2026__04_05_son_model.h5"
+  ]
+}

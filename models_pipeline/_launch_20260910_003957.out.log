@@ -1,0 +1,107 @@
+=== UCTAN UCA EGITIM VE BENCHMARK PIPELINE BASLIYOR ===
+Pipeline run-id: 20260909_223425
+Calisma modu: acik_run_id
+Egitim konfigurasyonu sayisi: 18
+Benchmark sorgu sayisi: 1000
+Egitim batch: gorev basina (kontrol=2); OOM durumunda kademeli yariya iner
+Cikarim batch merdiveni: [16, 8, 4, 2] (OOM durumunda dusurulur)
+Tahmini toplam sure: 63.5 saat
+Birlesik rapor (her gorev sonunda yenilenir): C:\d_surucusu\visual_navigation\benchmark\outputs\end_to_end_pipeline_20260909_223425\TUM_SONUCLAR.xlsx
+Ortak RAW baseline yok; ilk tamamlanan benchmarkta bir kez hesaplanacak.
+
+=== GOREV 1/18 (flat_f48_k4_sigmoid_repro) ===
+[flat_f48_k4_sigmoid_repro] Egitim daha once tamamlanmis; benchmark kaldigi yerden devam edecek | neden=eksik_ciktilar=['summary.json', 'summary_metadata.json', 'summary_incomplete.json', 'benchmark_results.xlsx', 'excel_validation.json']
+
+[ON KONTROL] Kaydedilen modeller dogrulaniyor: flat_f48_k4_sigmoid_repro
+Model on kontrolu: dosya=5, benzersiz_icerik=3
+  OK | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_mae_model_f48_k4.h5 | cikis_aktivasyonu=sigmoid | cikis_boyutu=(None, 544, 544, 1)
+  OK | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_val_loss_model_f48_k4.h5 | cikis_aktivasyonu=sigmoid | cikis_boyutu=(None, 544, 544, 1)
+  OK | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5 | cikis_aktivasyonu=sigmoid | cikis_boyutu=(None, 544, 544, 1)
+Tum benzersiz modeller cikis sozlesmesini sagliyor.
+
+[MARJ KAPISI] flat_f48_k4_sigmoid_repro | 25 checkpoint | CPU, ~25 dk | bolge=train
+Marj kapisi | ornek=60 seed=42 aoi=train normalizasyon=minus1_1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.45  2.82 +0.3501 +0.1582  +0.1919  55/60    0/120   36.5/33.4  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_b   1.32 -0.66 +0.0772 +0.1019  -0.0247  30/60    0/120   11.3/7.8   
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_b   1.32 -0.66 +0.0772 +0.1019  -0.0247  30/60    0/120   11.3/7.8   
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_b   0.75  0.72 +0.1602 +0.1205  +0.0397  40/60    0/120   14.8/12.5  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.57  1.72 +0.2501 +0.1429  +0.1072  49/60    0/120   17.6/15.5  
+_JOB_flat_f48_k4_sigmoid_repro_10_09_2026__00_29_s   0.75  0.72 +0.1602 +0.1205  +0.0397  40/60    0/120   14.8/12.5  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.72  0.85 +0.1224 +0.0877  +0.0347  42/60    0/120    9.8/8.1   
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.63  1.35 +0.1434 +0.0904  +0.0530  39/60    0/120   13.8/13.0  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.57  1.72 +0.2501 +0.1429  +0.1072  49/60    0/120   17.6/15.5  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.63  1.48 +0.1543 +0.0969  +0.0574  42/60    0/120   17.3/13.3  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.66  1.18 +0.2427 +0.1599  +0.0828  43/60    0/120   20.4/18.4  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.66  1.12 +0.2088 +0.1385  +0.0703  46/60    0/120   20.8/18.1  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.70  1.02 +0.1888 +0.1314  +0.0573  46/60    0/120   17.1/13.3  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   1.32 -0.66 +0.0772 +0.1019  -0.0247  30/60    0/120   11.3/7.8   
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   1.14 -0.27 +0.0848 +0.0971  -0.0122  27/60    0/120   14.6/10.1  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.83  0.48 +0.1135 +0.0946  +0.0189  36/60    0/120   14.2/10.2  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.95  0.11 +0.1292 +0.1225  +0.0067  33/60    0/120   17.9/14.0  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.76  0.71 +0.1089 +0.0824  +0.0265  40/60    0/120   13.2/10.3  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.73  0.93 +0.1189 +0.0863  +0.0326  42/60    0/120   14.7/9.6   
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.84  0.49 +0.1110 +0.0929  +0.0181  40/60    0/120   16.0/15.0  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.98  0.04 +0.0775 +0.0759  +0.0015  34/60    0/120   13.7/9.9   
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.98  0.05 +0.0956 +0.0934  +0.0022  31/60    0/120   14.7/12.3  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.78  0.64 +0.1473 +0.1156  +0.0317  37/60    0/120   19.5/18.6  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.88  0.27 +0.0906 +0.0800  +0.0106  38/60    0/120   14.1/12.7  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.76  0.77 +0.2151 +0.1627  +0.0524  42/60    0/120   20.0/20.6  
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.75  0.72 +0.1602 +0.1205  +0.0397  40/60    0/120   14.8/12.5  
+
+RAW baraji: ORAN < 0.45  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 0/25
+  ELENDI oran= 0.57  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.57  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.66  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.66  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.70  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00007_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.72  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.73  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00013_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.75  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_val_loss_model_f48_k4.h5
+  ELENDI oran= 0.75  _JOB_flat_f48_k4_sigmoid_repro_10_09_2026__00_29_son_model.h5
+  ELENDI oran= 0.75  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00020_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.76  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00019_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.76  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00012_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.78  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00017_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.83  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.84  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00014_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.88  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00018_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.95  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00011_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.98  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00016_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.98  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00015_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.14  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00009_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.32  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_mae_model_f48_k4.h5
+  ELENDI oran= 1.32  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_ssim_model_f48_k4.h5
+  ELENDI oran= 1.32  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5
+Elenen adaylar benchmark'a sokulmamali.
+JSON yazildi: C:\d_surucusu\visual_navigation\benchmark\outputs\end_to_end_pipeline_20260909_223425\_margin_gate\flat_f48_k4_sigmoid_repro.json
+[MARJ KAPISI] flat_f48_k4_sigmoid_repro | en iyi oran=0.57 | RAW baraji=0.45 | gecen=0/24
+[MARJ KAPISI] DIKKAT: flat_f48_k4_sigmoid_repro hicbir checkpoint ile RAW barajini gecmedi. Benchmark sonucunun da zayif olmasi beklenir.
+[MARJ KAPISI] En iyi aday zaten benchmark listesinde: _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5 (oran=0.57)
+[MARJ KAPISI] Benchmark tek adayla calisacak: _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5 -> _benchmark_adayi/
+
+[ON KONTROL] Kaydedilen modeller dogrulaniyor: flat_f48_k4_sigmoid_repro
+Model on kontrolu: dosya=5, benzersiz_icerik=3
+  OK | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_mae_model_f48_k4.h5 | cikis_aktivasyonu=sigmoid | cikis_boyutu=(None, 544, 544, 1)
+  OK | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_best_val_loss_model_f48_k4.h5 | cikis_aktivasyonu=sigmoid | cikis_boyutu=(None, 544, 544, 1)
+  OK | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5 | cikis_aktivasyonu=sigmoid | cikis_boyutu=(None, 544, 544, 1)
+Tum benzersiz modeller cikis sozlesmesini sagliyor.
+
+[BENCHMARK] Modeller test ediliyor | gorev=flat_f48_k4_sigmoid_repro | max_sorgu=1000 | raw_baseline=evet | cikarim_batch=16 (deneme 1/4)
+WIDE_URGUP_PLAN_JSON: {"query_raster": {"path": "C:\\d_surucusu\\visual_navigation\\benchmark\\urgup_cevresi_harita\\urgup_cevresi_gmap_utm_30cm.tif", "crs": "EPSG:32636", "width": 66546, "height": 86017, "count": 4, "resolution": [0.298582141739, 0.298582141739], "bounds": [660675.3922651609, 4254952.872569446, 680544.8394693244, 4280636.01265541]}, "map_raster": {"path": "C:\\d_surucusu\\visual_navigation\\benchmark\\urgup_cevresi_harita\\urgup_cevresi_bingmap_utm_30cm.tif", "crs": "EPSG:32636", "width": 66343, "height": 85854, "count": 4, "resolution": [0.298582141739, 0.298582141739], "bounds": [660709.4306293192, 4254991.6882478725, 680518.2656587097, 4280626.159444733]}, "overlap_m": [19808.835029390524, 25634.471196860075], "model_count": 1, "output_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\outputs\\end_to_end_pipeline_20260909_223425\\flat_f48_k4_sigmoid_repro", "resume": true}
+Komut: python geospatial_model_benchmark.py --query-raster C:\d_surucusu\visual_navigation\benchmark\urgup_cevresi_harita\urgup_cevresi_gmap_utm_30cm.tif --map-raster C:\d_surucusu\visual_navigation\benchmark\urgup_cevresi_harita\urgup_cevresi_bingmap_utm_30cm.tif --model-dir C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_benchmark_adayi --model-sampling full --include-raw --include-models --bidirectional --query-variants clean,hard_v1 --search-modes roi500,roi1000,roi2000,roi4000,roi8000,global --tile-size 544 --overlap 32 --crop-border 16 --block-size-m 1000 --samples-per-block 5 --max-queries 1000 --query-sampling balanced_exact --seed 42 --min-query-std 12 --min-query-entropy 4 --max-dark-fraction 0.20 --pyramid-factors 16,8,4,2,1 --top-k 30 --refine-radius-px 160 --nms-radius-px 256 --batch-size 16 --search-workers 8 --bootstrap-iterations 1000 --normalization minus1_1 --output-value-mode auto --enhancement none --excel-engine openpyxl --excel-update model --excel-report --no-results-csv --resume-run C:\d_surucusu\visual_navigation\benchmark\outputs\end_to_end_pipeline_20260909_223425\flat_f48_k4_sigmoid_repro --cleanup-maps
+İZOLE MODEL 1/2 | yeni süreç | yön=forward | model=_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-10 00:44:39 | INFO     | ========================================================================================
+2026-09-10 00:44:39 | INFO     | JEOREFERANSLI ORTAK-TEMSİL BENCHMARKI
+2026-09-10 00:44:39 | INFO     | ========================================================================================
+2026-09-10 00:44:39 | INFO     | Run klasörü: C:\d_surucusu\visual_navigation\benchmark\outputs\end_to_end_pipeline_20260909_223425\flat_f48_k4_sigmoid_repro
+2026-09-10 00:44:39 | INFO     | Log: C:\d_surucusu\visual_navigation\benchmark\outputs\end_to_end_pipeline_20260909_223425\flat_f48_k4_sigmoid_repro\benchmark.log
+2026-09-10 00:44:41 | INFO     | Sistem: {"python": "3.10.20 | packaged by conda-forge | (main, Jun 11 2026, 03:28:51) [MSC v.1944 64 bit (AMD64)]", "platform": "Windows-10-10.0.26300-SP0", "opencv": "4.10.0", "numpy": "1.23.5", "rasterio": "1.3.10", "tensorflow": "2.10.1", "tensorflow_cuda_build": true, "tensorflow_gpus": ["PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')"]}
+2026-09-10 00:44:42 | INFO     | CUDA CACHE | path=C:\d_surucusu\visual_navigation\benchmark\outputs\cuda_cache | max=4294967296 | mevcut=1197.1 MiB | disk cache süreçler arası PTX yükünü azaltır; TensorFlow/CUDA bağlamı her süreçte yeniden kurulur
+2026-09-10 00:44:42 | INFO     | MODEL KATALOĞU HAZIRLANIYOR | kök=C:\d_surucusu\visual_navigation\benchmark\models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_benchmark_adayi
+2026-09-10 00:44:42 | INFO     | MODEL KATALOĞU HAZIR | örnekleme=full | dosya=1 | seri=1 | örneklenen=1 | çalıştırılacak=1 | aynı_içerik_atlanan=0 | aynı_ad_farklı_içerik_grubu=0 | süre=0.00 sn

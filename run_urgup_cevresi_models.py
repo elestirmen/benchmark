@@ -25,6 +25,7 @@ def parser() -> argparse.ArgumentParser:
         description="Geniş Ürgüp Google/Bing haritalarında models/ klasörünü test eder."
     )
     result.add_argument("--output-dir", type=Path, default=DEFAULT_RUN_DIR)
+    result.add_argument("--model-dir", type=Path, default=MODEL_DIR)
     result.add_argument("--max-queries", type=int, default=3000)
     result.add_argument("--batch-size", type=int, default=16)
     result.add_argument("--search-workers", type=int, default=8)
@@ -41,10 +42,10 @@ def parser() -> argparse.ArgumentParser:
     return result
 
 
-def model_files() -> list[Path]:
+def model_files(model_dir: Path) -> list[Path]:
     return sorted(
         path
-        for path in MODEL_DIR.rglob("*")
+        for path in model_dir.rglob("*")
         if path.is_file() and path.suffix.lower() in MODEL_SUFFIXES
     )
 
@@ -71,9 +72,9 @@ def validate_inputs(args: argparse.Namespace) -> dict[str, object]:
         raise ValueError("max-queries ve batch-size pozitif olmalıdır.")
     if not 1 <= args.search_workers <= 8:
         raise ValueError("search-workers 1 ile 8 arasında olmalıdır.")
-    models = model_files()
+    models = model_files(args.model_dir)
     if not models:
-        raise FileNotFoundError(f"Model bulunamadı: {MODEL_DIR}")
+        raise FileNotFoundError(f"Model bulunamadı: {args.model_dir}")
     query = raster_metadata(QUERY_RASTER)
     search_map = raster_metadata(MAP_RASTER)
     if query["crs"] != search_map["crs"]:
@@ -105,7 +106,7 @@ def core_arguments(args: argparse.Namespace, *, resume: bool) -> list[str]:
     argv = [
         "--query-raster", str(QUERY_RASTER),
         "--map-raster", str(MAP_RASTER),
-        "--model-dir", str(MODEL_DIR),
+        "--model-dir", str(args.model_dir.resolve()),
         "--model-sampling", "full",
         "--include-raw", "--include-models", "--bidirectional",
         "--query-variants", "clean,hard_v1",
@@ -167,9 +168,10 @@ def completed_worker_keys(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = parser().parse_args(argv)
+    args, extra_args = parser().parse_known_args(argv)
     plan = validate_inputs(args)
     benchmark_argv = core_arguments(args, resume=bool(plan["resume"]))
+    benchmark_argv.extend(extra_args)
     print("WIDE_URGUP_PLAN_JSON:", json.dumps(plan, ensure_ascii=False))
     print("Komut:", "python geospatial_model_benchmark.py", " ".join(benchmark_argv))
     if args.dry_run:

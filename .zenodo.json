@@ -1,0 +1,23 @@
+{
+  "title": "Cross-Source Map Benchmark for GNSS-Denied UAV Localization",
+  "description": "Reproducible cross-source (Google vs. Bing) map-matching benchmark and analysis code accompanying the article 'Cross-Autoencoder Structural Representations for GNSS-Denied UAV Localization by Template Matching: Flight Evaluation and a Large-Scale Cross-Source Map Benchmark' (submitted to Drones). Includes spatially blocked query sampling with fixed seeds, the deterministic hard_v1 photometric degradation profile, coarse-to-fine NCC matching, checkpoint screening with SHA-256 cataloguing, epoch sweep tooling and spatial block-bootstrap confidence intervals. Dual-licensed MIT / Apache-2.0.",
+  "upload_type": "software",
+  "license": "mit",
+  "creators": [
+    {
+      "name": "Arık, Ahmet Ertuğrul",
+      "affiliation": "Kapadokya University, Nevşehir, Türkiye"
+    }
+  ],
+  "keywords": [
+    "GNSS-denied navigation",
+    "UAV localization",
+    "terrain-referenced navigation",
+    "cross-autoencoder",
+    "template matching",
+    "normalized cross-correlation",
+    "cross-view matching",
+    "benchmark"
+  ],
+  "language": "eng"
+}

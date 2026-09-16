@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: >-
+  If you use this benchmark or code, please cite the article below.
+title: >-
+  Cross-Source Map Benchmark for GNSS-Denied UAV Localization
+type: software
+version: 1.0.0
+date-released: 2026-09-16
+license: MIT
+authors:
+  - family-names: "Arık"
+    given-names: "Ahmet Ertuğrul"
+    affiliation: "Department of Information Systems and Technologies, Kapadokya University, Nevşehir, Türkiye; KÜN Geospatial AI & UAV Lab"
+    email: "ertugrul.arik@kapadokya.edu.tr"
+keywords:
+  - GNSS-denied navigation
+  - UAV localization
+  - terrain-referenced navigation
+  - cross-autoencoder
+  - template matching
+  - normalized cross-correlation
+  - cross-view matching
+  - benchmark
+preferred-citation:
+  type: article
+  title: >-
+    Cross-Autoencoder Structural Representations for GNSS-Denied UAV
+    Localization by Template Matching: Flight Evaluation and a Large-Scale
+    Cross-Source Map Benchmark
+  authors:
+    - family-names: "Arık"
+      given-names: "Ahmet Ertuğrul"
+      affiliation: "Kapadokya University, Nevşehir, Türkiye"
+    - family-names: "Emrahoğlu"
+      given-names: "Nuri"
+      affiliation: "Çukurova University, Adana, Türkiye"
+  journal: "Drones"
+  year: 2026
+  notes: "Submitted; citation details will be updated upon publication."
