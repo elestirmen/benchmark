@@ -1,0 +1,145 @@
+{
+  "model": "_03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__bdb7daa618c0.h5",
+  "model_sha256": "bdb7daa618c04ac7e6913ff6aaa88010be41bda7920d4505a470cf7fe5e75f68",
+  "harita": "C:\\d_surucusu\\visual_navigation\\template-matching\\haritalar\\ana_harita_karlik_30_cm_bingmap_utm__03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__bdb7daa618c0_geo.tif",
+  "anlik": "C:\\d_surucusu\\visual_navigation\\template-matching\\guzergahlar\\guzergah_5_to_karain",
+  "protokol": "eski (sozlesmeler acik)",
+  "kare": 18,
+  "success_25m": 0.6111111111111112,
+  "success_50m": 0.8888888888888888,
+  "success_70m": 1.0,
+  "tm_dogru": 18,
+  "tm_yanlis": 0,
+  "medyan_m": 12.0,
+  "ortalama_m": 21.333333333333332,
+  "sure_s": 132.43908190727234,
+  "kareler": [
+    {
+      "frame": 1,
+      "err_m": 0.0,
+      "tm_score": 0.0742865726351738,
+      "alt": 390,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 2,
+      "err_m": 0.0,
+      "tm_score": 0.07277652621269226,
+      "alt": 393,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 3,
+      "err_m": 31.0,
+      "tm_score": 0.11319402605295181,
+      "alt": 406,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 6,
+      "err_m": 39.0,
+      "tm_score": 0.13247418403625488,
+      "alt": 442,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 7,
+      "err_m": 38.0,
+      "tm_score": 0.1022864505648613,
+      "alt": 454,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 8,
+      "err_m": 35.0,
+      "tm_score": 0.11632382124662399,
+      "alt": 466,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 9,
+      "err_m": 35.0,
+      "tm_score": 0.12715241312980652,
+      "alt": 476,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 10,
+      "err_m": 5.0,
+      "tm_score": 0.15035687386989594,
+      "alt": 483,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 11,
+      "err_m": 8.0,
+      "tm_score": 0.18526360392570496,
+      "alt": 489,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 12,
+      "err_m": 7.0,
+      "tm_score": 0.1761118769645691,
+      "alt": 491,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 13,
+      "err_m": 6.0,
+      "tm_score": 0.1715821921825409,
+      "alt": 498,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 14,
+      "err_m": 11.0,
+      "tm_score": 0.17177897691726685,
+      "alt": 506,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 15,
+      "err_m": 10.0,
+      "tm_score": 0.1659967601299286,
+      "alt": 508,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 16,
+      "err_m": 11.0,
+      "tm_score": 0.1497724950313568,
+      "alt": 512,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 17,
+      "err_m": 12.0,
+      "tm_score": 0.13724066317081451,
+      "alt": 513,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 18,
+      "err_m": 61.0,
+      "tm_score": 0.14301656186580658,
+      "alt": 515,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 19,
+      "err_m": 59.0,
+      "tm_score": 0.20095331966876984,
+      "alt": 515,
+      "model_norm": "HISTEQ_PIL"
+    },
+    {
+      "frame": 20,
+      "err_m": 16.0,
+      "tm_score": 0.2493659406900406,
+      "alt": 514,
+      "model_norm": "HISTEQ_PIL"
+    }
+  ],
+  "max_frames": 20
+}

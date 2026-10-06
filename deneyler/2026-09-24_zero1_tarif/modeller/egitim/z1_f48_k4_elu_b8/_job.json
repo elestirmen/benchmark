@@ -1,0 +1,25 @@
+{
+  "MODEL_TYPE": "flat_bottleneck",
+  "FILTER_COUNT": 48,
+  "KERNEL_SIZE": [
+    4,
+    4
+  ],
+  "STRIDES": [
+    1,
+    1
+  ],
+  "FLAT_DEPTH": 3,
+  "HIDDEN_ACTIVATION": "elu",
+  "OUTPUT_ACTIVATION": "sigmoid",
+  "INPUT_NORMALIZATION": "zero_1",
+  "BATCH_SIZE": 8,
+  "EPOCHS": 20,
+  "LEARNING_RATE": 0.001,
+  "OPTIMIZER": "adam",
+  "LOSS_FUNCTION": "binary_crossentropy",
+  "PRETRAINED_MODEL": null,
+  "EARLY_STOPPING_PATIENCE": 0,
+  "REDUCE_LR_PATIENCE": 0,
+  "name": "z1_f48_k4_elu_b8"
+}

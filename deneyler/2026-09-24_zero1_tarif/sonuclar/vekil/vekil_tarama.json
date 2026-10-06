@@ -1,0 +1,257 @@
+{
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.255,
+   "bing2google/hard_v1": 0.34,
+   "google2bing/clean": 0.36,
+   "google2bing/hard_v1": 0.35,
+   "mean": 0.3262,
+   "n": 800,
+   "s5": 0.275,
+   "region:train_ne": 0.3625,
+   "region:train_nw": 0.29
+  },
+  "seconds": 283.0
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.76,
+   "bing2google/hard_v1": 0.72,
+   "google2bing/clean": 0.765,
+   "google2bing/hard_v1": 0.765,
+   "mean": 0.7525,
+   "n": 800,
+   "s5": 0.6913,
+   "region:train_ne": 0.63,
+   "region:train_nw": 0.875
+  },
+  "seconds": 204.3
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.655,
+   "bing2google/hard_v1": 0.535,
+   "google2bing/clean": 0.665,
+   "google2bing/hard_v1": 0.645,
+   "mean": 0.625,
+   "n": 800,
+   "s5": 0.5563,
+   "region:train_ne": 0.465,
+   "region:train_nw": 0.785
+  },
+  "seconds": 204.3
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1\\keras\\TARAMA_b1_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.67,
+   "bing2google/hard_v1": 0.5,
+   "google2bing/clean": 0.675,
+   "google2bing/hard_v1": 0.585,
+   "mean": 0.6075,
+   "n": 800,
+   "s5": 0.5463,
+   "region:train_ne": 0.455,
+   "region:train_nw": 0.76
+  },
+  "seconds": 287.5
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b8\\keras\\TARAMA_b8_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b8\\keras\\TARAMA_b8_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.28,
+   "bing2google/hard_v1": 0.285,
+   "google2bing/clean": 0.335,
+   "google2bing/hard_v1": 0.305,
+   "mean": 0.3012,
+   "n": 800,
+   "s5": 0.275,
+   "region:train_ne": 0.2675,
+   "region:train_nw": 0.335
+  },
+  "seconds": 357.0
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b8\\keras\\TARAMA_b8_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b8\\keras\\TARAMA_b8_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.285,
+   "bing2google/hard_v1": 0.295,
+   "google2bing/clean": 0.355,
+   "google2bing/hard_v1": 0.31,
+   "mean": 0.3112,
+   "n": 800,
+   "s5": 0.2888,
+   "region:train_ne": 0.28,
+   "region:train_nw": 0.3425
+  },
+  "seconds": 310.8
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b8\\keras\\TARAMA_b8_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b8\\keras\\TARAMA_b8_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.245,
+   "bing2google/hard_v1": 0.255,
+   "google2bing/clean": 0.275,
+   "google2bing/hard_v1": 0.285,
+   "mean": 0.265,
+   "n": 800,
+   "s5": 0.2387,
+   "region:train_ne": 0.2625,
+   "region:train_nw": 0.2675
+  },
+  "seconds": 288.3
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.455,
+   "bing2google/hard_v1": 0.43,
+   "google2bing/clean": 0.63,
+   "google2bing/hard_v1": 0.545,
+   "mean": 0.515,
+   "n": 800,
+   "s5": 0.4612,
+   "region:train_ne": 0.4,
+   "region:train_nw": 0.63
+  },
+  "seconds": 409.0
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.305,
+   "bing2google/hard_v1": 0.26,
+   "google2bing/clean": 0.515,
+   "google2bing/hard_v1": 0.47,
+   "mean": 0.3875,
+   "n": 800,
+   "s5": 0.33,
+   "region:train_ne": 0.3975,
+   "region:train_nw": 0.3775
+  },
+  "seconds": 356.0
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.52,
+   "bing2google/hard_v1": 0.375,
+   "google2bing/clean": 0.575,
+   "google2bing/hard_v1": 0.55,
+   "mean": 0.505,
+   "n": 800,
+   "s5": 0.4537,
+   "region:train_ne": 0.3525,
+   "region:train_nw": 0.6575
+  },
+  "seconds": 890.7
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.57,
+   "bing2google/hard_v1": 0.38,
+   "google2bing/clean": 0.57,
+   "google2bing/hard_v1": 0.54,
+   "mean": 0.515,
+   "n": 800,
+   "s5": 0.45,
+   "region:train_ne": 0.4,
+   "region:train_nw": 0.63
+  },
+  "seconds": 471.1
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_m11_b1\\keras\\TARAMA_m11b1_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.395,
+   "bing2google/hard_v1": 0.285,
+   "google2bing/clean": 0.55,
+   "google2bing/hard_v1": 0.53,
+   "mean": 0.44,
+   "n": 800,
+   "s5": 0.3663,
+   "region:train_ne": 0.395,
+   "region:train_nw": 0.485
+  },
+  "seconds": 277.5
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_tamveri\\keras\\TARAMA_tam_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_tamveri\\keras\\TARAMA_tam_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.805,
+   "bing2google/hard_v1": 0.785,
+   "google2bing/clean": 0.805,
+   "google2bing/hard_v1": 0.84,
+   "mean": 0.8087,
+   "n": 800,
+   "s5": 0.7338,
+   "region:train_ne": 0.72,
+   "region:train_nw": 0.8975
+  },
+  "seconds": 466.6
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_tamveri\\keras\\TARAMA_tam_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_tamveri\\keras\\TARAMA_tam_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.69,
+   "bing2google/hard_v1": 0.505,
+   "google2bing/clean": 0.71,
+   "google2bing/hard_v1": 0.66,
+   "mean": 0.6412,
+   "n": 800,
+   "s5": 0.5763,
+   "region:train_ne": 0.4625,
+   "region:train_nw": 0.82
+  },
+  "seconds": 257.8
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_tamveri\\keras\\TARAMA_tam_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_tamveri\\keras\\TARAMA_tam_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.715,
+   "bing2google/hard_v1": 0.61,
+   "google2bing/clean": 0.68,
+   "google2bing/hard_v1": 0.675,
+   "mean": 0.67,
+   "n": 800,
+   "s5": 0.6138,
+   "region:train_ne": 0.555,
+   "region:train_nw": 0.785
+  },
+  "seconds": 256.4
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f48_k4_elu_z1_b1\\keras\\TARAMA_f48b1_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f48_k4_elu_z1_b1\\keras\\TARAMA_f48b1_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.335,
+   "bing2google/hard_v1": 0.34,
+   "google2bing/clean": 0.375,
+   "google2bing/hard_v1": 0.32,
+   "mean": 0.3425,
+   "n": 800,
+   "s5": 0.3187,
+   "region:train_ne": 0.2725,
+   "region:train_nw": 0.4125
+  },
+  "seconds": 309.5
+ },
+ "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_s7\\keras\\TARAMA_b1s7_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\tarama_f32_k3_elu_z1_b1_s7\\keras\\TARAMA_b1s7_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.655,
+   "bing2google/hard_v1": 0.57,
+   "google2bing/clean": 0.665,
+   "google2bing/hard_v1": 0.65,
+   "mean": 0.635,
+   "n": 800,
+   "s5": 0.5775,
+   "region:train_ne": 0.4725,
+   "region:train_nw": 0.7975
+  },
+  "seconds": 404.8
+ }
+}

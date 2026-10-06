@@ -1,0 +1,38 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-25 10:58:32 - INFO - Model loaded (standard): models_pipeline\20260909_223425\bce_b16\_benchmark_adayi\_JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4.h5
+2026-09-25 10:58:32 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48   0.77  0.70 +0.2261 +0.1734  +0.0527 100.5/150 1.5/300.0    8.1/9.1   
+                                                   gruplar: g2b_clean=0.680  g2b_hard_v1=0.677  b2g_clean=0.828  b2g_hard_v1=0.900
+2026-09-25 10:59:08 - INFO - Model loaded (standard): models_pipeline\20260909_223425\bce_b32\_benchmark_adayi\_JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4.h5
+2026-09-25 10:59:08 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48   0.76  0.80 +0.2936 +0.2219  +0.0717 110.25/150 14.25/300.0    6.8/7.3   
+                                                   gruplar: g2b_clean=0.676  g2b_hard_v1=0.673  b2g_clean=0.842  b2g_hard_v1=0.840
+2026-09-25 11:00:24 - INFO - Model loaded (standard): models_pipeline\20260909_223425\bce_b8\_benchmark_adayi\_JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4.h5
+2026-09-25 11:00:24 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_   0.76  0.80 +0.2919 +0.2205  +0.0714 106.0/150 16.75/300.0    7.6/8.5   
+                                                   gruplar: g2b_clean=0.676  g2b_hard_v1=0.686  b2g_clean=0.815  b2g_hard_v1=0.850
+2026-09-25 11:02:02 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f24_k4\_benchmark_adayi\_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:02:02 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_ep   0.72  1.07 +0.1904 +0.1349  +0.0555 110.75/150 0.0/300.0   18.3/18.9  
+                                                   gruplar: g2b_clean=0.685  g2b_hard_v1=0.632  b2g_clean=0.716  b2g_hard_v1=0.830
+2026-09-25 11:02:55 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f32_k4\_benchmark_adayi\_JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5
+2026-09-25 11:02:55 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5      1.01  0.14 +0.1147 +0.1053  +0.0094 82.75/150 0.0/300.0   13.7/14.6  
+                                                   gruplar: g2b_clean=0.880  g2b_hard_v1=0.748  b2g_clean=0.828  b2g_hard_v1=1.595
+2026-09-25 11:04:09 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_benchmark_adayi\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:04:09 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.72  0.95 +0.2432 +0.1752  +0.0680 112.0/150 0.0/300.0   15.8/17.0  
+                                                   gruplar: g2b_clean=0.679  g2b_hard_v1=0.662  b2g_clean=0.758  b2g_hard_v1=0.794
+2026-09-25 11:05:29 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f64_k4\_benchmark_adayi\_JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:05:29 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_ep   0.86  0.48 +0.1418 +0.1177  +0.0241 92.5/150 0.0/300.0   15.7/16.6  
+                                                   gruplar: g2b_clean=0.782  g2b_hard_v1=0.724  b2g_clean=0.801  b2g_hard_v1=1.124
+2026-09-25 11:07:59 - INFO - Model loaded (standard): deneyler\2026-09-24_zero1_tarif\modeller\adaylar\b1_f32k3_e3\TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:07:59 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+CIKIS_KODU=127

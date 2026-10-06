@@ -1,0 +1,48 @@
+WARNING:tensorflow:5 out of the last 5 calls to <function Model.make_predict_function.<locals>.predict_function at 0x000002148133E830> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+WARNING:tensorflow:6 out of the last 6 calls to <function Model.make_predict_function.<locals>.predict_function at 0x000002148133F250> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+max fark 0.0
+yeniden yukleme fark 0.0 params 134964
+WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+WARNING:tensorflow:5 out of the last 5 calls to <function Model.make_predict_function.<locals>.predict_function at 0x00000140013113F0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+max fark 5.960464477539063e-08
+yeniden yukleme fark 0.0 params 84875
+WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+max fark 0.0
+yeniden yukleme fark 0.0 params 62874
+WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+max fark 0.0
+yeniden yukleme fark 0.0 params 72090
+WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+max fark 0.0
+yeniden yukleme fark 0.0 params 34786
+WARNING:tensorflow:5 out of the last 5 calls to <function Model.make_predict_function.<locals>.predict_function at 0x000001C2024AAF80> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+max fark 0.0
+Traceback (most recent call last):
+  File "C:\d_surucusu\visual_navigation\benchmark\deney_araclari\topluluk.py", line 43, in <module>
+    main()
+  File "C:\d_surucusu\visual_navigation\benchmark\deney_araclari\topluluk.py", line 37, in main
+    ens.save(args.out)
+  File "C:\Users\ertugrul\anaconda3\envs\visual_navigation_cuda\lib\site-packages\keras\utils\traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\ertugrul\anaconda3\envs\visual_navigation_cuda\lib\site-packages\h5py\_hl\group.py", line 183, in create_dataset
+    dsid = dataset.make_new_dset(group, shape, dtype, data, name, **kwds)
+  File "C:\Users\ertugrul\anaconda3\envs\visual_navigation_cuda\lib\site-packages\h5py\_hl\dataset.py", line 163, in make_new_dset
+    dset_id = h5d.create(parent.id, name, tid, sid, dcpl=dcpl, dapl=dapl)
+  File "h5py\_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py\h5d.pyx", line 137, in h5py.h5d.create
+ValueError: Unable to synchronously create dataset (name already exists)
+2026-09-26 04:48:47 BASLA kapi topluluk varyantlari
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.41  x6_bdb7_k323_d6.h5
+  GECTI  oran= 0.41  x4_cb62_bdb7_k323_d6.h5
+  GECTI  oran= 0.41  x7_cb62_k323.h5
+  GECTI  oran= 0.41  x10_x1_tta8tam.h5
+  GECTI  oran= 0.42  x8_cb62_d6.h5
+  GECTI  oran= 0.43  x9_k323_d6.h5
+2026-09-26 05:21:00 BITTI kapi topluluk varyantlari cikis=0
+2026-09-26 05:21:00 BASLA urgup4000_x1_2022_topluluk
+2026-09-26 13:57:39 BITTI urgup4000_x1_2022_topluluk CIKIS_KODU=0
+2026-09-26 13:57:39 SABAH KUYRUGU BITTI

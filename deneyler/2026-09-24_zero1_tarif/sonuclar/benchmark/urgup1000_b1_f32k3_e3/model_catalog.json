@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\_resmi_adaylar\\b1_f32k3_e3",
+  "patterns": [
+    "*.h5",
+    "*.keras",
+    "*.hdf5"
+  ],
+  "max_models": null,
+  "sampling_mode": "full",
+  "stats": {
+    "sampling_mode": "full",
+    "discovered_files": 1,
+    "unique_content_files": 1,
+    "series_count": 1,
+    "sampled_files_before_content_dedup": 1,
+    "selected_models": 1,
+    "identical_files_skipped": 0,
+    "duplicate_name_groups": 0,
+    "conflicting_name_groups": 0
+  },
+  "models": [
+    {
+      "relative_path": "TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+      "sha256": "2351848d782cec4c15de77f8319f9d6c339a507ece5d26558cd52ceafca8162c",
+      "model_id": "TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid__1__1__2351848d782c",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\_resmi_adaylar\\b1_f32k3_e3\\TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5",
+      "size_bytes": 84808,
+      "mtime_ns": 1790208684241027800,
+      "series_id": "tarama_b1_model_f32_k3_epoch__n__helu_osigmoid__1__1__9bd1653d63",
+      "series_key": "./tarama_b1_model_f32_k3_epoch_{n}_helu_osigmoid_(1, 1)_",
+      "checkpoint_number": 3,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "tarama_b1_model_f32_k3_epoch__n__helu_osigmoid__1__1__9bd1653d63:full:TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5"
+      ],
+      "duplicate_paths": []
+    }
+  ]
+}

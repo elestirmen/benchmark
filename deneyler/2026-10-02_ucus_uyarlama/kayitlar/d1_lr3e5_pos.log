@@ -1,0 +1,32 @@
+veri: egitim=1039 dogrulama=306 (17s)
+  1_tezde_ucus_5: {'etiketli': 211, 'yakalanan': 216, 'kaynak': {'x1': 190, '1_tezde_ucus_5_RAW_kimlik': 14, '1_tezde_ucus_5_2022_tpu_f48k4_cb62': 1, '1_tezde_ucus_5_2022_k32_3_e1900': 1, '1_tezde_ucus_5_2022_deneme6_f32k5': 5}}
+  2_tezde_ucus_6: {'etiketli': 118, 'yakalanan': 146, 'kaynak': {'x1': 112, '2_tezde_ucus_6_2022_tpu_f48k4_cb62': 2, '2_tezde_ucus_6_2022_k32_3_e1900': 1, '2_tezde_ucus_6_2022_deneme6_f32k5': 2, '2_tezde_ucus_6_RAW_kimlik': 1}}
+  3_tezde_ucus_7: {'etiketli': 110, 'yakalanan': 135, 'kaynak': {'x1': 93, '3_tezde_ucus_7_2022_deneme6_f32k5': 4, '3_tezde_ucus_7_RAW_kimlik': 7, '3_tezde_ucus_7_2022_k32_3_e1900': 4, '3_tezde_ucus_7_2022_tpu_f48k4_cb62': 2}}
+  4_tezde_ucus_8: {'etiketli': 62, 'yakalanan': 115, 'kaynak': {'x1': 41, '4_tezde_ucus_8_2022_tpu_f48k4_cb62': 6, '4_tezde_ucus_8_2022_k32_3_e1900': 8, '4_tezde_ucus_8_2022_deneme6_f32k5': 4, '4_tezde_ucus_8_RAW_kimlik': 3}}
+  5_tezde_ucus_9: {'etiketli': 105, 'yakalanan': 110, 'kaynak': {'x1': 95, '5_tezde_ucus_9_2022_tpu_f48k4_cb62': 2, '5_tezde_ucus_9_2022_k32_3_e1900': 5, '5_tezde_ucus_9_RAW_kimlik': 3}}
+  guzergah_1: {'etiketli': 68, 'yakalanan': 81, 'kaynak': {'x1': 59, 'guzergah_1_2022_deneme6_f32k5': 4, 'guzergah_1_2022_k32_3_e1900': 3, 'guzergah_1_2022_tpu_f48k4_cb62': 1, 'guzergah_1_RAW_kimlik': 1}}
+  guzergah_1_donus: {'etiketli': 48, 'yakalanan': 54, 'kaynak': {'x1': 41, 'guzergah_1_donus_2022_deneme6_f32k5': 2, 'guzergah_1_donus_RAW_kimlik': 4, 'guzergah_1_donus_2022_k32_3_e1900': 1}}
+  guzergah_2_tezde_ucus_1: {'etiketli': 131, 'yakalanan': 145, 'kaynak': {'x1': 112, 'guzergah_2_tezde_ucus_1_2022_k32_3_e1900': 9, 'guzergah_2_tezde_ucus_1_2022_deneme6_f32k5': 7, 'guzergah_2_tezde_ucus_1_RAW_kimlik': 1, 'guzergah_2_tezde_ucus_1_2022_tpu_f48k4_cb62': 2}}
+  guzergah_3_tezde_ucus_2: {'etiketli': 186, 'yakalanan': 200, 'kaynak': {'x1': 177, 'guzergah_3_tezde_ucus_2_2022_deneme6_f32k5': 3, 'guzergah_3_tezde_ucus_2_2022_k32_3_e1900': 3, 'guzergah_3_tezde_ucus_2_2022_tpu_f48k4_cb62': 2, 'guzergah_3_tezde_ucus_2_RAW_kimlik': 1}}
+  6_tezde_ucus_4: {'etiketli': 155, 'yakalanan': 167, 'kaynak': {'x1': 139, '6_tezde_ucus_4_2022_tpu_f48k4_cb62': 4, '6_tezde_ucus_4_RAW_kimlik': 4, '6_tezde_ucus_4_2022_deneme6_f32k5': 8}}
+  guzergah_4_tezde_ucus_3: {'etiketli': 151, 'yakalanan': 210, 'kaynak': {'guzergah_4_tezde_ucus_3_2022_deneme6_f32k5': 15, 'x1': 112, 'guzergah_4_tezde_ucus_3_RAW_kimlik': 14, 'guzergah_4_tezde_ucus_3_2022_tpu_f48k4_cb62': 3, 'guzergah_4_tezde_ucus_3_2022_k32_3_e1900': 7}}
+epoch 0 (ogretmen) VAL_GPS=0.822 | val_basari=0.882 oran=0.933 ncc=0.310 | egt_basari=0.933 oran=0.910
+  adim 500 VAL_GPS=0.838 | val_basari=0.830 oran=0.936 ncc=0.349 | egt_basari=0.887 oran=0.921
+  adim 1000 VAL_GPS=0.841 | val_basari=0.824 oran=0.936 ncc=0.344 | egt_basari=0.897 oran=0.917
+epoch 1 loss=2.361 VAL_GPS=0.838 | val_basari=0.817 oran=0.939 ncc=0.353 | egt_basari=0.887 oran=0.922 (231s)
+  adim 1500 VAL_GPS=0.841 | val_basari=0.797 oran=0.947 ncc=0.355 | egt_basari=0.877 oran=0.926
+  adim 2000 VAL_GPS=0.836 | val_basari=0.797 oran=0.937 ncc=0.354 | egt_basari=0.897 oran=0.919
+epoch 2 loss=2.283 VAL_GPS=0.838 | val_basari=0.810 oran=0.939 ncc=0.355 | egt_basari=0.890 oran=0.921 (245s)
+  adim 2500 VAL_GPS=0.836 | val_basari=0.807 oran=0.937 ncc=0.353 | egt_basari=0.893 oran=0.917
+  adim 3000 VAL_GPS=0.838 | val_basari=0.807 oran=0.936 ncc=0.354 | egt_basari=0.907 oran=0.918
+epoch 3 loss=2.256 VAL_GPS=0.836 | val_basari=0.804 oran=0.937 ncc=0.355 | egt_basari=0.893 oran=0.918 (270s)
+  adim 3500 VAL_GPS=0.836 | val_basari=0.804 oran=0.938 ncc=0.356 | egt_basari=0.890 oran=0.922
+  adim 4000 VAL_GPS=0.838 | val_basari=0.807 oran=0.940 ncc=0.358 | egt_basari=0.890 oran=0.921
+epoch 4 loss=2.233 VAL_GPS=0.833 | val_basari=0.824 oran=0.938 ncc=0.353 | egt_basari=0.890 oran=0.915 (265s)
+  adim 4500 VAL_GPS=0.836 | val_basari=0.804 oran=0.938 ncc=0.350 | egt_basari=0.897 oran=0.915
+  adim 5000 VAL_GPS=0.841 | val_basari=0.791 oran=0.943 ncc=0.362 | egt_basari=0.893 oran=0.922
+epoch 5 loss=2.218 VAL_GPS=0.838 | val_basari=0.791 oran=0.941 ncc=0.362 | egt_basari=0.893 oran=0.920 (260s)
+  adim 5500 VAL_GPS=0.841 | val_basari=0.807 oran=0.940 ncc=0.362 | egt_basari=0.893 oran=0.917
+  adim 6000 VAL_GPS=0.838 | val_basari=0.801 oran=0.940 ncc=0.357 | egt_basari=0.893 oran=0.919
+epoch 6 loss=2.211 VAL_GPS=0.836 | val_basari=0.804 oran=0.938 ncc=0.362 | egt_basari=0.900 oran=0.920 (260s)
+bitti

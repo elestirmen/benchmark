@@ -1,0 +1,154 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+OpenCV CUDA devices: 0, has TM: False, build CUDA: False, build CUDA line: 
+2026-10-02 08:53:30.016623: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-02 08:53:30.017442: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-02 08:53:30.019970: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-02 08:53:31.069381: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:42] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2026-10-02 08:53:31.069986: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13500 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 5060 Ti, pci bus id: 0000:01:00.0, compute capability: 12.0
+[On isleme] topluluk_x1_2022.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+[On isleme] topluluk_x1_2022.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+(22987, 31656)
+(22987, 31656)
+1096.1160888671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1554.0
+rakım =:  1096.1160888671875
+ucus_yuksekligi = : 483.8839111328125
+yaw = : -79.7
+2026-10-02 08:53:35.414917: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+(512, 512)
+TemplateMatching backend: CPU
+(4489, 4489)
+-1000000000.0 0.3472166955471039 (0, 0) (2265, 2271)
+konum:  (18945, 15667, 122, 128)
+uzaklik = 0.009 km
+[1/8] ERR=9m  ACC=100.0%  TM=0.347  LOC_SPD=0.00m/s  OF_SPD=0.00m/s (warmup) t=5.20s
+Kodun calisma suresi___________________________________________: 5.28 saniye
+1 / 8      dogru_tahmin: ,1,  yanlis_tahmin: ,0,  dogru pozitif: 1,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1098.2879638671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1098.2879638671875
+ucus_yuksekligi = : 482.7120361328125
+yaw = : -80.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4121626913547516 (0, 0) (2265, 2271)
+konum:  (18702, 15640, 126, 117)
+uzaklik = 0.008 km
+[2/8] ERR=8m  ACC=100.0%  TM=0.412  LOC_SPD=8.89m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.87s
+Kodun calisma suresi___________________________________________: 0.95 saniye
+2 / 8      dogru_tahmin: ,2,  yanlis_tahmin: ,0,  dogru pozitif: 2,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1098.1533203125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1098.1533203125
+ucus_yuksekligi = : 484.8466796875
+yaw = : -80.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.36535754799842834 (0, 0) (2259, 2260)
+konum:  (18490, 15603, 124, 118)
+uzaklik = 0.008 km
+[3/8] ERR=8m  ACC=100.0%  TM=0.365  LOC_SPD=12.80m/s  OF_SPD=13.51m/s t=0.83s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+3 / 8      dogru_tahmin: ,3,  yanlis_tahmin: ,0,  dogru pozitif: 3,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1097.8304443359375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1558.0
+rakım =:  1097.8304443359375
+ucus_yuksekligi = : 486.1695556640625
+yaw = : -79.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3273390531539917 (0, 0) (2258, 2250)
+konum:  (18347, 15558, 127, 130)
+uzaklik = 0.005 km
+[4/8] ERR=5m  ACC=100.0%  TM=0.327  LOC_SPD=13.91m/s  OF_SPD=15.06m/s t=0.77s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+4 / 8      dogru_tahmin: ,4,  yanlis_tahmin: ,0,  dogru pozitif: 4,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1083.523193359375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1083.523193359375
+ucus_yuksekligi = : 498.476806640625
+yaw = : 102.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.25008881092071533 (0, 0) (2237, 2183)
+konum:  (15773, 14466, 288, 322)
+uzaklik = 0.059 km
+[5/8] ERR=58m  ACC=100.0%  TM=0.250  LOC_SPD=11.50m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+5 / 8      dogru_tahmin: ,5,  yanlis_tahmin: ,0,  dogru pozitif: 5,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1084.4786376953125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1084.4786376953125
+ucus_yuksekligi = : 497.5213623046875
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3494938611984253 (0, 0) (2242, 2186)
+konum:  (16191, 14699, 106, 121)
+uzaklik = 0.018 km
+[6/8] ERR=18m  ACC=100.0%  TM=0.349  LOC_SPD=16.27m/s  OF_SPD=17.08m/s t=0.74s
+Kodun calisma suresi___________________________________________: 0.82 saniye
+6 / 8      dogru_tahmin: ,6,  yanlis_tahmin: ,0,  dogru pozitif: 6,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1083.16162109375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1083.16162109375
+ucus_yuksekligi = : 497.83837890625
+yaw = : 101.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2938164472579956 (0, 0) (2242, 2199)
+konum:  (16397, 14748, 118, 120)
+uzaklik = 0.014 km
+[7/8] ERR=13m  ACC=100.0%  TM=0.294  LOC_SPD=12.58m/s  OF_SPD=13.36m/s t=0.75s
+Kodun calisma suresi___________________________________________: 0.82 saniye
+7 / 8      dogru_tahmin: ,7,  yanlis_tahmin: ,0,  dogru pozitif: 7,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1084.8865966796875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1084.8865966796875
+ucus_yuksekligi = : 496.1134033203125
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31279605627059937 (0, 0) (2236, 2209)
+konum:  (16593, 14793, 126, 119)
+uzaklik = 0.011 km
+[8/8] ERR=10m  ACC=100.0%  TM=0.313  LOC_SPD=15.36m/s  OF_SPD=16.02m/s t=0.73s
+Kodun calisma suresi___________________________________________: 0.81 saniye
+8 / 8      dogru_tahmin: ,8,  yanlis_tahmin: ,0,  dogru pozitif: 8,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+dogru tahmin =  8
+yanlış tahmin =  0
+yanlış pozitif =  0
+doğruluk yüzdesi: 100.00
+UCUS topluluk_x1_2022.h5: kare=8 <=70m=1.0 <=25m=0.875 medyan=10.0

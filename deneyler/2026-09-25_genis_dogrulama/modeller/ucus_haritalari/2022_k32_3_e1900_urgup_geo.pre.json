@@ -1,0 +1,10 @@
+{
+  "input_normalization": "minus1_1",
+  "enhancement": "none",
+  "protokol": "F1",
+  "color_mode": "grayscale",
+  "image_size": 544,
+  "model": "2022_k32_3_e1900.h5",
+  "source_image": "urgup_bingmap_utm_30_cm.tif",
+  "produced_by": "deney_araclari/ucus_testi.py harita"
+}

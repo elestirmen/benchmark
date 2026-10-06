@@ -1,0 +1,9 @@
+{
+  "input_normalization": "minus1_1",
+  "enhancement": "none",
+  "color_mode": "grayscale",
+  "image_size": 544,
+  "model": "2022_deneme6_f32k5.h5",
+  "source_image": "karlik_30_cm_bingmap_utm.tif",
+  "produced_by": "deney_araclari/ucus_testi.py harita"
+}

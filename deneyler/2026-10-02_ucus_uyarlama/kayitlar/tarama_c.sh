@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Tarama C: B ile ayni + negatiflerden +-10 px halka cikarildi (--ignore 10). 3 epoch, 250 adimda bir dogrulama.
+
+BENCH=/c/d_surucusu/visual_navigation/benchmark
+D=$BENCH/deneyler/2026-10-02_ucus_uyarlama
+R=C:/d_surucusu/visual_navigation/benchmark/deneyler/2026-09-25_genis_dogrulama/kayitlar/ucus_rotalar
+ENVT=/c/Users/ertugrul/anaconda3/envs/adaf
+cd "$BENCH/deney_araclari" || exit 1
+O=$D/modeller/ogretmen
+EGITIM=(1_tezde_ucus_5 2_tezde_ucus_6 3_tezde_ucus_7 4_tezde_ucus_8 5_tezde_ucus_9
+  guzergah_1 guzergah_1_donus guzergah_2_tezde_ucus_1 guzergah_3_tezde_ucus_2)
+DOGRULAMA=(6_tezde_ucus_4 guzergah_4_tezde_ucus_3)
+kos() {
+  local name=$1; shift
+  "$ENVT/python.exe" -u ucus_uyarlama_egitim.py --veri "$D/veri" --out-dir "$D/modeller/egitim/$name" \
+    --ogretmen "$O/x1_uye0.npz" "$O/x1_uye1.npz" "$O/x1_uye2.npz" \
+    --egitim "${EGITIM[@]}" --dogrulama "${DOGRULAMA[@]}" --epochs 3 --eval-every 250 --ignore 10 --pos-weight 0 \
+    --diger-kayitlar "$R/{rota}_2022_*.log" "$R/{rota}_RAW_kimlik.log" "$@" > "$D/kayitlar/$name.log" 2>&1
+  echo "$(date '+%F %T') BITTI $name" >> "$D/kayitlar/tarama_c.log"
+}
+( kos c1_lr1e5 --lr 1e-5; kos c3_lr1e5_tau05 --lr 1e-5 --tau 0.05 ) &
+( kos c2_lr3e5 --lr 3e-5; kos c4_lr1e5_capa --lr 1e-5 --anchor 1.0 ) &
+wait
+echo "$(date '+%F %T') TARAMA C BITTI" >> "$D/kayitlar/tarama_c.log"

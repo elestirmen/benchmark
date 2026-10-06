@@ -82,8 +82,11 @@ def probe(name, **overrides):
 def build_probe_jobs(epochs):
     """Repro konfigurasyonundan yalniz lr ve batch ekseninde ayril."""
     jobs = [
-        # Kontrol: mevcut sweep ayari. Coktugu biliniyor; ayni butce ve ayni
+        # Kontrol: guncel sweep ayari (2026-09-24'ten beri batch 1; bkz.
+        # end_to_end_pipeline NEDEN BU SWEEP BOYLE). Ayni butce ve ayni
         # olcumle tekrar edilmesi diger satirlarin yorumlanmasini saglar.
+        probe("lr1e-3_b1", LEARNING_RATE=0.001, BATCH_SIZE=1),
+        # Eski sweep ayari (batch 2); coktugu biliniyor.
         probe("lr1e-3_b2", LEARNING_RATE=0.001, BATCH_SIZE=2),
         # lr'yi dusurmek, batch 2'nin gradyan gurultusunu telafi eden en ucuz
         # mudahaledir.
@@ -102,7 +105,9 @@ def build_probe_jobs(epochs):
 def estimate_probe_minutes(job):
     """Batch buyudukce epoch basina sure duser; olcum f48/k4/batch2'den."""
     per_epoch = pipeline.estimate_minutes_per_epoch(job)
-    batch_speedup = math.sqrt(int(job["BATCH_SIZE"]) / 2.0)
+    # batch 1'in epoch suresi zaten ayri olculdu (MEASURED_B1_MINUTES_PER_EPOCH);
+    # hizlanma duzeltmesi yalniz batch 2 olcumunden turetilen isler icindir.
+    batch_speedup = 1.0 if int(job["BATCH_SIZE"]) == 1 else math.sqrt(int(job["BATCH_SIZE"]) / 2.0)
     train = per_epoch * int(job["EPOCHS"]) / batch_speedup
     gate = (int(job["EPOCHS"]) + 1) * 0.35  # 20 ornekle kapi ~20 sn/checkpoint
     return train + gate

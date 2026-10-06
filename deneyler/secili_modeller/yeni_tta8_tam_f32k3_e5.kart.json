@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "yeni_tta8_tam_f32k3_e5",
+  "aciklama": "Yeni soyun en iyisi (2026-09-26): tam e5 x 8 dihedral donusum TTA (cekirdek donusumuyle tek h5). Urgup 1000 sorgu global 0.673 (TTA'siz 0.564, RAW 0.461). Kapi 0.482. Adana 0.922.",
+  "tarif": "egitimsiz: deney_araclari/yansima_toplulugu.py --transforms id,fliplr,flipud,rot180,rot90,rot270,transpose,antitranspose",
+  "kaynak_deney": "2026-09-25_parametre_arama",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\tta\\tta8_tam_e5.h5",
+  "raf_dosyasi": "yeni_tta8_tam_f32k3_e5.h5",
+  "sha256": "19c8d9c4c4911c26fe86d6d69c65138fdf602ace993107665b387bd7db0e9718",
+  "rafa_eklenme": "2026-09-26T05:24:03"
+}

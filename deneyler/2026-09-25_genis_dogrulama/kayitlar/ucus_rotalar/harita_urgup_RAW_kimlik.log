@@ -1,0 +1,30 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:40:47.443103: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-01 20:40:47.457892: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-01 20:40:47.462290: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-01 20:40:48.521651: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13500 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 5060 Ti, pci bus id: 0000:01:00.0, compute capability: 12.0
+2026-10-01 20:40:48 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus\RAW_kimlik.h5
+2026-10-01 20:40:48 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+2026-10-01 20:40:48 - INFO - BAŞLADI | Streaming model map | RAW_kimlik.h5
+2026-10-01 20:40:48 - WARNING - CPLE_FileIO in Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:40:48 - WARNING - CPLE_FileIO in Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:40:48 - WARNING - CPLE_FileIO in Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:40:49.415529: I tensorflow/stream_executor/cuda/cuda_blas.cc:1614] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+2026-10-01 20:40:49 - INFO - İLK GPU BATCH HAZIR | model=RAW_kimlik | batch=8 | süre=0.84 sn | CUDA bağlamı, PTX yükleme/JIT ve TensorFlow graph hazırlığı dahil olabilir
+2026-10-01 20:40:51 - INFO - Harita işleniyor | RAW_kimlik | batch 34/349 (%9)
+2026-10-01 20:40:54 - INFO - Harita işleniyor | RAW_kimlik | batch 68/349 (%19)
+2026-10-01 20:40:56 - INFO - Harita işleniyor | RAW_kimlik | batch 102/349 (%29)
+2026-10-01 20:40:59 - INFO - Harita işleniyor | RAW_kimlik | batch 136/349 (%38)
+2026-10-01 20:41:02 - INFO - Harita işleniyor | RAW_kimlik | batch 170/349 (%48)
+2026-10-01 20:41:05 - INFO - Harita işleniyor | RAW_kimlik | batch 204/349 (%58)
+2026-10-01 20:41:08 - INFO - Harita işleniyor | RAW_kimlik | batch 238/349 (%68)
+2026-10-01 20:41:11 - INFO - Harita işleniyor | RAW_kimlik | batch 272/349 (%77)
+2026-10-01 20:41:14 - INFO - Harita işleniyor | RAW_kimlik | batch 306/349 (%87)
+2026-10-01 20:41:17 - INFO - Harita işleniyor | RAW_kimlik | batch 340/349 (%97)
+2026-10-01 20:41:23 - WARNING - CPLE_FileIO in Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:41:23 - WARNING - CPLE_FileIO in Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:41:23 - WARNING - CPLE_FileIO in Cannot find header.dxf (GDAL_DATA is not defined)
+2026-10-01 20:41:23 - INFO - TAMAMLANDI | Streaming model map | RAW_kimlik.h5 | süre=34.88 sn
+2026-10-01 20:41:23 - INFO - STREAMING MAP READY | tiles=2790 | intermediate_png=0 | seconds=34.88
+HARITA C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus_haritalari\RAW_kimlik_urgup_geo.tif  (35 s)

@@ -1,0 +1,62 @@
+{
+ "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00002_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.26,
+   "bing2google/hard_v1": 0.26,
+   "google2bing/clean": 0.28,
+   "google2bing/hard_v1": 0.275,
+   "mean": 0.2688,
+   "n": 800,
+   "s5": 0.2462,
+   "region:train_ne": 0.255,
+   "region:train_nw": 0.2825
+  },
+  "seconds": 498.8
+ },
+ "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00004_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.41,
+   "bing2google/hard_v1": 0.465,
+   "google2bing/clean": 0.365,
+   "google2bing/hard_v1": 0.465,
+   "mean": 0.4263,
+   "n": 800,
+   "s5": 0.355,
+   "region:train_ne": 0.48,
+   "region:train_nw": 0.3725
+  },
+  "seconds": 432.7
+ },
+ "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.34,
+   "bing2google/hard_v1": 0.355,
+   "google2bing/clean": 0.355,
+   "google2bing/hard_v1": 0.41,
+   "mean": 0.365,
+   "n": 800,
+   "s5": 0.3212,
+   "region:train_ne": 0.4875,
+   "region:train_nw": 0.2425
+  },
+  "seconds": 1190.5
+ },
+ "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "C:/d_surucusu/visual_navigation/benchmark/models_pipeline/zero1_deneyleri/z1_f48_k4_elu_b8/_JOB_z1_f48_k4_elu_b8_23_09_2026__23_46_model_f48_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.215,
+   "bing2google/hard_v1": 0.225,
+   "google2bing/clean": 0.25,
+   "google2bing/hard_v1": 0.295,
+   "mean": 0.2462,
+   "n": 800,
+   "s5": 0.2175,
+   "region:train_ne": 0.37,
+   "region:train_nw": 0.1225
+  },
+  "seconds": 446.4
+ }
+}

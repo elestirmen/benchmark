@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\adaylar\\x1_2022_topluluk",
+  "patterns": [
+    "*.h5",
+    "*.keras",
+    "*.hdf5"
+  ],
+  "max_models": null,
+  "sampling_mode": "full",
+  "stats": {
+    "sampling_mode": "full",
+    "discovered_files": 1,
+    "unique_content_files": 1,
+    "series_count": 1,
+    "sampled_files_before_content_dedup": 1,
+    "selected_models": 1,
+    "identical_files_skipped": 0,
+    "duplicate_name_groups": 0,
+    "conflicting_name_groups": 0
+  },
+  "models": [
+    {
+      "relative_path": "x1_2022_tpu_k323_d6.h5",
+      "sha256": "d7bc263a7909d659c968c2391617b1c3cabd9d069b0f724df065f019a3d543ca",
+      "model_id": "x1_2022_tpu_k323_d6__d7bc263a7909",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\adaylar\\x1_2022_topluluk\\x1_2022_tpu_k323_d6.h5",
+      "size_bytes": 400840,
+      "mtime_ns": 1790325579573610700,
+      "series_id": "x1_2022_tpu_k323_d6__6d5ed40ec6",
+      "series_key": "./x1_2022_tpu_k323_d6",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "x1_2022_tpu_k323_d6__6d5ed40ec6:full:x1_2022_tpu_k323_d6.h5"
+      ],
+      "duplicate_paths": []
+    }
+  ]
+}

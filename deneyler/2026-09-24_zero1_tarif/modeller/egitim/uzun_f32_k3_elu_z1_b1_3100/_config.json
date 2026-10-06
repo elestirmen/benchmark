@@ -1,0 +1,18 @@
+{
+  "out_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\uzun_f32_k3_elu_z1_b1_3100",
+  "data_dir": "E:\\temp\\tez__ayna\\python_calismalar\\larger-google-sat2maps-dataset\\islenmis\\sonuclar_19",
+  "filters": 32,
+  "kernel": 3,
+  "depth": 3,
+  "hidden": "elu",
+  "norm": "zero_1",
+  "batch": 1,
+  "lr": 0.001,
+  "epochs": 60,
+  "save_epochs": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60",
+  "seed": 42,
+  "amp": false,
+  "max_train": 3100,
+  "max_files": 0,
+  "no_filter": true
+}

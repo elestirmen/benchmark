@@ -142,6 +142,8 @@ STATUS_COLUMNS = [
     "HIDDEN_ACTIVATION",
     "OUTPUT_ACTIVATION",
     "LOSS_FUNCTION",
+    "INPUT_NORMALIZATION",
+    "BATCH_SIZE",
     "EPOCHS",
     "estimated_hours",
 ]
@@ -157,6 +159,8 @@ STATUS_HEADERS = {
     "HIDDEN_ACTIVATION": "Gizli akt.",
     "OUTPUT_ACTIVATION": "Çıkış akt.",
     "LOSS_FUNCTION": "Kayıp",
+    "INPUT_NORMALIZATION": "Giriş norm.",
+    "BATCH_SIZE": "Batch",
     "EPOCHS": "Epoch",
     "estimated_hours": "Tahmini saat",
 }

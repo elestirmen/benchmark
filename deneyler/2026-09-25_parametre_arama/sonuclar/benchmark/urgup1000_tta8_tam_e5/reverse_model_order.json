@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-09-26T00:13:41+00:00",
+  "target_direction": "urgup_cevresi_bingmap_utm_30cm__TO__urgup_cevresi_gmap_utm_30cm",
+  "source_direction": "urgup_cevresi_gmap_utm_30cm__TO__urgup_cevresi_bingmap_utm_30cm",
+  "ranking_rule": [
+    "mean_success_25m_desc",
+    "mean_auc_25m_desc",
+    "mean_median_error_m_asc",
+    "model_id_asc"
+  ],
+  "complete_source_groups_required": 12,
+  "models": [
+    {
+      "model_id": "tta8_tam_e5__19c8d9c4c491",
+      "model_file": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\adaylar\\tta8_tam_e5\\tta8_tam_e5.h5",
+      "source_direction": "urgup_cevresi_gmap_utm_30cm__TO__urgup_cevresi_bingmap_utm_30cm",
+      "source_group_count": 12,
+      "expected_group_count": 12,
+      "catalog_position": 1,
+      "ranking_status": "scored_complete_source_direction",
+      "missing_groups": [],
+      "mean_success_25m": 0.7665000000000001,
+      "mean_auc_25m": 0.6587333346201948,
+      "mean_median_error_m": 3.9539605568475023,
+      "reverse_scan_position": 1
+    }
+  ]
+}

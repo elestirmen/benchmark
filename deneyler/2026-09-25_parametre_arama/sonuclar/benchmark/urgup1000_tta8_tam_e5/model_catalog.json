@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\adaylar\\tta8_tam_e5",
+  "patterns": [
+    "*.h5",
+    "*.keras",
+    "*.hdf5"
+  ],
+  "max_models": null,
+  "sampling_mode": "full",
+  "stats": {
+    "sampling_mode": "full",
+    "discovered_files": 1,
+    "unique_content_files": 1,
+    "series_count": 1,
+    "sampled_files_before_content_dedup": 1,
+    "selected_models": 1,
+    "identical_files_skipped": 0,
+    "duplicate_name_groups": 0,
+    "conflicting_name_groups": 0
+  },
+  "models": [
+    {
+      "relative_path": "tta8_tam_e5.h5",
+      "sha256": "19c8d9c4c4911c26fe86d6d69c65138fdf602ace993107665b387bd7db0e9718",
+      "model_id": "tta8_tam_e5__19c8d9c4c491",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\adaylar\\tta8_tam_e5\\tta8_tam_e5.h5",
+      "size_bytes": 574592,
+      "mtime_ns": 1790325545759392100,
+      "series_id": "tta8_tam_e5__86070f4cde",
+      "series_key": "./tta8_tam_e5",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "tta8_tam_e5__86070f4cde:full:tta8_tam_e5.h5"
+      ],
+      "duplicate_paths": []
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "model": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\secili_modeller\\2022_tpu_f48k4_cb62.h5",
+  "elapsed_seconds": 237.56362980001722,
+  "created_at_utc": "2026-09-25T09:59:23+00:00",
+  "pipeline": "streaming_v1",
+  "intermediate_png_count": 0
+}

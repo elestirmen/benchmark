@@ -1,0 +1,11 @@
+2026-10-02 22:09:58 TEST d2_s1000 6_tezde_ucus_4
+d2_s1000 6_tezde_ucus_4 UCUS d2_s1000.h5: kare=167 <=70m=0.9700598802395209 <=25m=0.9161676646706587 medyan=11.0
+2026-10-02 22:14:13 TEST d2_s1000 guzergah_4_tezde_ucus_3
+d2_s1000 guzergah_4_tezde_ucus_3 UCUS d2_s1000.h5: kare=210 <=70m=0.9142857142857143 <=25m=0.6047619047619047 medyan=22.0
+2026-10-02 22:19:04 BIRINCIL ADAY (Karlik testi oncesi sabitlendi): d2_s1000 = d2_lr3e5/step_001000
+2026-10-02 22:19:04 TEST d2_s1000 guzergah_5_to_karain
+d2_s1000 guzergah_5_to_karain UCUS d2_s1000.h5: kare=191 <=70m=0.8481675392670157 <=25m=0.7277486910994765 medyan=10.0
+2026-10-02 22:24:29 TEST d2_s1000 guzergah_6_to_tagar
+d2_s1000 guzergah_6_to_tagar UCUS d2_s1000.h5: kare=130 <=70m=0.7846153846153846 <=25m=0.6538461538461539 medyan=15.0
+2026-10-02 22:27:48 TEST d2_s1000 guzergah_7_to_gurlevek
+d2_s1000 guzergah_7_to_gurlevek UCUS d2_s1000.h5: kare=144 <=70m=0.7638888888888888 <=25m=0.5069444444444444 medyan=24.0

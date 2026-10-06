@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri",
+  "patterns": [
+    "*.h5",
+    "*.keras",
+    "*.hdf5"
+  ],
+  "max_models": null,
+  "sampling_mode": "full",
+  "stats": {
+    "sampling_mode": "full",
+    "discovered_files": 8,
+    "unique_content_files": 8,
+    "series_count": 8,
+    "sampled_files_before_content_dedup": 8,
+    "selected_models": 8,
+    "identical_files_skipped": 0,
+    "duplicate_name_groups": 0,
+    "conflicting_name_groups": 0
+  },
+  "models": [
+    {
+      "relative_path": "2022_deneme6_f32k5.h5",
+      "sha256": "b48bdc1ed522c201197188905c87964f1aa42d31fcd03b796583a8ed9cfa457a",
+      "model_id": "2022_deneme6_f32k5__b48bdc1ed522",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\2022_deneme6_f32k5.h5",
+      "size_bytes": 329248,
+      "mtime_ns": 1665134728000000000,
+      "series_id": "2022_deneme6_f32k5__6125d4ae04",
+      "series_key": "./2022_deneme6_f32k5",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "2022_deneme6_f32k5__6125d4ae04:full:2022_deneme6_f32k5.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "2022_k32_3_e1900.h5",
+      "sha256": "f7ba9bc4d7bbda63096e23db7738f1e4c9798c0072b0ab8135bfc1f5b1f9253d",
+      "model_id": "2022_k32_3_e1900__f7ba9bc4d7bb",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\2022_k32_3_e1900.h5",
+      "size_bytes": 220984,
+      "mtime_ns": 1646872000000000000,
+      "series_id": "2022_k32_3_e1900__adf825a63d",
+      "series_key": "./2022_k32_3_e1900",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "2022_k32_3_e1900__adf825a63d:full:2022_k32_3_e1900.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "2022_tpu_f48k4_cb62.h5",
+      "sha256": "cb62bfb86ad05abb0e29ce0a84ae4b98916953f1e6ac0e93967e6136603c0229",
+      "model_id": "2022_tpu_f48k4_cb62__cb62bfb86ad0",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\2022_tpu_f48k4_cb62.h5",
+      "size_bytes": 665600,
+      "mtime_ns": 1649395902000000000,
+      "series_id": "2022_tpu_f48k4_cb62__55fc38014a",
+      "series_key": "./2022_tpu_f48k4_cb62",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "2022_tpu_f48k4_cb62__55fc38014a:full:2022_tpu_f48k4_cb62.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "tta8_tam_e5.h5",
+      "sha256": "19c8d9c4c4911c26fe86d6d69c65138fdf602ace993107665b387bd7db0e9718",
+      "model_id": "tta8_tam_e5__19c8d9c4c491",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\tta8_tam_e5.h5",
+      "size_bytes": 574592,
+      "mtime_ns": 1790325545759392100,
+      "series_id": "tta8_tam_e5__86070f4cde",
+      "series_key": "./tta8_tam_e5",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "tta8_tam_e5__86070f4cde:full:tta8_tam_e5.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "x1_2022_tpu_k323_d6.h5",
+      "sha256": "d7bc263a7909d659c968c2391617b1c3cabd9d069b0f724df065f019a3d543ca",
+      "model_id": "x1_2022_tpu_k323_d6__d7bc263a7909",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\x1_2022_tpu_k323_d6.h5",
+      "size_bytes": 400840,
+      "mtime_ns": 1790325579573610700,
+      "series_id": "x1_2022_tpu_k323_d6__6d5ed40ec6",
+      "series_key": "./x1_2022_tpu_k323_d6",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "x1_2022_tpu_k323_d6__6d5ed40ec6:full:x1_2022_tpu_k323_d6.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "yeni_pipeline_z1_f32k3_e9.h5",
+      "sha256": "7815ed362b0c41a7e4ca658bf158d95506b49879036103741fedbeebbb303b73",
+      "model_id": "yeni_pipeline_z1_f32k3_e9__7815ed362b0c",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\yeni_pipeline_z1_f32k3_e9.h5",
+      "size_bytes": 222400,
+      "mtime_ns": 1790224942401270400,
+      "series_id": "yeni_pipeline_z1_f32k3_e9__67db5bac09",
+      "series_key": "./yeni_pipeline_z1_f32k3_e9",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "yeni_pipeline_z1_f32k3_e9__67db5bac09:full:yeni_pipeline_z1_f32k3_e9.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "yeni_tam_f32k3_e5.h5",
+      "sha256": "0a42a6027ba8d11fd971004929dc315074a2940cd9edf139eec83b5f8b6715fc",
+      "model_id": "yeni_tam_f32k3_e5__0a42a6027ba8",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\yeni_tam_f32k3_e5.h5",
+      "size_bytes": 84808,
+      "mtime_ns": 1790212408728288400,
+      "series_id": "yeni_tam_f32k3_e5__d5453c89fb",
+      "series_key": "./yeni_tam_f32k3_e5",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "yeni_tam_f32k3_e5__d5453c89fb:full:yeni_tam_f32k3_e5.h5"
+      ],
+      "duplicate_paths": []
+    },
+    {
+      "relative_path": "yeni_topluluk3.h5",
+      "sha256": "2df6587fa2e9d6e40c2f40f3ec0345936eeca7da841083386b478ae59f6c2373",
+      "model_id": "yeni_topluluk3__2df6587fa2e9",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\adana_modelleri\\yeni_topluluk3.h5",
+      "size_bytes": 220216,
+      "mtime_ns": 1790222209171489900,
+      "series_id": "yeni_topluluk3__f9a7ed95b4",
+      "series_key": "./yeni_topluluk3",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "yeni_topluluk3__f9a7ed95b4:full:yeni_topluluk3.h5"
+      ],
+      "duplicate_paths": []
+    }
+  ]
+}

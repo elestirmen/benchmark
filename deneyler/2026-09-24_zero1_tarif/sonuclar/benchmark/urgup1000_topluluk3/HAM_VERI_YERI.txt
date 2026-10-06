@@ -1,0 +1,2 @@
+Ham veri (results.jsonl, sorgu karolari, benchmark.log) tasinamadi (klasor baska bir surec tarafindan kilitliydi) ve yerinde duruyor:
+C:\d_surucusu\visual_navigation\benchmark\outputs\zero1_deneyleri\topluluk3

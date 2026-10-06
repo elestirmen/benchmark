@@ -1,0 +1,8 @@
+veri: egitim=5211 dogrulama=672 (77s)
+epoch 1 lr=0.001 loss=0.4698 val_loss=0.4335 ema_val=0.4455 (193s)
+epoch 2 lr=0.001 loss=0.4599 val_loss=0.4300 ema_val=0.4389 (169s)
+epoch 3 lr=0.001 loss=0.4410 val_loss=0.4138 ema_val=0.4257 (151s)
+epoch 4 lr=0.001 loss=0.4252 val_loss=0.4060 ema_val=0.4060 (149s)
+epoch 5 lr=0.001 loss=0.4184 val_loss=0.3973 ema_val=0.3947 (172s)
+epoch 6 lr=0.001 loss=0.4164 val_loss=0.3898 ema_val=0.3895 (189s)
+CIKIS_KODU=127

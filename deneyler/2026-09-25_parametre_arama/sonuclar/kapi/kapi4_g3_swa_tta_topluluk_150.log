@@ -1,0 +1,103 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-25 15:16:54 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\karma_f32_k53_z1_b1_tam\keras\SWA_karma_swa_model_f32_k53_epoch_e03-12_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:16:54 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_karma_swa_model_f32_k53_epoch_e03-12_helu_osig   0.82  0.62 +0.1975 +0.1615  +0.0360 97.75/150 0.0/300.0   15.1/16.3  
+                                                   gruplar: g2b_clean=0.777  g2b_hard_v1=0.807  b2g_clean=0.799  b2g_hard_v1=0.898
+2026-09-25 15:19:27 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\tam_f32_k3_elu_z1_b1_s1\keras\SWA_s1_swa_model_f32_k3_epoch_e03-12_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:19:27 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_s1_swa_model_f32_k3_epoch_e03-12_helu_osigmoid   0.77  0.76 +0.1951 +0.1497  +0.0454 97.0/150 0.0/300.0   17.2/18.6  
+                                                   gruplar: g2b_clean=0.694  g2b_hard_v1=0.750  b2g_clean=0.758  b2g_hard_v1=0.883
+2026-09-25 15:21:20 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\tam_f32_k3_elu_z1_b1_s1\keras\SWA_s1_swa_model_f32_k3_epoch_e06-12_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:21:20 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_s1_swa_model_f32_k3_epoch_e06-12_helu_osigmoid   0.70  1.16 +0.1934 +0.1342  +0.0592 102.5/150 0.0/300.0   16.5/18.1  
+                                                   gruplar: g2b_clean=0.631  g2b_hard_v1=0.684  b2g_clean=0.669  b2g_hard_v1=0.809
+2026-09-25 15:23:15 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\tam_f32_k3_elu_z1_b1_s2\keras\SWA_s2_swa_model_f32_k3_epoch_e03-12_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:23:15 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_s2_swa_model_f32_k3_epoch_e03-12_helu_osigmoid   0.60  1.69 +0.2559 +0.1522  +0.1037 121.5/150 0.0/300.0   19.1/20.5  
+                                                   gruplar: g2b_clean=0.545  g2b_hard_v1=0.605  b2g_clean=0.564  b2g_hard_v1=0.686
+2026-09-25 15:25:06 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\tam_f32_k3_elu_z1_b1_s2\keras\SWA_s2_swa_model_f32_k3_epoch_e06-12_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:25:06 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_s2_swa_model_f32_k3_epoch_e06-12_helu_osigmoid   0.63  1.50 +0.2451 +0.1538  +0.0913 115.75/150 0.0/300.0   19.8/21.1  
+                                                   gruplar: g2b_clean=0.576  g2b_hard_v1=0.624  b2g_clean=0.608  b2g_hard_v1=0.721
+2026-09-25 15:26:57 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\tarama_f32_k3_elu_z1_b1_tamveri\keras\SWA_tam_swa_model_f32_k3_epoch_e02-06_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:26:57 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_tam_swa_model_f32_k3_epoch_e02-06_helu_osigmoi   0.60  1.78 +0.1951 +0.1171  +0.0780 112.25/150 0.0/300.0   17.1/19.0  
+                                                   gruplar: g2b_clean=0.570  g2b_hard_v1=0.593  b2g_clean=0.568  b2g_hard_v1=0.683
+2026-09-25 15:28:49 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\tarama_f32_k3_elu_z1_b1_tamveri\keras\SWA_tam_swa_model_f32_k3_epoch_e03-06_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:28:49 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_tam_swa_model_f32_k3_epoch_e03-06_helu_osigmoi   0.60  1.72 +0.1808 +0.1081  +0.0726 111.25/150 0.0/300.0   17.0/18.9  
+                                                   gruplar: g2b_clean=0.564  g2b_hard_v1=0.595  b2g_clean=0.558  b2g_hard_v1=0.693
+2026-09-25 15:30:40 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\uzun_f32_k3_elu_z1_b1_3100\keras\SWA_uzun_swa_model_f32_k3_epoch_e20-60_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:30:40 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_uzun_swa_model_f32_k3_epoch_e20-60_helu_osigmo   0.56  2.08 +0.2073 +0.1162  +0.0911 115.75/150 0.0/300.0   15.0/16.3  
+                                                   gruplar: g2b_clean=0.536  g2b_hard_v1=0.546  b2g_clean=0.546  b2g_hard_v1=0.621
+2026-09-25 15:32:30 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\swa\uzun_f32_k3_elu_z1_b1_3100\keras\SWA_uzun_swa_model_f32_k3_epoch_e40-60_helu_osigmoid_(1, 1)_.h5
+2026-09-25 15:32:30 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+SWA_uzun_swa_model_f32_k3_epoch_e40-60_helu_osigmo   0.56  2.17 +0.2094 +0.1159  +0.0934 117.0/150 0.0/300.0   16.3/17.8  
+                                                   gruplar: g2b_clean=0.529  g2b_hard_v1=0.537  b2g_clean=0.542  b2g_hard_v1=0.614
+2026-09-25 15:34:22 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\tta\tta4_tam_e5.h5
+2026-09-25 15:34:22 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 15:34:25 - INFO - Model output mode inferred once: sigmoid
+tta4_tam_e5.h5                                       0.49  3.16 +0.2709 +0.1317  +0.1391 135.0/150 0.0/300.0   16.4/18.2  
+                                                   gruplar: g2b_clean=0.479  g2b_hard_v1=0.479  b2g_clean=0.473  b2g_hard_v1=0.518
+2026-09-25 15:41:03 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\tta\tta4_topluluk3.h5
+2026-09-25 15:41:03 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 15:41:12 - INFO - Model output mode inferred once: sigmoid
+tta4_topluluk3.h5                                    0.49  3.15 +0.3152 +0.1534  +0.1618 136.5/150 0.25/300.0   15.7/17.4  
+                                                   gruplar: g2b_clean=0.465  g2b_hard_v1=0.482  b2g_clean=0.475  b2g_hard_v1=0.528
+2026-09-25 16:00:56 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\tta\tta8_tam_e5.h5
+2026-09-25 16:00:56 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 16:01:02 - INFO - Model output mode inferred once: sigmoid
+tta8_tam_e5.h5                                       0.48  3.24 +0.2931 +0.1411  +0.1520 137.0/150 0.0/300.0   15.7/17.4  
+                                                   gruplar: g2b_clean=0.471  g2b_hard_v1=0.470  b2g_clean=0.474  b2g_hard_v1=0.513
+2026-09-25 16:15:20 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x1_2022_tpu_k323_d6.h5
+2026-09-25 16:15:20 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 16:15:24 - INFO - Model output mode inferred once: sigmoid
+x1_2022_tpu_k323_d6.h5                               0.41  4.37 +0.3134 +0.1271  +0.1863 141.25/150 0.0/300.0   46.0/49.9  
+                                                   gruplar: g2b_clean=0.398  g2b_hard_v1=0.402  b2g_clean=0.391  b2g_hard_v1=0.434
+2026-09-25 16:22:44 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x2_tpu_yeni3.h5
+2026-09-25 16:22:44 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 16:22:48 - INFO - Model output mode inferred once: sigmoid
+x2_tpu_yeni3.h5                                      0.44  4.04 +0.3113 +0.1375  +0.1737 139.75/150 0.0/300.0   25.8/27.7  
+                                                   gruplar: g2b_clean=0.436  g2b_hard_v1=0.446  b2g_clean=0.426  b2g_hard_v1=0.462
+2026-09-25 16:31:12 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x3_tpu_k323_yeni3.h5
+2026-09-25 16:31:12 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 16:31:17 - INFO - Model output mode inferred once: sigmoid
+x3_tpu_k323_yeni3.h5                                 0.42  4.41 +0.3235 +0.1354  +0.1881 140.0/150 0.0/300.0   29.4/31.8  
+                                                   gruplar: g2b_clean=0.413  g2b_hard_v1=0.417  b2g_clean=0.402  b2g_hard_v1=0.445
+2026-09-25 16:42:14 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-24_zero1_tarif\modeller\egitim\tam_f32_k3_elu_z1_b1_s2\keras\TAM_s2_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+2026-09-25 16:42:14 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+TAM_s2_model_f32_k3_epoch_00007_helu_osigmoid_(1,    0.54  2.26 +0.2244 +0.1199  +0.1046 122.5/150 0.0/300.0   18.9/20.6  
+                                                   gruplar: g2b_clean=0.500  g2b_hard_v1=0.554  b2g_clean=0.480  b2g_hard_v1=0.628
+2026-09-25 16:44:13 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-24_zero1_tarif\modeller\egitim\uzun_f32_k3_elu_z1_b1_3100\keras\UZUN_model_f32_k3_epoch_00027_helu_osigmoid_(1, 1)_.h5
+2026-09-25 16:44:13 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+UZUN_model_f32_k3_epoch_00027_helu_osigmoid_(1, 1)   0.52  2.61 +0.2341 +0.1215  +0.1126 126.75/150 0.0/300.0   19.6/21.5  
+                                                   gruplar: g2b_clean=0.494  g2b_hard_v1=0.505  b2g_clean=0.508  b2g_hard_v1=0.575
+
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 10/17
+  GECTI  oran= 0.41  x1_2022_tpu_k323_d6.h5
+  GECTI  oran= 0.42  x3_tpu_k323_yeni3.h5
+  GECTI  oran= 0.44  x2_tpu_yeni3.h5
+  GECTI  oran= 0.48  tta8_tam_e5.h5
+  GECTI  oran= 0.49  tta4_tam_e5.h5
+  GECTI  oran= 0.49  tta4_topluluk3.h5
+  GECTI  oran= 0.52  UZUN_model_f32_k3_epoch_00027_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.54  TAM_s2_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  SWA_uzun_swa_model_f32_k3_epoch_e40-60_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  SWA_uzun_swa_model_f32_k3_epoch_e20-60_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  SWA_s2_swa_model_f32_k3_epoch_e03-12_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  SWA_tam_swa_model_f32_k3_epoch_e03-06_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  SWA_tam_swa_model_f32_k3_epoch_e02-06_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  SWA_s2_swa_model_f32_k3_epoch_e06-12_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.70  SWA_s1_swa_model_f32_k3_epoch_e06-12_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.77  SWA_s1_swa_model_f32_k3_epoch_e03-12_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.82  SWA_karma_swa_model_f32_k53_epoch_e03-12_helu_osigmoid_(1, 1)_.h5
+Elenen adaylar benchmark'a sokulmamali.
+JSON yazildi: C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\sonuclar\kapi\kapi4_g3_swa_tta_topluluk_150.json

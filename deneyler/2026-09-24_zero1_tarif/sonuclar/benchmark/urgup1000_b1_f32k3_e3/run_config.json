@@ -1,0 +1,367 @@
+{
+  "query_raster": "C:\\d_surucusu\\visual_navigation\\benchmark\\urgup_cevresi_harita\\urgup_cevresi_gmap_utm_30cm.tif",
+  "map_raster": "C:\\d_surucusu\\visual_navigation\\benchmark\\urgup_cevresi_harita\\urgup_cevresi_bingmap_utm_30cm.tif",
+  "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\_resmi_adaylar\\b1_f32k3_e3",
+  "models": null,
+  "max_models": null,
+  "model_sampling": "full",
+  "output_root": "C:\\d_surucusu\\visual_navigation\\benchmark\\outputs\\zero1_deneyleri",
+  "run_id": "b1_f32k3_e3",
+  "resume_run": "C:\\d_surucusu\\visual_navigation\\benchmark\\outputs\\zero1_deneyleri\\b1_f32k3_e3",
+  "bidirectional": true,
+  "include_raw": false,
+  "include_models": true,
+  "query_variants": [
+    "clean",
+    "hard_v1"
+  ],
+  "tile_size": 544,
+  "overlap": 32,
+  "crop_border": 16,
+  "block_size_m": 1000.0,
+  "samples_per_block": 5,
+  "max_queries": 1000,
+  "query_sampling": "balanced_exact",
+  "seed": 42,
+  "min_query_std": 12.0,
+  "min_query_entropy": 4.0,
+  "max_dark_fraction": 0.2,
+  "query_edge_buffer_m": null,
+  "search_modes": [
+    {
+      "name": "roi_500m",
+      "roi_radius_m": 500.0
+    },
+    {
+      "name": "roi_1000m",
+      "roi_radius_m": 1000.0
+    },
+    {
+      "name": "roi_2000m",
+      "roi_radius_m": 2000.0
+    },
+    {
+      "name": "roi_4000m",
+      "roi_radius_m": 4000.0
+    },
+    {
+      "name": "roi_8000m",
+      "roi_radius_m": 8000.0
+    },
+    {
+      "name": "global",
+      "roi_radius_m": null
+    }
+  ],
+  "pyramid_factors": [
+    16,
+    8,
+    4,
+    2,
+    1
+  ],
+  "top_k": 30,
+  "refine_radius_px": 160,
+  "nms_radius_px": 256,
+  "batch_size": 16,
+  "search_workers": 8,
+  "bootstrap_iterations": 1000,
+  "normalization": "minus1_1",
+  "output_value_mode": "auto",
+  "enhancement": "none",
+  "keep_intermediate": false,
+  "force_queries": false,
+  "force_maps": false,
+  "cleanup_maps": true,
+  "fail_fast": false,
+  "strict_excel": true,
+  "excel_engine": "openpyxl",
+  "excel_update": "model",
+  "excel_report": true,
+  "results_csv": false,
+  "worker_model_id": null,
+  "worker_direction": null,
+  "worker_skip_final_export": false,
+  "worker_finalize_only": true,
+  "isolate_models": true,
+  "verbose": false,
+  "hard_v1_profile": {
+    "profile_revision": "uav_camera_v1",
+    "scenarios": {
+      "clear_light": 0.2,
+      "haze": 0.25,
+      "motion_blur": 0.2,
+      "defocus_blur": 0.15,
+      "low_contrast": 0.1,
+      "compression_noise": 0.1
+    },
+    "gain": [
+      0.82,
+      1.18
+    ],
+    "bias": [
+      -14.0,
+      14.0
+    ],
+    "gamma": [
+      0.82,
+      1.22
+    ],
+    "white_balance_gain": [
+      0.9,
+      1.1
+    ],
+    "saturation": [
+      0.78,
+      1.22
+    ],
+    "haze_alpha": [
+      0.12,
+      0.32
+    ],
+    "haze_airlight": [
+      225.0,
+      255.0
+    ],
+    "motion_blur_length_px": [
+      5,
+      17
+    ],
+    "defocus_sigma": [
+      1.0,
+      2.6
+    ],
+    "low_contrast_factor": [
+      0.55,
+      0.8
+    ],
+    "noise_std": [
+      0.8,
+      4.0
+    ],
+    "compression_noise_std": [
+      5.0,
+      10.0
+    ],
+    "jpeg_quality": [
+      65,
+      92
+    ],
+    "compression_jpeg_quality": [
+      35,
+      60
+    ],
+    "vignette_probability": 0.18,
+    "vignette_strength": [
+      0.08,
+      0.22
+    ]
+  },
+  "model_catalog_schema_version": 2,
+  "model_catalog_stats": {
+    "sampling_mode": "full",
+    "discovered_files": 1,
+    "unique_content_files": 1,
+    "series_count": 1,
+    "sampled_files_before_content_dedup": 1,
+    "selected_models": 1,
+    "identical_files_skipped": 0,
+    "duplicate_name_groups": 0,
+    "conflicting_name_groups": 0
+  },
+  "model_catalog_file": "C:\\d_surucusu\\visual_navigation\\benchmark\\outputs\\zero1_deneyleri\\b1_f32k3_e3\\model_catalog.json",
+  "model_catalog_sha256": "6e6015ddcf9a416237384be0f3659efab124956859763c68d27bd019bc669f20",
+  "scientific_semantics_version": 2,
+  "resume_signature_payload": {
+    "schema_version": 2,
+    "scientific_semantics_version": 2,
+    "model_catalog_schema_version": 2,
+    "query_raster": {
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\urgup_cevresi_harita\\urgup_cevresi_gmap_utm_30cm.tif",
+      "size_bytes": 9982659750,
+      "mtime_ns": 1786915037824002200
+    },
+    "map_raster": {
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\urgup_cevresi_harita\\urgup_cevresi_bingmap_utm_30cm.tif",
+      "size_bytes": 7328233657,
+      "mtime_ns": 1786916646854407900
+    },
+    "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\zero1_deneyleri\\_resmi_adaylar\\b1_f32k3_e3",
+    "models": [],
+    "max_models": null,
+    "model_sampling": "full",
+    "model_inventory_count": 1,
+    "model_inventory_sha256": "5cd44d190320a08c7074081825fef8c870b7a857527f59bcccd65a98f7e6e5e1",
+    "bidirectional": true,
+    "include_raw": false,
+    "include_models": true,
+    "query_variants": [
+      "clean",
+      "hard_v1"
+    ],
+    "tile_size": 544,
+    "overlap": 32,
+    "crop_border": 16,
+    "block_size_m": 1000.0,
+    "samples_per_block": 5,
+    "max_queries": 1000,
+    "query_sampling": "balanced_exact",
+    "seed": 42,
+    "min_query_std": 12.0,
+    "min_query_entropy": 4.0,
+    "max_dark_fraction": 0.2,
+    "query_edge_buffer_m": null,
+    "search_modes": [
+      {
+        "name": "roi_500m",
+        "roi_radius_m": 500.0
+      },
+      {
+        "name": "roi_1000m",
+        "roi_radius_m": 1000.0
+      },
+      {
+        "name": "roi_2000m",
+        "roi_radius_m": 2000.0
+      },
+      {
+        "name": "roi_4000m",
+        "roi_radius_m": 4000.0
+      },
+      {
+        "name": "roi_8000m",
+        "roi_radius_m": 8000.0
+      },
+      {
+        "name": "global",
+        "roi_radius_m": null
+      }
+    ],
+    "pyramid_factors": [
+      16,
+      8,
+      4,
+      2,
+      1
+    ],
+    "top_k": 30,
+    "refine_radius_px": 160,
+    "nms_radius_px": 256,
+    "normalization": "minus1_1",
+    "output_value_mode": "auto",
+    "enhancement": "none",
+    "hard_v1_profile": {
+      "profile_revision": "uav_camera_v1",
+      "scenarios": {
+        "clear_light": 0.2,
+        "haze": 0.25,
+        "motion_blur": 0.2,
+        "defocus_blur": 0.15,
+        "low_contrast": 0.1,
+        "compression_noise": 0.1
+      },
+      "gain": [
+        0.82,
+        1.18
+      ],
+      "bias": [
+        -14.0,
+        14.0
+      ],
+      "gamma": [
+        0.82,
+        1.22
+      ],
+      "white_balance_gain": [
+        0.9,
+        1.1
+      ],
+      "saturation": [
+        0.78,
+        1.22
+      ],
+      "haze_alpha": [
+        0.12,
+        0.32
+      ],
+      "haze_airlight": [
+        225.0,
+        255.0
+      ],
+      "motion_blur_length_px": [
+        5,
+        17
+      ],
+      "defocus_sigma": [
+        1.0,
+        2.6
+      ],
+      "low_contrast_factor": [
+        0.55,
+        0.8
+      ],
+      "noise_std": [
+        0.8,
+        4.0
+      ],
+      "compression_noise_std": [
+        5.0,
+        10.0
+      ],
+      "jpeg_quality": [
+        65,
+        92
+      ],
+      "compression_jpeg_quality": [
+        35,
+        60
+      ],
+      "vignette_probability": 0.18,
+      "vignette_strength": [
+        0.08,
+        0.22
+      ]
+    }
+  },
+  "resume_signature": "cab7706a1ca8a9470beef1703999f38149c6c19c226c6e4098591292391f1753",
+  "operational_history": [
+    {
+      "event": "initial_start",
+      "at_utc": "2026-09-24T00:11:37+00:00",
+      "batch_size": 16,
+      "search_workers": 8,
+      "cleanup_maps": true,
+      "excel_update": "model"
+    },
+    {
+      "event": "resume",
+      "at_utc": "2026-09-24T01:22:02+00:00",
+      "batch_size": 16,
+      "search_workers": 8,
+      "cleanup_maps": true,
+      "excel_update": "model"
+    },
+    {
+      "event": "resume",
+      "at_utc": "2026-09-24T02:24:20+00:00",
+      "batch_size": 16,
+      "search_workers": 8,
+      "cleanup_maps": true,
+      "excel_update": "model"
+    }
+  ],
+  "created_at_utc": "2026-09-24T00:11:37+00:00",
+  "last_started_at_utc": "2026-09-24T02:24:20+00:00",
+  "system": {
+    "python": "3.10.20 | packaged by conda-forge | (main, Jun 11 2026, 03:28:51) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "opencv": "4.10.0",
+    "numpy": "1.23.5",
+    "rasterio": "1.3.10",
+    "tensorflow": "2.10.1",
+    "tensorflow_cuda_build": true,
+    "tensorflow_gpus": [
+      "PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')"
+    ]
+  }
+}

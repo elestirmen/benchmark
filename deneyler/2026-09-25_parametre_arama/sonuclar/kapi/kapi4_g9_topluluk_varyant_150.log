@@ -1,0 +1,47 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-26 04:49:09 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x4_cb62_bdb7_k323_d6.h5
+2026-09-26 04:49:09 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 04:49:12 - INFO - Model output mode inferred once: sigmoid
+x4_cb62_bdb7_k323_d6.h5                              0.41  4.40 +0.3092 +0.1253  +0.1839 141.25/150 0.0/300.0   48.5/52.4  
+                                                   gruplar: g2b_clean=0.395  g2b_hard_v1=0.406  b2g_clean=0.391  b2g_hard_v1=0.432
+2026-09-26 04:55:36 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x6_bdb7_k323_d6.h5
+2026-09-26 04:55:36 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 04:55:38 - INFO - Model output mode inferred once: sigmoid
+x6_bdb7_k323_d6.h5                                   0.41  4.42 +0.3131 +0.1265  +0.1866 140.5/150 0.0/300.0   43.7/47.7  
+                                                   gruplar: g2b_clean=0.393  g2b_hard_v1=0.401  b2g_clean=0.388  b2g_hard_v1=0.439
+2026-09-26 04:59:59 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x7_cb62_k323.h5
+2026-09-26 04:59:59 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 05:00:00 - INFO - Model output mode inferred once: sigmoid
+x7_cb62_k323.h5                                      0.41  4.35 +0.2877 +0.1176  +0.1701 140.5/150 0.0/300.0   57.4/61.8  
+                                                   gruplar: g2b_clean=0.400  g2b_hard_v1=0.412  b2g_clean=0.391  b2g_hard_v1=0.437
+2026-09-26 05:03:11 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x8_cb62_d6.h5
+2026-09-26 05:03:11 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 05:03:13 - INFO - Model output mode inferred once: sigmoid
+x8_cb62_d6.h5                                        0.42  4.00 +0.2990 +0.1256  +0.1734 140.0/150 0.0/300.0   46.6/49.9  
+                                                   gruplar: g2b_clean=0.414  g2b_hard_v1=0.421  b2g_clean=0.409  b2g_hard_v1=0.439
+2026-09-26 05:06:47 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x9_k323_d6.h5
+2026-09-26 05:06:47 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 05:06:48 - INFO - Model output mode inferred once: sigmoid
+x9_k323_d6.h5                                        0.43  3.96 +0.2765 +0.1180  +0.1585 136.75/150 0.0/300.0   40.8/45.4  
+                                                   gruplar: g2b_clean=0.414  g2b_hard_v1=0.419  b2g_clean=0.407  b2g_hard_v1=0.474
+2026-09-26 05:09:15 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x10_x1_tta8tam.h5
+2026-09-26 05:09:15 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 05:09:20 - INFO - Model output mode inferred once: sigmoid
+x10_x1_tta8tam.h5                                    0.41  4.34 +0.3269 +0.1340  +0.1928 141.25/150 0.0/300.0   36.3/39.5  
+                                                   gruplar: g2b_clean=0.405  g2b_hard_v1=0.408  b2g_clean=0.396  b2g_hard_v1=0.435
+
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 6/6
+  GECTI  oran= 0.41  x6_bdb7_k323_d6.h5
+  GECTI  oran= 0.41  x4_cb62_bdb7_k323_d6.h5
+  GECTI  oran= 0.41  x7_cb62_k323.h5
+  GECTI  oran= 0.41  x10_x1_tta8tam.h5
+  GECTI  oran= 0.42  x8_cb62_d6.h5
+  GECTI  oran= 0.43  x9_k323_d6.h5
+JSON yazildi: C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\sonuclar\kapi\kapi4_g9_topluluk_varyant_150.json

@@ -1,0 +1,215 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-25 11:20:31 - INFO - Model loaded (standard): models_pipeline\20260909_223425\bce_b16\_benchmark_adayi\_JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4.h5
+2026-09-25 11:20:31 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48   0.77  0.70 +0.2261 +0.1734  +0.0527 100.5/150 1.5/300.0    8.1/9.1   
+                                                   gruplar: g2b_clean=0.680  g2b_hard_v1=0.677  b2g_clean=0.828  b2g_hard_v1=0.900
+2026-09-25 11:22:44 - INFO - Model loaded (standard): models_pipeline\20260909_223425\bce_b32\_benchmark_adayi\_JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4.h5
+2026-09-25 11:22:44 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48   0.76  0.80 +0.2936 +0.2219  +0.0717 110.25/150 14.25/300.0    6.8/7.3   
+                                                   gruplar: g2b_clean=0.676  g2b_hard_v1=0.673  b2g_clean=0.842  b2g_hard_v1=0.840
+2026-09-25 11:25:29 - INFO - Model loaded (standard): models_pipeline\20260909_223425\bce_b8\_benchmark_adayi\_JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4.h5
+2026-09-25 11:25:29 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_   0.76  0.80 +0.2919 +0.2205  +0.0714 106.0/150 16.75/300.0    7.6/8.5   
+                                                   gruplar: g2b_clean=0.676  g2b_hard_v1=0.686  b2g_clean=0.815  b2g_hard_v1=0.850
+2026-09-25 11:28:18 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f24_k4\_benchmark_adayi\_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:28:18 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_ep   0.72  1.07 +0.1904 +0.1349  +0.0555 110.75/150 0.0/300.0   18.3/18.9  
+                                                   gruplar: g2b_clean=0.685  g2b_hard_v1=0.632  b2g_clean=0.716  b2g_hard_v1=0.830
+2026-09-25 11:30:23 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f32_k4\_benchmark_adayi\_JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5
+2026-09-25 11:30:23 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5      1.01  0.14 +0.1147 +0.1053  +0.0094 82.75/150 0.0/300.0   13.7/14.6  
+                                                   gruplar: g2b_clean=0.880  g2b_hard_v1=0.748  b2g_clean=0.828  b2g_hard_v1=1.595
+2026-09-25 11:32:25 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f48_k4_sigmoid_repro\_benchmark_adayi\_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:32:25 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_m   0.72  0.95 +0.2432 +0.1752  +0.0680 112.0/150 0.0/300.0   15.8/17.0  
+                                                   gruplar: g2b_clean=0.679  g2b_hard_v1=0.662  b2g_clean=0.758  b2g_hard_v1=0.794
+2026-09-25 11:35:28 - INFO - Model loaded (standard): models_pipeline\20260909_223425\flat_f64_k4\_benchmark_adayi\_JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:35:28 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_ep   0.86  0.48 +0.1418 +0.1177  +0.0241 92.5/150 0.0/300.0   15.7/16.6  
+                                                   gruplar: g2b_clean=0.782  g2b_hard_v1=0.724  b2g_clean=0.801  b2g_hard_v1=1.124
+2026-09-25 11:39:14 - INFO - Model loaded (standard): deneyler\2026-09-24_zero1_tarif\modeller\adaylar\b1_f32k3_e3\TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:39:14 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(   0.55  2.28 +0.1522 +0.0837  +0.0685 103.25/150 0.25/300.0   14.2/15.8  
+                                                   gruplar: g2b_clean=0.526  g2b_hard_v1=0.514  b2g_clean=0.542  b2g_hard_v1=0.626
+2026-09-25 11:40:33 - INFO - Model loaded (standard): deneyler\2026-09-24_zero1_tarif\modeller\adaylar\tam_f32k3_e5\TARAMA_tam_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+2026-09-25 11:40:33 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+TARAMA_tam_model_f32_k3_epoch_00005_helu_osigmoid_   0.52  2.72 +0.1841 +0.0950  +0.0891 130.25/150 0.0/300.0   19.3/21.2  
+                                                   gruplar: g2b_clean=0.503  g2b_hard_v1=0.513  b2g_clean=0.498  b2g_hard_v1=0.553
+2026-09-25 11:41:45 - INFO - Model loaded (standard): deneyler\2026-09-24_zero1_tarif\modeller\adaylar\topluluk3\topluluk3_tame5_s2e7_uzune27.h5
+2026-09-25 11:41:45 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 11:41:46 - INFO - Model output mode inferred once: sigmoid
+topluluk3_tame5_s2e7_uzune27.h5                      0.49  3.04 +0.2732 +0.1348  +0.1384 134.75/150 0.0/300.0   16.6/18.3  
+                                                   gruplar: g2b_clean=0.470  g2b_hard_v1=0.494  b2g_clean=0.477  b2g_hard_v1=0.539
+2026-09-25 11:44:22 - INFO - Model loaded (standard): deneyler\pipeline_20260924_065751\modeller\z1_f32_k3_b1\_benchmark_adayi\_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5
+2026-09-25 11:44:22 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_   0.53  2.42 +0.1582 +0.0842  +0.0741 120.25/150 0.0/300.0   17.8/19.6  
+                                                   gruplar: g2b_clean=0.508  g2b_hard_v1=0.534  b2g_clean=0.510  b2g_hard_v1=0.582
+2026-09-25 11:45:34 - INFO - Model loaded (standard): models\01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__b48bdc1ed522.h5
+2026-09-25 11:45:34 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoi   0.48  3.07 +0.2692 +0.1290  +0.1401 133.25/150 0.0/300.0   32.8/36.6  
+                                                   gruplar: g2b_clean=0.460  g2b_hard_v1=0.460  b2g_clean=0.481  b2g_hard_v1=0.518
+2026-09-25 11:47:16 - INFO - Model loaded (standard): models\01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__f910fdaa1ad7.h5
+2026-09-25 11:47:16 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoi   0.52  2.66 +0.1582 +0.0815  +0.0767 117.75/150 0.0/300.0   19.9/21.3  
+                                                   gruplar: g2b_clean=0.500  g2b_hard_v1=0.474  b2g_clean=0.528  b2g_hard_v1=0.564
+2026-09-25 11:48:57 - INFO - Model loaded (standard): models\02_modeller___15_10_2022__16_32_gpu_model_f32_k5_epoch__epoch__sigmoi__1__82b000f07266.h5
+2026-09-25 11:48:57 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+02_modeller___15_10_2022__16_32_gpu_model_f32_k5_e   0.48  3.44 +0.2025 +0.0964  +0.1061 127.75/150 0.25/300.0   39.5/40.9  
+                                                   gruplar: g2b_clean=0.475  g2b_hard_v1=0.448  b2g_clean=0.489  b2g_hard_v1=0.494
+2026-09-25 11:51:04 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__0ba75572577e.h5
+2026-09-25 11:51:04 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.43  4.07 +0.2524 +0.1073  +0.1451 139.5/150 0.0/300.0   65.5/70.2  
+                                                   gruplar: g2b_clean=0.414  g2b_hard_v1=0.440  b2g_clean=0.405  b2g_hard_v1=0.445
+2026-09-25 11:53:58 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__3ca910618354.h5
+2026-09-25 11:53:58 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.43  3.87 +0.2521 +0.1093  +0.1428 138.5/150 0.0/300.0   65.0/69.7  
+                                                   gruplar: g2b_clean=0.417  g2b_hard_v1=0.446  b2g_clean=0.415  b2g_hard_v1=0.460
+2026-09-25 11:56:38 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__47491621799b.h5
+2026-09-25 11:56:38 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.44  3.94 +0.2481 +0.1079  +0.1402 137.5/150 0.0/300.0   62.1/66.5  
+                                                   gruplar: g2b_clean=0.417  g2b_hard_v1=0.446  b2g_clean=0.418  b2g_hard_v1=0.462
+2026-09-25 11:59:51 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__540ee65bcc35.h5
+2026-09-25 11:59:51 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.46  3.42 +0.2440 +0.1118  +0.1322 134.5/150 0.0/300.0   62.7/66.5  
+                                                   gruplar: g2b_clean=0.447  g2b_hard_v1=0.476  b2g_clean=0.445  b2g_hard_v1=0.466
+2026-09-25 12:02:46 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__83d14ff0bb51.h5
+2026-09-25 12:02:46 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.43  3.85 +0.2403 +0.1043  +0.1361 137.75/150 0.0/300.0   60.1/64.4  
+                                                   gruplar: g2b_clean=0.412  g2b_hard_v1=0.445  b2g_clean=0.420  b2g_hard_v1=0.462
+2026-09-25 12:05:25 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__bdb7daa618c0.h5
+2026-09-25 12:05:25 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.42  4.12 +0.2558 +0.1079  +0.1479 139.5/150 0.0/300.0   61.4/65.7  
+                                                   gruplar: g2b_clean=0.405  g2b_hard_v1=0.431  b2g_clean=0.407  b2g_hard_v1=0.446
+2026-09-25 12:07:57 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__be1ed72dac32.h5
+2026-09-25 12:07:57 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.43  4.05 +0.2208 +0.0953  +0.1255 137.0/150 0.0/300.0   67.5/72.1  
+                                                   gruplar: g2b_clean=0.418  g2b_hard_v1=0.443  b2g_clean=0.416  b2g_hard_v1=0.452
+2026-09-25 12:11:02 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__cb62bfb86ad0.h5
+2026-09-25 12:11:02 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.44  3.70 +0.2462 +0.1082  +0.1380 139.75/150 0.0/300.0   71.2/75.2  
+                                                   gruplar: g2b_clean=0.431  g2b_hard_v1=0.452  b2g_clean=0.424  b2g_hard_v1=0.453
+2026-09-25 12:13:42 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__d75d34b45400.h5
+2026-09-25 12:13:42 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.44  3.94 +0.2450 +0.1085  +0.1365 136.0/150 0.0/300.0   61.1/65.2  
+                                                   gruplar: g2b_clean=0.429  g2b_hard_v1=0.449  b2g_clean=0.427  b2g_hard_v1=0.470
+2026-09-25 12:16:21 - INFO - Model loaded (standard): models\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__f5ec282aa346.h5
+2026-09-25 12:16:21 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch   0.43  4.02 +0.2459 +0.1055  +0.1405 137.25/150 0.0/300.0   58.7/62.9  
+                                                   gruplar: g2b_clean=0.410  g2b_hard_v1=0.440  b2g_clean=0.413  b2g_hard_v1=0.457
+2026-09-25 12:19:21 - INFO - Model loaded (standard): models\06_modeller___17_10_2022__16_25_gpu_model_f40_k3_epoch__epoch__sigmoi__f__d9829f8fe8c2.h5
+2026-09-25 12:19:21 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+06_modeller___17_10_2022__16_25_gpu_model_f40_k3_e   0.54  2.50 +0.1947 +0.1042  +0.0905 113.25/150 0.0/300.0   24.5/25.7  
+                                                   gruplar: g2b_clean=0.518  g2b_hard_v1=0.492  b2g_clean=0.549  b2g_hard_v1=0.586
+2026-09-25 12:21:28 - INFO - Model loaded (standard): models\_17_10_2022__16_25_GPU_model_f40_k3_epoch_00001_sigmoid_(1_ 1)_.h5
+2026-09-25 12:21:28 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_17_10_2022__16_25_GPU_model_f40_k3_epoch_00001_si   0.57  2.18 +0.1946 +0.1100  +0.0846 108.75/150 0.0/300.0   17.4/18.5  
+                                                   gruplar: g2b_clean=0.534  g2b_hard_v1=0.522  b2g_clean=0.575  b2g_hard_v1=0.636
+2026-09-25 12:23:04 - INFO - Model loaded (standard): models\_18_10_2022__22_07_GPU_model_f40_k3_epoch_00004_sigmoid_(1_ 1)_.h5
+2026-09-25 12:23:04 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_18_10_2022__22_07_GPU_model_f40_k3_epoch_00004_si   0.57  2.03 +0.1663 +0.0954  +0.0709 109.5/150 0.0/300.0   25.3/26.6  
+                                                   gruplar: g2b_clean=0.555  g2b_hard_v1=0.521  b2g_clean=0.611  b2g_hard_v1=0.612
+2026-09-25 12:24:33 - INFO - Model loaded (standard): models\_18_10_2022__22_32_GPU_model_f40_k3_epoch_00001_sigmoid_(1_ 1)_.h5
+2026-09-25 12:24:33 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+_18_10_2022__22_32_GPU_model_f40_k3_epoch_00001_si   0.59  1.95 +0.1967 +0.1147  +0.0820 105.75/150 0.0/300.0   20.2/21.0  
+                                                   gruplar: g2b_clean=0.556  g2b_hard_v1=0.519  b2g_clean=0.596  b2g_hard_v1=0.670
+2026-09-25 12:26:33 - INFO - Model loaded (standard): models\GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_06_10_2022_.h5
+2026-09-25 12:26:33 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_06_10_   0.59  1.91 +0.2465 +0.1439  +0.1026 112.75/150 0.25/300.0   19.9/22.1  
+                                                   gruplar: g2b_clean=0.548  g2b_hard_v1=0.588  b2g_clean=0.560  b2g_hard_v1=0.645
+2026-09-25 12:27:49 - INFO - Model loaded (standard): models\GPU_model_f32_k5_epoch_00002_sigmoid_(1_ 1)_07_10_2022_.h5
+2026-09-25 12:27:49 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f32_k5_epoch_00002_sigmoid_(1_ 1)_07_10_   0.48  3.07 +0.2692 +0.1290  +0.1401 133.25/150 0.0/300.0   32.8/36.6  
+                                                   gruplar: g2b_clean=0.460  g2b_hard_v1=0.460  b2g_clean=0.481  b2g_hard_v1=0.518
+2026-09-25 12:29:38 - INFO - Model loaded (standard): models\GPU_model_f32_k5_epoch_00008_sigmoid_(1_ 1)_11_10_2022_.h5
+2026-09-25 12:29:38 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f32_k5_epoch_00008_sigmoid_(1_ 1)_11_10_   0.58  2.27 +0.2207 +0.1266  +0.0941 117.0/150 0.0/300.0   41.8/46.1  
+                                                   gruplar: g2b_clean=0.562  g2b_hard_v1=0.562  b2g_clean=0.551  b2g_hard_v1=0.627
+2026-09-25 12:31:54 - INFO - Model loaded (standard): models\GPU_model_f32_k5_epoch_00019_sigmoid_(1_ 1)_07_10_2022_.h5
+2026-09-25 12:31:54 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f32_k5_epoch_00019_sigmoid_(1_ 1)_07_10_   0.56  2.18 +0.2033 +0.1138  +0.0895 120.75/150 0.0/300.0   31.4/33.1  
+                                                   gruplar: g2b_clean=0.534  g2b_hard_v1=0.504  b2g_clean=0.588  b2g_hard_v1=0.620
+2026-09-25 12:33:49 - INFO - Model loaded (standard): models\GPU_model_f32_k5_epoch_00033_sigmoid_(1_ 1)_07_10_2022_.h5
+2026-09-25 12:33:49 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f32_k5_epoch_00033_sigmoid_(1_ 1)_07_10_   0.57  2.15 +0.1861 +0.1066  +0.0795 120.0/150 0.0/300.0   22.5/24.4  
+                                                   gruplar: g2b_clean=0.554  g2b_hard_v1=0.517  b2g_clean=0.606  b2g_hard_v1=0.619
+2026-09-25 12:35:40 - INFO - Model loaded (standard): models\GPU_model_f32_k6_epoch_00004_sigmoid_(1, 1)_.h5
+2026-09-25 12:35:40 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f32_k6_epoch_00004_sigmoid_(1, 1)_.h5      0.54  2.37 +0.2172 +0.1182  +0.0990 121.5/150 0.5/300.0   17.5/19.3  
+                                                   gruplar: g2b_clean=0.516  g2b_hard_v1=0.517  b2g_clean=0.558  b2g_hard_v1=0.589
+2026-09-25 12:38:07 - INFO - Model loaded (standard): models\GPU_model_f48_k5_epoch_00450_sigmoid_(2, 2)_.h5
+2026-09-25 12:38:07 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+GPU_model_f48_k5_epoch_00450_sigmoid_(2, 2)_.h5      0.60  1.93 +0.2465 +0.1464  +0.1001 121.5/150 0.0/300.0   72.1/77.5  
+                                                   gruplar: g2b_clean=0.535  g2b_hard_v1=0.543  b2g_clean=0.628  b2g_hard_v1=0.686
+2026-09-25 12:39:03 - INFO - Model loaded (standard): models\model_k_32_3_epoch_01900_sigmoid_(1, 1)_.h5
+2026-09-25 12:39:03 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+model_k_32_3_epoch_01900_sigmoid_(1, 1)_.h5          0.44  3.86 +0.2192 +0.0961  +0.1231 133.75/150 0.0/300.0   57.5/63.6  
+                                                   gruplar: g2b_clean=0.423  g2b_hard_v1=0.436  b2g_clean=0.408  b2g_hard_v1=0.499
+2026-09-25 12:40:26 - INFO - Model loaded (standard): models\model_k_32_3_epoch_02000_sigmoid_(1, 1)_.h5
+2026-09-25 12:40:26 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+model_k_32_3_epoch_02000_sigmoid_(1, 1)_.h5          0.50  2.96 +0.1833 +0.0910  +0.0923 120.25/150 0.75/300.0   51.7/57.7  
+                                                   gruplar: g2b_clean=0.481  g2b_hard_v1=0.477  b2g_clean=0.452  b2g_hard_v1=0.598
+2026-09-25 12:41:44 - INFO - Model loaded (standard): models\sat2map_cross_conv_elu.h5
+2026-09-25 12:41:44 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 12:41:47 - INFO - Model output mode inferred once: tanh
+sat2map_cross_conv_elu.h5                            inf  0.00 +0.0000 +0.0000  +0.0000 0.0/150 300.0/300.0    0.0/0.0   
+                                                   gruplar: g2b_clean=inf  g2b_hard_v1=inf  b2g_clean=inf  b2g_hard_v1=inf
+2026-09-25 12:46:51 - INFO - Model loaded (standard): models\tpu_model_f48_k4_epoch_01100_sigmoid_(1, 1)_.h5
+2026-09-25 12:46:51 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+tpu_model_f48_k4_epoch_01100_sigmoid_(1, 1)_.h5      0.46  3.25 +0.2423 +0.1113  +0.1310 134.5/150 0.0/300.0   59.5/63.5  
+                                                   gruplar: g2b_clean=0.451  g2b_hard_v1=0.479  b2g_clean=0.442  b2g_hard_v1=0.466
+2026-09-25 12:50:14 - INFO - Model loaded (standard): models\tpu_model_f48_k7_epoch_00100_sigmoid_(1, 1)_.h5
+2026-09-25 12:50:14 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+tpu_model_f48_k7_epoch_00100_sigmoid_(1, 1)_.h5      0.52  2.60 +0.2097 +0.1085  +0.1013 125.0/150 0.25/300.0   62.0/66.2  
+                                                   gruplar: g2b_clean=0.479  g2b_hard_v1=0.495  b2g_clean=0.525  b2g_hard_v1=0.576
+
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 29/40
+  GECTI  oran= 0.42  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__bdb7daa618c0.h5
+  GECTI  oran= 0.43  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__0ba75572577e.h5
+  GECTI  oran= 0.43  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__f5ec282aa346.h5
+  GECTI  oran= 0.43  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__be1ed72dac32.h5
+  GECTI  oran= 0.43  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__3ca910618354.h5
+  GECTI  oran= 0.43  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__83d14ff0bb51.h5
+  GECTI  oran= 0.44  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__47491621799b.h5
+  GECTI  oran= 0.44  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__cb62bfb86ad0.h5
+  GECTI  oran= 0.44  model_k_32_3_epoch_01900_sigmoid_(1, 1)_.h5
+  GECTI  oran= 0.44  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__d75d34b45400.h5
+  GECTI  oran= 0.46  03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__540ee65bcc35.h5
+  GECTI  oran= 0.46  tpu_model_f48_k4_epoch_01100_sigmoid_(1, 1)_.h5
+  GECTI  oran= 0.48  02_modeller___15_10_2022__16_32_gpu_model_f32_k5_epoch__epoch__sigmoi__1__82b000f07266.h5
+  GECTI  oran= 0.48  01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__b48bdc1ed522.h5
+  GECTI  oran= 0.48  GPU_model_f32_k5_epoch_00002_sigmoid_(1_ 1)_07_10_2022_.h5
+  GECTI  oran= 0.49  topluluk3_tame5_s2e7_uzune27.h5
+  GECTI  oran= 0.50  model_k_32_3_epoch_02000_sigmoid_(1, 1)_.h5
+  GECTI  oran= 0.52  01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__f910fdaa1ad7.h5
+  GECTI  oran= 0.52  TARAMA_tam_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.52  tpu_model_f48_k7_epoch_00100_sigmoid_(1, 1)_.h5
+  GECTI  oran= 0.53  _JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5
+  GECTI  oran= 0.54  06_modeller___17_10_2022__16_25_gpu_model_f40_k3_epoch__epoch__sigmoi__f__d9829f8fe8c2.h5
+  GECTI  oran= 0.54  GPU_model_f32_k6_epoch_00004_sigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  TARAMA_b1_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  GPU_model_f32_k5_epoch_00019_sigmoid_(1_ 1)_07_10_2022_.h5
+  GECTI  oran= 0.57  _17_10_2022__16_25_GPU_model_f40_k3_epoch_00001_sigmoid_(1_ 1)_.h5
+  GECTI  oran= 0.57  GPU_model_f32_k5_epoch_00033_sigmoid_(1_ 1)_07_10_2022_.h5
+  GECTI  oran= 0.57  _18_10_2022__22_07_GPU_model_f40_k3_epoch_00004_sigmoid_(1_ 1)_.h5
+  GECTI  oran= 0.58  GPU_model_f32_k5_epoch_00008_sigmoid_(1_ 1)_11_10_2022_.h5
+  ELENDI oran= 0.59  _18_10_2022__22_32_GPU_model_f40_k3_epoch_00001_sigmoid_(1_ 1)_.h5
+  ELENDI oran= 0.59  GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_06_10_2022_.h5
+  ELENDI oran= 0.60  GPU_model_f48_k5_epoch_00450_sigmoid_(2, 2)_.h5
+  ELENDI oran= 0.72  _JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.72  _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.76  _JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4.h5
+  ELENDI oran= 0.76  _JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4.h5
+  ELENDI oran= 0.77  _JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4.h5
+  ELENDI oran= 0.86  _JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.01  _JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5
+  ELENDI oran=  inf  sat2map_cross_conv_elu.h5
+Elenen adaylar benchmark'a sokulmamali.
+JSON yazildi: deneyler\2026-09-25_parametre_arama\sonuclar\kapi\kapi4_kalibrasyon_150.json
+CIKIS_KODU=0

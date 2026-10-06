@@ -1,0 +1,73 @@
+{
+  "samples": 150,
+  "seed": 42,
+  "aoi": "train",
+  "normalization": "minus1_1",
+  "primary_metric": "false_peak_ratio",
+  "raw_false_peak_ratio": 0.5307293232811524,
+  "raw_margin": 0.1628036989420761,
+  "results": {
+    "RAW": {
+      "samples": 150,
+      "truth_ncc_mean": 0.3469291967706223,
+      "truth_ncc_median": 0.36054252595324243,
+      "wrong_ncc_mean": 0.18412549782854612,
+      "wrong_ncc_std": 0.07839174641361478,
+      "false_peak_ratio": 0.5307293232811524,
+      "separation_z": 2.0767964280714257,
+      "margin_mean": 0.1628036989420761,
+      "margin_median": 0.17686146944912412,
+      "wins": 132,
+      "win_rate": 0.88,
+      "rejected_templates": 0,
+      "rejected_total": 300,
+      "query_std_mean": 36.82185786040201,
+      "map_std_mean": 35.227047871055554
+    },
+    "topluluk5.h5": {
+      "samples": 150,
+      "truth_ncc_mean": 0.2832098309106715,
+      "truth_ncc_median": 0.28512660213729535,
+      "wrong_ncc_mean": 0.13449923164071814,
+      "wrong_ncc_std": 0.0442805844279049,
+      "false_peak_ratio": 0.4749101795238922,
+      "separation_z": 3.3583702923360326,
+      "margin_mean": 0.1487105992699533,
+      "margin_median": 0.14134478705959724,
+      "wins": 135,
+      "win_rate": 0.9,
+      "rejected_templates": 0,
+      "rejected_total": 300,
+      "query_std_mean": 22.647135757444474,
+      "map_std_mean": 14.300763747205183,
+      "output_value_mode": "sigmoid",
+      "params": 63925,
+      "layers": 7
+    },
+    "topluluk7.h5": {
+      "samples": 150,
+      "truth_ncc_mean": 0.2906516583860386,
+      "truth_ncc_median": 0.29503856507611953,
+      "wrong_ncc_mean": 0.13754900688162613,
+      "wrong_ncc_std": 0.04470759958381515,
+      "false_peak_ratio": 0.4732434958239112,
+      "separation_z": 3.4245330308415407,
+      "margin_mean": 0.15310265150441243,
+      "margin_median": 0.1483074172801499,
+      "wins": 138,
+      "win_rate": 0.92,
+      "rejected_templates": 0,
+      "rejected_total": 300,
+      "query_std_mean": 21.048907112696767,
+      "map_std_mean": 12.74982914298038,
+      "output_value_mode": "sigmoid",
+      "params": 89495,
+      "layers": 9
+    }
+  },
+  "passed": [
+    "topluluk5.h5",
+    "topluluk7.h5"
+  ],
+  "failed": []
+}

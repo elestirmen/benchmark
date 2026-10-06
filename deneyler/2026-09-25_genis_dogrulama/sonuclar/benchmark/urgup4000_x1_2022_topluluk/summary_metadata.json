@@ -1,0 +1,14 @@
+{
+  "state_schema_version": 2,
+  "summary_schema_version": 5,
+  "scientific_semantics_version": 2,
+  "bootstrap_iterations": 1000,
+  "seed": 42,
+  "incremental_equivalence": "checkpoint_not_full_verified",
+  "state_rebuilt": false,
+  "new_rows_processed": 0,
+  "group_count": 24,
+  "incomplete_group_count": 0,
+  "expected_queries_per_group": 4000,
+  "updated_at_utc": "2026-09-26T10:50:13+00:00"
+}

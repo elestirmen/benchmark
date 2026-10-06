@@ -13,6 +13,13 @@ models_epoch_sweep/
 
 # Generated benchmark artifacts
 outputs/
+# deneyler/: modeller (*.h5), summary.json, kartlar ve BENIOKU dosyalari izlenir;
+# PyTorch checkpoint'leri, sorgu karolari ve benchmark ara durumu izlenmez.
+deneyler/**/*.npz
+deneyler/**/queries/
+deneyler/**/.summary_state/
+deneyler/**/models/
+deneyler/.pano_hash_cache.json
 *.xlsx
 *.xls
 *.csv

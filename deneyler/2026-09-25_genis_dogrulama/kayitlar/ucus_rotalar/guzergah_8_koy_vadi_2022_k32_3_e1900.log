@@ -1,0 +1,3931 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+OpenCV CUDA devices: 0, has TM: False, build CUDA: False, build CUDA line: 
+2026-10-01 22:38:23.443931: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-01 22:38:23.445758: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-01 22:38:23.449524: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-01 22:38:24.417567: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:42] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2026-10-01 22:38:24.418028: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13500 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 5060 Ti, pci bus id: 0000:01:00.0, compute capability: 12.0
+[On isleme] 2022_k32_3_e1900.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+[On isleme] 2022_k32_3_e1900.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+(30921, 18299)
+(30921, 18299)
+1393.552734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1393.552734375
+ucus_yuksekligi = : 138.447265625
+yaw = : -162.2
+merkezi dışarıda
+(30921, 18299)
+1390.3079833984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1390.3079833984375
+ucus_yuksekligi = : 141.6920166015625
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1386.2900390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1386.2900390625
+ucus_yuksekligi = : 145.7099609375
+yaw = : -166.8
+merkezi dışarıda
+(30921, 18299)
+1394.23974609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1394.23974609375
+ucus_yuksekligi = : 137.76025390625
+yaw = : 16.2
+merkezi dışarıda
+(30921, 18299)
+1391.0435791015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1391.0435791015625
+ucus_yuksekligi = : 141.9564208984375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1388.664794921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1388.664794921875
+ucus_yuksekligi = : 144.335205078125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1386.8487548828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1386.8487548828125
+ucus_yuksekligi = : 145.1512451171875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1381.472900390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1381.472900390625
+ucus_yuksekligi = : 149.527099609375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1377.126953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1377.126953125
+ucus_yuksekligi = : 153.873046875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1373.1392822265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1373.1392822265625
+ucus_yuksekligi = : 157.8607177734375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1367.63916015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1367.63916015625
+ucus_yuksekligi = : 163.36083984375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1363.98828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1363.98828125
+ucus_yuksekligi = : 167.01171875
+yaw = : 16.6
+merkezi dışarıda
+(30921, 18299)
+1362.0606689453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1362.0606689453125
+ucus_yuksekligi = : 168.9393310546875
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1365.7791748046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1365.7791748046875
+ucus_yuksekligi = : 165.2208251953125
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1369.456298828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1369.456298828125
+ucus_yuksekligi = : 161.543701171875
+yaw = : 16.5
+merkezi dışarıda
+(30921, 18299)
+1383.4219970703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1383.4219970703125
+ucus_yuksekligi = : 147.5780029296875
+yaw = : 16.3
+merkezi dışarıda
+(30921, 18299)
+1399.3111572265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1399.3111572265625
+ucus_yuksekligi = : 131.6888427734375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1397.217041015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1397.217041015625
+ucus_yuksekligi = : 133.782958984375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1397.4359130859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1397.4359130859375
+ucus_yuksekligi = : 134.5640869140625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1393.39697265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1393.39697265625
+ucus_yuksekligi = : 138.60302734375
+yaw = : 18.9
+merkezi dışarıda
+(30921, 18299)
+1380.081298828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1380.081298828125
+ucus_yuksekligi = : 150.918701171875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1385.3631591796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1385.3631591796875
+ucus_yuksekligi = : 146.6368408203125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1394.30615234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1394.30615234375
+ucus_yuksekligi = : 138.69384765625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1390.9569091796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1390.9569091796875
+ucus_yuksekligi = : 142.0430908203125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1386.9599609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1386.9599609375
+ucus_yuksekligi = : 145.0400390625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1388.789306640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1388.789306640625
+ucus_yuksekligi = : 143.210693359375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1398.9691162109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1398.9691162109375
+ucus_yuksekligi = : 133.0308837890625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1398.062255859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1398.062255859375
+ucus_yuksekligi = : 134.937744140625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1395.0850830078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1395.0850830078125
+ucus_yuksekligi = : 137.9149169921875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1394.1463623046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1394.1463623046875
+ucus_yuksekligi = : 138.8536376953125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1393.44091796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1393.44091796875
+ucus_yuksekligi = : 139.55908203125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1398.464111328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1398.464111328125
+ucus_yuksekligi = : 133.535888671875
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1400.5819091796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1400.5819091796875
+ucus_yuksekligi = : 131.4180908203125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1391.10693359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1391.10693359375
+ucus_yuksekligi = : 140.89306640625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1388.4962158203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1388.4962158203125
+ucus_yuksekligi = : 144.5037841796875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1381.0887451171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1381.0887451171875
+ucus_yuksekligi = : 150.9112548828125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1378.3594970703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1378.3594970703125
+ucus_yuksekligi = : 153.6405029296875
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1383.951416015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1383.951416015625
+ucus_yuksekligi = : 149.048583984375
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1387.55517578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1387.55517578125
+ucus_yuksekligi = : 145.44482421875
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1374.52685546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1374.52685546875
+ucus_yuksekligi = : 158.47314453125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1372.0782470703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1372.0782470703125
+ucus_yuksekligi = : 160.9217529296875
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1372.1170654296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1372.1170654296875
+ucus_yuksekligi = : 159.8829345703125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1372.21044921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1372.21044921875
+ucus_yuksekligi = : 160.78955078125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1363.7672119140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1363.7672119140625
+ucus_yuksekligi = : 169.2327880859375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1356.3709716796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1356.3709716796875
+ucus_yuksekligi = : 176.6290283203125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1354.801513671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1354.801513671875
+ucus_yuksekligi = : 179.198486328125
+yaw = : -163.1
+merkezi dışarıda
+(30921, 18299)
+1355.7674560546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1355.7674560546875
+ucus_yuksekligi = : 178.2325439453125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1359.053955078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1359.053955078125
+ucus_yuksekligi = : 174.946044921875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1363.3817138671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1363.3817138671875
+ucus_yuksekligi = : 170.6182861328125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1366.1787109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1366.1787109375
+ucus_yuksekligi = : 167.8212890625
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1366.1158447265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1366.1158447265625
+ucus_yuksekligi = : 167.8841552734375
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1366.14794921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1366.14794921875
+ucus_yuksekligi = : 167.85205078125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1370.916259765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1370.916259765625
+ucus_yuksekligi = : 163.083740234375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1380.25244140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1380.25244140625
+ucus_yuksekligi = : 153.74755859375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1389.8040771484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1389.8040771484375
+ucus_yuksekligi = : 144.1959228515625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1386.5716552734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1386.5716552734375
+ucus_yuksekligi = : 147.4283447265625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1380.0341796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1380.0341796875
+ucus_yuksekligi = : 153.9658203125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1384.283935546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1384.283935546875
+ucus_yuksekligi = : 149.716064453125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1402.7862548828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1402.7862548828125
+ucus_yuksekligi = : 131.2137451171875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1413.0762939453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1413.0762939453125
+ucus_yuksekligi = : 120.9237060546875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1418.8935546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1418.8935546875
+ucus_yuksekligi = : 115.1064453125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1429.037109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1429.037109375
+ucus_yuksekligi = : 104.962890625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1436.14697265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1436.14697265625
+ucus_yuksekligi = : 97.85302734375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1441.8363037109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1441.8363037109375
+ucus_yuksekligi = : 92.1636962890625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1445.5521240234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1508.0
+rakım =:  1445.5521240234375
+ucus_yuksekligi = : 88.4478759765625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1445.9688720703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1507.0
+rakım =:  1445.9688720703125
+ucus_yuksekligi = : 87.0311279296875
+yaw = : -171.7
+merkezi dışarıda
+(30921, 18299)
+1422.9088134765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1422.9088134765625
+ucus_yuksekligi = : 108.0911865234375
+yaw = : 16.5
+merkezi dışarıda
+(30921, 18299)
+1417.60595703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1506.0
+rakım =:  1417.60595703125
+ucus_yuksekligi = : 114.39404296875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1406.6458740234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1406.6458740234375
+ucus_yuksekligi = : 124.3541259765625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1404.931884765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1404.931884765625
+ucus_yuksekligi = : 126.068115234375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1403.7537841796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1403.7537841796875
+ucus_yuksekligi = : 127.2462158203125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1396.6778564453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1396.6778564453125
+ucus_yuksekligi = : 133.3221435546875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1388.8221435546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1388.8221435546875
+ucus_yuksekligi = : 141.1778564453125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1385.39501953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1385.39501953125
+ucus_yuksekligi = : 144.60498046875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1374.5797119140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1374.5797119140625
+ucus_yuksekligi = : 155.4202880859375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1372.519775390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1372.519775390625
+ucus_yuksekligi = : 157.480224609375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1367.149169921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1367.149169921875
+ucus_yuksekligi = : 162.850830078125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1365.7823486328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1365.7823486328125
+ucus_yuksekligi = : 164.2176513671875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1372.3446044921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1372.3446044921875
+ucus_yuksekligi = : 157.6553955078125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1384.04052734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1384.04052734375
+ucus_yuksekligi = : 145.95947265625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1383.0120849609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1383.0120849609375
+ucus_yuksekligi = : 146.9879150390625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1375.1287841796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1375.1287841796875
+ucus_yuksekligi = : 154.8712158203125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1367.7374267578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1367.7374267578125
+ucus_yuksekligi = : 162.2625732421875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1362.6336669921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1362.6336669921875
+ucus_yuksekligi = : 167.3663330078125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1357.140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1357.140625
+ucus_yuksekligi = : 172.859375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1356.601806640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1356.601806640625
+ucus_yuksekligi = : 173.398193359375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1356.2889404296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1356.2889404296875
+ucus_yuksekligi = : 173.7110595703125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1353.578857421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1353.578857421875
+ucus_yuksekligi = : 176.421142578125
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1351.1761474609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1505.0
+rakım =:  1351.1761474609375
+ucus_yuksekligi = : 179.8238525390625
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1350.04150390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1350.04150390625
+ucus_yuksekligi = : 179.95849609375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1350.56298828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1350.56298828125
+ucus_yuksekligi = : 179.43701171875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1352.6583251953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1352.6583251953125
+ucus_yuksekligi = : 177.3416748046875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1354.200927734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1354.200927734375
+ucus_yuksekligi = : 175.799072265625
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1355.465576171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1355.465576171875
+ucus_yuksekligi = : 174.534423828125
+yaw = : 16.4
+merkezi dışarıda
+(30921, 18299)
+1363.25634765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1363.25634765625
+ucus_yuksekligi = : 166.74365234375
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1364.68017578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1364.68017578125
+ucus_yuksekligi = : 165.31982421875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1361.95751953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1361.95751953125
+ucus_yuksekligi = : 168.04248046875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1357.7315673828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1357.7315673828125
+ucus_yuksekligi = : 172.2684326171875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1363.4805908203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1363.4805908203125
+ucus_yuksekligi = : 165.5194091796875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1375.3792724609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1375.3792724609375
+ucus_yuksekligi = : 153.6207275390625
+yaw = : 16.6
+merkezi dışarıda
+(30921, 18299)
+1375.9517822265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1375.9517822265625
+ucus_yuksekligi = : 153.0482177734375
+yaw = : 16.6
+merkezi dışarıda
+(30921, 18299)
+1371.99267578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1371.99267578125
+ucus_yuksekligi = : 157.00732421875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1368.1685791015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1368.1685791015625
+ucus_yuksekligi = : 161.8314208984375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1364.828857421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1364.828857421875
+ucus_yuksekligi = : 165.171142578125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1366.116943359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1366.116943359375
+ucus_yuksekligi = : 163.883056640625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1367.1146240234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1367.1146240234375
+ucus_yuksekligi = : 162.8853759765625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1368.7894287109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1368.7894287109375
+ucus_yuksekligi = : 161.2105712890625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1361.98974609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1361.98974609375
+ucus_yuksekligi = : 168.01025390625
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1352.261474609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1352.261474609375
+ucus_yuksekligi = : 177.738525390625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1354.384521484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1354.384521484375
+ucus_yuksekligi = : 175.615478515625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1355.373291015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1355.373291015625
+ucus_yuksekligi = : 174.626708984375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1354.799072265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1354.799072265625
+ucus_yuksekligi = : 175.200927734375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1350.81982421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1350.81982421875
+ucus_yuksekligi = : 179.18017578125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1351.523193359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1351.523193359375
+ucus_yuksekligi = : 178.476806640625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1351.755859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1351.755859375
+ucus_yuksekligi = : 178.244140625
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1350.4892578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1350.4892578125
+ucus_yuksekligi = : 179.5107421875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1349.6807861328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1349.6807861328125
+ucus_yuksekligi = : 179.3192138671875
+yaw = : 18.0
+merkezi dışarıda
+(30921, 18299)
+1334.749267578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1502.0
+rakım =:  1334.749267578125
+ucus_yuksekligi = : 193.250732421875
+yaw = : -162.3
+merkezi dışarıda
+(30921, 18299)
+1334.8695068359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1502.0
+rakım =:  1334.8695068359375
+ucus_yuksekligi = : 193.1304931640625
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1336.928466796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1336.928466796875
+ucus_yuksekligi = : 192.071533203125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1337.941162109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1337.941162109375
+ucus_yuksekligi = : 192.058837890625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1337.971435546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1504.0
+rakım =:  1337.971435546875
+ucus_yuksekligi = : 192.028564453125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1338.4752197265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1338.4752197265625
+ucus_yuksekligi = : 190.5247802734375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1339.8323974609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1339.8323974609375
+ucus_yuksekligi = : 189.1676025390625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1341.6064453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1503.0
+rakım =:  1341.6064453125
+ucus_yuksekligi = : 187.3935546875
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1343.0611572265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1502.0
+rakım =:  1343.0611572265625
+ucus_yuksekligi = : 184.9388427734375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1342.35498046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1502.0
+rakım =:  1342.35498046875
+ucus_yuksekligi = : 185.64501953125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1342.6861572265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1342.6861572265625
+ucus_yuksekligi = : 184.3138427734375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1343.7386474609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1343.7386474609375
+ucus_yuksekligi = : 183.2613525390625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1346.2626953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1346.2626953125
+ucus_yuksekligi = : 180.7373046875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1346.98681640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1346.98681640625
+ucus_yuksekligi = : 180.01318359375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1347.49072265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1347.49072265625
+ucus_yuksekligi = : 179.50927734375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1348.149169921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.149169921875
+ucus_yuksekligi = : 178.850830078125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1347.84716796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1347.84716796875
+ucus_yuksekligi = : 179.15283203125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1348.3416748046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.3416748046875
+ucus_yuksekligi = : 178.6583251953125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1348.104248046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.104248046875
+ucus_yuksekligi = : 178.895751953125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1346.6248779296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1346.6248779296875
+ucus_yuksekligi = : 180.3751220703125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1348.1002197265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.1002197265625
+ucus_yuksekligi = : 178.8997802734375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1348.5389404296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.5389404296875
+ucus_yuksekligi = : 178.4610595703125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1347.502685546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1347.502685546875
+ucus_yuksekligi = : 179.497314453125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1347.797119140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1347.797119140625
+ucus_yuksekligi = : 179.202880859375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1348.2796630859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.2796630859375
+ucus_yuksekligi = : 178.7203369140625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1347.3641357421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1347.3641357421875
+ucus_yuksekligi = : 179.6358642578125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1346.7728271484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1346.7728271484375
+ucus_yuksekligi = : 180.2271728515625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1348.1182861328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.1182861328125
+ucus_yuksekligi = : 178.8817138671875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1348.7447509765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1348.7447509765625
+ucus_yuksekligi = : 178.2552490234375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1350.2294921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1350.2294921875
+ucus_yuksekligi = : 176.7705078125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1351.6302490234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1351.6302490234375
+ucus_yuksekligi = : 175.3697509765625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1350.9520263671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1350.9520263671875
+ucus_yuksekligi = : 176.0479736328125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1350.5484619140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1350.5484619140625
+ucus_yuksekligi = : 176.4515380859375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1352.0089111328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1352.0089111328125
+ucus_yuksekligi = : 174.9910888671875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1354.7850341796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1354.7850341796875
+ucus_yuksekligi = : 171.2149658203125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1355.264404296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1355.264404296875
+ucus_yuksekligi = : 170.735595703125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1355.52001953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1355.52001953125
+ucus_yuksekligi = : 170.47998046875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1356.9970703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1356.9970703125
+ucus_yuksekligi = : 169.0029296875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1358.6898193359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1358.6898193359375
+ucus_yuksekligi = : 167.3101806640625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1359.950927734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1359.950927734375
+ucus_yuksekligi = : 166.049072265625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1361.5794677734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1361.5794677734375
+ucus_yuksekligi = : 164.4205322265625
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1362.6802978515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1362.6802978515625
+ucus_yuksekligi = : 163.3197021484375
+yaw = : -162.5
+merkezi dışarıda
+(30921, 18299)
+1363.95166015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1363.95166015625
+ucus_yuksekligi = : 162.04833984375
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1366.3426513671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1366.3426513671875
+ucus_yuksekligi = : 159.6573486328125
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1370.6966552734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1370.6966552734375
+ucus_yuksekligi = : 155.3033447265625
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1377.1195068359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1377.1195068359375
+ucus_yuksekligi = : 149.8804931640625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1381.3863525390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1381.3863525390625
+ucus_yuksekligi = : 145.6136474609375
+yaw = : -162.5
+merkezi dışarıda
+(30921, 18299)
+1384.247314453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1384.247314453125
+ucus_yuksekligi = : 142.752685546875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1391.0133056640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1391.0133056640625
+ucus_yuksekligi = : 134.9866943359375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1392.9925537109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1392.9925537109375
+ucus_yuksekligi = : 133.0074462890625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1392.6688232421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1392.6688232421875
+ucus_yuksekligi = : 133.3311767578125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1397.336669921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1397.336669921875
+ucus_yuksekligi = : 128.663330078125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1402.501708984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1501.0
+rakım =:  1402.501708984375
+ucus_yuksekligi = : 124.498291015625
+yaw = : -162.4
+merkezi dışarıda
+(30921, 18299)
+1384.63134765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1384.63134765625
+ucus_yuksekligi = : 140.36865234375
+yaw = : 16.2
+merkezi dışarıda
+(30921, 18299)
+1382.152587890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1382.152587890625
+ucus_yuksekligi = : 142.847412109375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1379.9822998046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1379.9822998046875
+ucus_yuksekligi = : 145.0177001953125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1376.802001953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1376.802001953125
+ucus_yuksekligi = : 148.197998046875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1373.5162353515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1373.5162353515625
+ucus_yuksekligi = : 151.4837646484375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1371.925537109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1371.925537109375
+ucus_yuksekligi = : 152.074462890625
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1369.6925048828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1369.6925048828125
+ucus_yuksekligi = : 154.3074951171875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1367.634033203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1367.634033203125
+ucus_yuksekligi = : 156.365966796875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1366.76416015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1366.76416015625
+ucus_yuksekligi = : 157.23583984375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1365.2176513671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1365.2176513671875
+ucus_yuksekligi = : 158.7823486328125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1363.182373046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1363.182373046875
+ucus_yuksekligi = : 160.817626953125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1360.8370361328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1360.8370361328125
+ucus_yuksekligi = : 163.1629638671875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1359.5863037109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1359.5863037109375
+ucus_yuksekligi = : 164.4136962890625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1357.5472412109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1357.5472412109375
+ucus_yuksekligi = : 166.4527587890625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1356.2520751953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1356.2520751953125
+ucus_yuksekligi = : 166.7479248046875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1355.130859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1355.130859375
+ucus_yuksekligi = : 167.869140625
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1354.5404052734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1354.5404052734375
+ucus_yuksekligi = : 168.4595947265625
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1353.9052734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1353.9052734375
+ucus_yuksekligi = : 169.0947265625
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1352.81494140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1352.81494140625
+ucus_yuksekligi = : 170.18505859375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1351.35205078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1351.35205078125
+ucus_yuksekligi = : 171.64794921875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1349.9678955078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1349.9678955078125
+ucus_yuksekligi = : 173.0321044921875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1349.3743896484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1349.3743896484375
+ucus_yuksekligi = : 173.6256103515625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1348.376708984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1348.376708984375
+ucus_yuksekligi = : 174.623291015625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1348.3375244140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1348.3375244140625
+ucus_yuksekligi = : 174.6624755859375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1347.8760986328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1347.8760986328125
+ucus_yuksekligi = : 175.1239013671875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1346.1676025390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1346.1676025390625
+ucus_yuksekligi = : 177.8323974609375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1345.2374267578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1345.2374267578125
+ucus_yuksekligi = : 177.7625732421875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1344.2330322265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1344.2330322265625
+ucus_yuksekligi = : 178.7669677734375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1343.70849609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1343.70849609375
+ucus_yuksekligi = : 180.29150390625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1343.8614501953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1343.8614501953125
+ucus_yuksekligi = : 180.1385498046875
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1342.8343505859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1342.8343505859375
+ucus_yuksekligi = : 181.1656494140625
+yaw = : 16.5
+merkezi dışarıda
+(30921, 18299)
+1343.624267578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1343.624267578125
+ucus_yuksekligi = : 179.375732421875
+yaw = : 16.6
+merkezi dışarıda
+(30921, 18299)
+1342.3143310546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1342.3143310546875
+ucus_yuksekligi = : 181.6856689453125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1342.351806640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1342.351806640625
+ucus_yuksekligi = : 180.648193359375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1342.0372314453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1342.0372314453125
+ucus_yuksekligi = : 180.9627685546875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1341.652587890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1341.652587890625
+ucus_yuksekligi = : 181.347412109375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1340.5723876953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1340.5723876953125
+ucus_yuksekligi = : 182.4276123046875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1339.823486328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1339.823486328125
+ucus_yuksekligi = : 183.176513671875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1338.7906494140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1338.7906494140625
+ucus_yuksekligi = : 184.2093505859375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1337.6904296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1337.6904296875
+ucus_yuksekligi = : 185.3095703125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1337.53369140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1337.53369140625
+ucus_yuksekligi = : 185.46630859375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1336.7454833984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1336.7454833984375
+ucus_yuksekligi = : 186.2545166015625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1335.7130126953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1335.7130126953125
+ucus_yuksekligi = : 187.2869873046875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1335.196533203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1335.196533203125
+ucus_yuksekligi = : 187.803466796875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1334.7308349609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1334.7308349609375
+ucus_yuksekligi = : 188.2691650390625
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1334.6199951171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1334.6199951171875
+ucus_yuksekligi = : 188.3800048828125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1335.5308837890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1335.5308837890625
+ucus_yuksekligi = : 188.4691162109375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1335.174072265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1335.174072265625
+ucus_yuksekligi = : 188.825927734375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1333.3892822265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1333.3892822265625
+ucus_yuksekligi = : 190.6107177734375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1342.3350830078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1342.3350830078125
+ucus_yuksekligi = : 181.6649169921875
+yaw = : 17.2
+merkezi dışarıda
+(30921, 18299)
+1342.3536376953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1342.3536376953125
+ucus_yuksekligi = : 181.6463623046875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1341.9066162109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1341.9066162109375
+ucus_yuksekligi = : 183.0933837890625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1341.6070556640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1341.6070556640625
+ucus_yuksekligi = : 183.3929443359375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1340.389892578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1340.389892578125
+ucus_yuksekligi = : 184.610107421875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1339.7764892578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1339.7764892578125
+ucus_yuksekligi = : 185.2235107421875
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1338.4969482421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1338.4969482421875
+ucus_yuksekligi = : 186.5030517578125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1337.6319580078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1337.6319580078125
+ucus_yuksekligi = : 187.3680419921875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1337.5478515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1337.5478515625
+ucus_yuksekligi = : 187.4521484375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1336.3546142578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1336.3546142578125
+ucus_yuksekligi = : 188.6453857421875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1335.6201171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1335.6201171875
+ucus_yuksekligi = : 189.3798828125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1335.1131591796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1335.1131591796875
+ucus_yuksekligi = : 189.8868408203125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1334.6824951171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1334.6824951171875
+ucus_yuksekligi = : 190.3175048828125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1334.627197265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1334.627197265625
+ucus_yuksekligi = : 189.372802734375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1335.615966796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1335.615966796875
+ucus_yuksekligi = : 188.384033203125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1334.9176025390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1334.9176025390625
+ucus_yuksekligi = : 189.0823974609375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1333.1551513671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1333.1551513671875
+ucus_yuksekligi = : 190.8448486328125
+yaw = : 17.2
+merkezi dışarıda
+(30921, 18299)
+1331.2728271484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1331.2728271484375
+ucus_yuksekligi = : 192.7271728515625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1330.48974609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1330.48974609375
+ucus_yuksekligi = : 193.51025390625
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1330.80419921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1330.80419921875
+ucus_yuksekligi = : 193.19580078125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1330.5279541015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1330.5279541015625
+ucus_yuksekligi = : 193.4720458984375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1329.4810791015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1329.4810791015625
+ucus_yuksekligi = : 194.5189208984375
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1329.112060546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1329.112060546875
+ucus_yuksekligi = : 193.887939453125
+yaw = : 27.6
+merkezi dışarıda
+(30921, 18299)
+1323.50732421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1323.50732421875
+ucus_yuksekligi = : 199.49267578125
+yaw = : -162.3
+merkezi dışarıda
+(30921, 18299)
+1323.709228515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1323.709228515625
+ucus_yuksekligi = : 200.290771484375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1325.46044921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1325.46044921875
+ucus_yuksekligi = : 198.53955078125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1325.716796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1325.716796875
+ucus_yuksekligi = : 199.283203125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1325.9278564453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1325.9278564453125
+ucus_yuksekligi = : 199.0721435546875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1327.1610107421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1327.1610107421875
+ucus_yuksekligi = : 198.8389892578125
+yaw = : -163.1
+merkezi dışarıda
+(30921, 18299)
+1327.0433349609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1327.0433349609375
+ucus_yuksekligi = : 197.9566650390625
+yaw = : -163.1
+merkezi dışarıda
+(30921, 18299)
+1329.159912109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1329.159912109375
+ucus_yuksekligi = : 195.840087890625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1330.7808837890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1330.7808837890625
+ucus_yuksekligi = : 194.2191162109375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1329.8077392578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1329.8077392578125
+ucus_yuksekligi = : 195.1922607421875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1330.6282958984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1330.6282958984375
+ucus_yuksekligi = : 194.3717041015625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1331.954345703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1331.954345703125
+ucus_yuksekligi = : 193.045654296875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1332.590087890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1332.590087890625
+ucus_yuksekligi = : 192.409912109375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1333.744384765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1333.744384765625
+ucus_yuksekligi = : 192.255615234375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1334.6314697265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1334.6314697265625
+ucus_yuksekligi = : 191.3685302734375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1335.5089111328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1335.5089111328125
+ucus_yuksekligi = : 190.4910888671875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1336.406982421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1336.406982421875
+ucus_yuksekligi = : 188.593017578125
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1336.8807373046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1336.8807373046875
+ucus_yuksekligi = : 188.1192626953125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1337.2664794921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1337.2664794921875
+ucus_yuksekligi = : 188.7335205078125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1337.597412109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1337.597412109375
+ucus_yuksekligi = : 188.402587890625
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1338.7296142578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1338.7296142578125
+ucus_yuksekligi = : 187.2703857421875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1339.2135009765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1339.2135009765625
+ucus_yuksekligi = : 185.7864990234375
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1340.829345703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1340.829345703125
+ucus_yuksekligi = : 184.170654296875
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1341.72265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1341.72265625
+ucus_yuksekligi = : 183.27734375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1341.7535400390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1341.7535400390625
+ucus_yuksekligi = : 184.2464599609375
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1343.835693359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1343.835693359375
+ucus_yuksekligi = : 182.164306640625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1345.9752197265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1345.9752197265625
+ucus_yuksekligi = : 180.0247802734375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1345.230224609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1345.230224609375
+ucus_yuksekligi = : 180.769775390625
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1346.1064453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1346.1064453125
+ucus_yuksekligi = : 179.8935546875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1346.79296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1346.79296875
+ucus_yuksekligi = : 179.20703125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1347.19677734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1347.19677734375
+ucus_yuksekligi = : 178.80322265625
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1349.154296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1349.154296875
+ucus_yuksekligi = : 176.845703125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1350.496826171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1350.496826171875
+ucus_yuksekligi = : 175.503173828125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1349.853271484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1349.853271484375
+ucus_yuksekligi = : 176.146728515625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1350.8232421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1350.8232421875
+ucus_yuksekligi = : 175.1767578125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1351.8074951171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1351.8074951171875
+ucus_yuksekligi = : 174.1925048828125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1354.4974365234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1354.4974365234375
+ucus_yuksekligi = : 171.5025634765625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1353.677978515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1353.677978515625
+ucus_yuksekligi = : 172.322021484375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1354.4044189453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1354.4044189453125
+ucus_yuksekligi = : 171.5955810546875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1354.8443603515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1354.8443603515625
+ucus_yuksekligi = : 171.1556396484375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1355.991455078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1355.991455078125
+ucus_yuksekligi = : 170.008544921875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1357.6639404296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1357.6639404296875
+ucus_yuksekligi = : 168.3360595703125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1358.25
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1358.25
+ucus_yuksekligi = : 167.75
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1359.2882080078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1359.2882080078125
+ucus_yuksekligi = : 166.7117919921875
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1360.4588623046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1360.4588623046875
+ucus_yuksekligi = : 165.5411376953125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1361.5360107421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1361.5360107421875
+ucus_yuksekligi = : 164.4639892578125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1363.32763671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1363.32763671875
+ucus_yuksekligi = : 162.67236328125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1364.6248779296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1364.6248779296875
+ucus_yuksekligi = : 161.3751220703125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1366.0328369140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1366.0328369140625
+ucus_yuksekligi = : 159.9671630859375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1367.8544921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1367.8544921875
+ucus_yuksekligi = : 158.1455078125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1369.7362060546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1369.7362060546875
+ucus_yuksekligi = : 156.2637939453125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1371.2750244140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1371.2750244140625
+ucus_yuksekligi = : 154.7249755859375
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1372.577880859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1372.577880859375
+ucus_yuksekligi = : 153.422119140625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1373.632080078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1373.632080078125
+ucus_yuksekligi = : 152.367919921875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1376.262451171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1376.262451171875
+ucus_yuksekligi = : 149.737548828125
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1380.7523193359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1380.7523193359375
+ucus_yuksekligi = : 145.2476806640625
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1385.173095703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1500.0
+rakım =:  1385.173095703125
+ucus_yuksekligi = : 140.826904296875
+yaw = : -171.5
+merkezi dışarıda
+(30921, 18299)
+1383.0423583984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1383.0423583984375
+ucus_yuksekligi = : 140.9576416015625
+yaw = : 16.4
+merkezi dışarıda
+(30921, 18299)
+1377.7520751953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1377.7520751953125
+ucus_yuksekligi = : 146.2479248046875
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1374.645263671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1374.645263671875
+ucus_yuksekligi = : 149.354736328125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1372.34033203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1372.34033203125
+ucus_yuksekligi = : 151.65966796875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1370.1138916015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1370.1138916015625
+ucus_yuksekligi = : 153.8861083984375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1369.2064208984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1369.2064208984375
+ucus_yuksekligi = : 154.7935791015625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1366.642822265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1366.642822265625
+ucus_yuksekligi = : 157.357177734375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1365.412353515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1365.412353515625
+ucus_yuksekligi = : 158.587646484375
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1365.097412109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1365.097412109375
+ucus_yuksekligi = : 158.902587890625
+yaw = : 16.5
+merkezi dışarıda
+(30921, 18299)
+1364.5791015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1364.5791015625
+ucus_yuksekligi = : 159.4208984375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1363.621337890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1363.621337890625
+ucus_yuksekligi = : 160.378662109375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1362.2667236328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1362.2667236328125
+ucus_yuksekligi = : 161.7332763671875
+yaw = : 16.7
+merkezi dışarıda
+(30921, 18299)
+1361.3773193359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1361.3773193359375
+ucus_yuksekligi = : 162.6226806640625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1360.413818359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1360.413818359375
+ucus_yuksekligi = : 163.586181640625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1359.769775390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1359.769775390625
+ucus_yuksekligi = : 164.230224609375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1359.5638427734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1359.5638427734375
+ucus_yuksekligi = : 164.4361572265625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1358.6466064453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.6466064453125
+ucus_yuksekligi = : 165.3533935546875
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1358.588134765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.588134765625
+ucus_yuksekligi = : 165.411865234375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1359.3260498046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1359.3260498046875
+ucus_yuksekligi = : 164.6739501953125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1358.9072265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.9072265625
+ucus_yuksekligi = : 165.0927734375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1358.8172607421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.8172607421875
+ucus_yuksekligi = : 165.1827392578125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1358.459716796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.459716796875
+ucus_yuksekligi = : 165.540283203125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1357.256103515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1357.256103515625
+ucus_yuksekligi = : 166.743896484375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1355.419921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1355.419921875
+ucus_yuksekligi = : 168.580078125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1356.7105712890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1356.7105712890625
+ucus_yuksekligi = : 167.2894287109375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1356.6402587890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1356.6402587890625
+ucus_yuksekligi = : 167.3597412109375
+yaw = : 17.2
+merkezi dışarıda
+(30921, 18299)
+1355.398681640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1355.398681640625
+ucus_yuksekligi = : 168.601318359375
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1353.045654296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1353.045654296875
+ucus_yuksekligi = : 170.954345703125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1351.95751953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1351.95751953125
+ucus_yuksekligi = : 172.04248046875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1352.70751953125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1352.70751953125
+ucus_yuksekligi = : 171.29248046875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1354.7196044921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1354.7196044921875
+ucus_yuksekligi = : 169.2803955078125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1354.8695068359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1354.8695068359375
+ucus_yuksekligi = : 169.1304931640625
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1352.099365234375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1352.099365234375
+ucus_yuksekligi = : 171.900634765625
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1346.2039794921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1346.2039794921875
+ucus_yuksekligi = : 177.7960205078125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1344.74853515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1344.74853515625
+ucus_yuksekligi = : 179.25146484375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1346.2283935546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1346.2283935546875
+ucus_yuksekligi = : 177.7716064453125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1345.753662109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1345.753662109375
+ucus_yuksekligi = : 178.246337890625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1343.5732421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1343.5732421875
+ucus_yuksekligi = : 180.4267578125
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1344.1578369140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1344.1578369140625
+ucus_yuksekligi = : 179.8421630859375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1343.764892578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1343.764892578125
+ucus_yuksekligi = : 180.235107421875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1341.4420166015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1341.4420166015625
+ucus_yuksekligi = : 182.5579833984375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1339.2694091796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1339.2694091796875
+ucus_yuksekligi = : 184.7305908203125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1338.5321044921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1338.5321044921875
+ucus_yuksekligi = : 184.4678955078125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1337.8795166015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1337.8795166015625
+ucus_yuksekligi = : 185.1204833984375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1336.25244140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1336.25244140625
+ucus_yuksekligi = : 186.74755859375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1335.294189453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1335.294189453125
+ucus_yuksekligi = : 187.705810546875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1335.8946533203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1335.8946533203125
+ucus_yuksekligi = : 187.1053466796875
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1335.238037109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1335.238037109375
+ucus_yuksekligi = : 187.761962890625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1333.7830810546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1333.7830810546875
+ucus_yuksekligi = : 189.2169189453125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1332.3189697265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1332.3189697265625
+ucus_yuksekligi = : 190.6810302734375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1332.1453857421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1332.1453857421875
+ucus_yuksekligi = : 190.8546142578125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1330.382568359375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1330.382568359375
+ucus_yuksekligi = : 193.617431640625
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1328.1495361328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1328.1495361328125
+ucus_yuksekligi = : 195.8504638671875
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1328.0777587890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1328.0777587890625
+ucus_yuksekligi = : 194.9222412109375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1328.6337890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1328.6337890625
+ucus_yuksekligi = : 195.3662109375
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1327.149169921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1327.149169921875
+ucus_yuksekligi = : 196.850830078125
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1325.351806640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1325.351806640625
+ucus_yuksekligi = : 198.648193359375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1323.140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1323.140625
+ucus_yuksekligi = : 200.859375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1322.5244140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1322.5244140625
+ucus_yuksekligi = : 199.4755859375
+yaw = : 22.5
+merkezi dışarıda
+(30921, 18299)
+1337.92822265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1337.92822265625
+ucus_yuksekligi = : 185.07177734375
+yaw = : -162.1
+merkezi dışarıda
+(30921, 18299)
+1339.0938720703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1339.0938720703125
+ucus_yuksekligi = : 182.9061279296875
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1340.1339111328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1340.1339111328125
+ucus_yuksekligi = : 182.8660888671875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1338.72998046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1338.72998046875
+ucus_yuksekligi = : 184.27001953125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1345.452880859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1345.452880859375
+ucus_yuksekligi = : 177.547119140625
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1349.6275634765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1349.6275634765625
+ucus_yuksekligi = : 173.3724365234375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1351.6064453125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1351.6064453125
+ucus_yuksekligi = : 172.3935546875
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1352.0699462890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1352.0699462890625
+ucus_yuksekligi = : 171.9300537109375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1352.5263671875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1352.5263671875
+ucus_yuksekligi = : 171.4736328125
+yaw = : -163.3
+merkezi dışarıda
+(30921, 18299)
+1354.283935546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1354.283935546875
+ucus_yuksekligi = : 169.716064453125
+yaw = : -163.3
+merkezi dışarıda
+(30921, 18299)
+1355.5869140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1355.5869140625
+ucus_yuksekligi = : 168.4130859375
+yaw = : -163.2
+merkezi dışarıda
+(30921, 18299)
+1356.7174072265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1356.7174072265625
+ucus_yuksekligi = : 167.2825927734375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1358.06787109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.06787109375
+ucus_yuksekligi = : 165.93212890625
+yaw = : -163.1
+merkezi dışarıda
+(30921, 18299)
+1354.8717041015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1354.8717041015625
+ucus_yuksekligi = : 170.1282958984375
+yaw = : -163.1
+merkezi dışarıda
+(30921, 18299)
+1358.6207275390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1358.6207275390625
+ucus_yuksekligi = : 166.3792724609375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1357.716552734375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1357.716552734375
+ucus_yuksekligi = : 166.283447265625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1354.8023681640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1354.8023681640625
+ucus_yuksekligi = : 170.1976318359375
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1354.7313232421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1354.7313232421875
+ucus_yuksekligi = : 169.2686767578125
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1354.9185791015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1354.9185791015625
+ucus_yuksekligi = : 169.0814208984375
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1356.1290283203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1356.1290283203125
+ucus_yuksekligi = : 167.8709716796875
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1355.6280517578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1355.6280517578125
+ucus_yuksekligi = : 168.3719482421875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1357.15966796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1357.15966796875
+ucus_yuksekligi = : 166.84033203125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1358.3238525390625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1358.3238525390625
+ucus_yuksekligi = : 165.6761474609375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1357.91162109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1357.91162109375
+ucus_yuksekligi = : 166.08837890625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1363.8282470703125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1363.8282470703125
+ucus_yuksekligi = : 160.1717529296875
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1370.8096923828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1370.8096923828125
+ucus_yuksekligi = : 153.1903076171875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1376.190185546875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1376.190185546875
+ucus_yuksekligi = : 147.809814453125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1381.797119140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1381.797119140625
+ucus_yuksekligi = : 142.202880859375
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1379.906982421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1379.906982421875
+ucus_yuksekligi = : 144.093017578125
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1374.103271484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1374.103271484375
+ucus_yuksekligi = : 149.896728515625
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1368.2135009765625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1368.2135009765625
+ucus_yuksekligi = : 155.7864990234375
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1378.0850830078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1378.0850830078125
+ucus_yuksekligi = : 146.9149169921875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1384.0733642578125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1384.0733642578125
+ucus_yuksekligi = : 140.9266357421875
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1385.485107421875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1385.485107421875
+ucus_yuksekligi = : 138.514892578125
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1386.5748291015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1386.5748291015625
+ucus_yuksekligi = : 137.4251708984375
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1390.189697265625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1390.189697265625
+ucus_yuksekligi = : 133.810302734375
+yaw = : -163.1
+merkezi dışarıda
+(30921, 18299)
+1388.980224609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1388.980224609375
+ucus_yuksekligi = : 135.019775390625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1389.3175048828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1389.3175048828125
+ucus_yuksekligi = : 134.6824951171875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1389.1524658203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1389.1524658203125
+ucus_yuksekligi = : 135.8475341796875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1388.996826171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1388.996826171875
+ucus_yuksekligi = : 136.003173828125
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1388.8399658203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1388.8399658203125
+ucus_yuksekligi = : 136.1600341796875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1392.4664306640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1392.4664306640625
+ucus_yuksekligi = : 132.5335693359375
+yaw = : -162.5
+merkezi dışarıda
+(30921, 18299)
+1393.437744140625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1393.437744140625
+ucus_yuksekligi = : 131.562255859375
+yaw = : -162.1
+merkezi dışarıda
+(30921, 18299)
+1389.229248046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1389.229248046875
+ucus_yuksekligi = : 135.770751953125
+yaw = : -162.5
+merkezi dışarıda
+(30921, 18299)
+1381.461669921875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1381.461669921875
+ucus_yuksekligi = : 143.538330078125
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1373.4202880859375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1373.4202880859375
+ucus_yuksekligi = : 151.5797119140625
+yaw = : -162.7
+merkezi dışarıda
+(30921, 18299)
+1370.6416015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1370.6416015625
+ucus_yuksekligi = : 154.3583984375
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1370.0858154296875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1370.0858154296875
+ucus_yuksekligi = : 154.9141845703125
+yaw = : -163.0
+merkezi dışarıda
+(30921, 18299)
+1370.3760986328125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1370.3760986328125
+ucus_yuksekligi = : 153.6239013671875
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1370.704833984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1370.704833984375
+ucus_yuksekligi = : 153.295166015625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1371.7269287109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1371.7269287109375
+ucus_yuksekligi = : 152.2730712890625
+yaw = : -162.9
+merkezi dışarıda
+(30921, 18299)
+1370.6524658203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1370.6524658203125
+ucus_yuksekligi = : 154.3475341796875
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1370.62890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1370.62890625
+ucus_yuksekligi = : 154.37109375
+yaw = : -162.4
+merkezi dışarıda
+(30921, 18299)
+1372.010498046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1372.010498046875
+ucus_yuksekligi = : 152.989501953125
+yaw = : -162.6
+merkezi dışarıda
+(30921, 18299)
+1373.2767333984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1373.2767333984375
+ucus_yuksekligi = : 151.7232666015625
+yaw = : -162.4
+merkezi dışarıda
+(30921, 18299)
+1375.54541015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1375.54541015625
+ucus_yuksekligi = : 149.45458984375
+yaw = : -162.5
+merkezi dışarıda
+(30921, 18299)
+1378.1478271484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1378.1478271484375
+ucus_yuksekligi = : 146.8521728515625
+yaw = : -162.5
+merkezi dışarıda
+(30921, 18299)
+1382.7724609375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1499.0
+rakım =:  1382.7724609375
+ucus_yuksekligi = : 142.2275390625
+yaw = : -162.8
+merkezi dışarıda
+(30921, 18299)
+1384.5032958984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1498.0
+rakım =:  1384.5032958984375
+ucus_yuksekligi = : 139.4967041015625
+yaw = : -174.0
+merkezi dışarıda
+(30921, 18299)
+1379.758056640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1379.758056640625
+ucus_yuksekligi = : 142.241943359375
+yaw = : 16.2
+merkezi dışarıda
+(30921, 18299)
+1377.0914306640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1377.0914306640625
+ucus_yuksekligi = : 145.9085693359375
+yaw = : 17.0
+merkezi dışarıda
+(30921, 18299)
+1376.1673583984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1376.1673583984375
+ucus_yuksekligi = : 146.8326416015625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1376.24658203125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1376.24658203125
+ucus_yuksekligi = : 146.75341796875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1375.670166015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1375.670166015625
+ucus_yuksekligi = : 147.329833984375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1378.1373291015625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1378.1373291015625
+ucus_yuksekligi = : 144.8626708984375
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1384.5965576171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1384.5965576171875
+ucus_yuksekligi = : 137.4034423828125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1397.320556640625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1397.320556640625
+ucus_yuksekligi = : 124.679443359375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1415.03955078125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1415.03955078125
+ucus_yuksekligi = : 106.96044921875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1416.915771484375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1416.915771484375
+ucus_yuksekligi = : 105.084228515625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1404.9268798828125
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1404.9268798828125
+ucus_yuksekligi = : 117.0731201171875
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1400.0653076171875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1496.0
+rakım =:  1400.0653076171875
+ucus_yuksekligi = : 121.9346923828125
+yaw = : 16.8
+merkezi dışarıda
+(30921, 18299)
+1399.0621337890625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1399.0621337890625
+ucus_yuksekligi = : 123.9378662109375
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1410.510498046875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1410.510498046875
+ucus_yuksekligi = : 112.489501953125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1428.5657958984375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1428.5657958984375
+ucus_yuksekligi = : 94.4342041015625
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1440.8475341796875
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1440.8475341796875
+ucus_yuksekligi = : 82.1524658203125
+yaw = : 16.9
+merkezi dışarıda
+(30921, 18299)
+1444.88037109375
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1444.88037109375
+ucus_yuksekligi = : 78.11962890625
+yaw = : 17.1
+merkezi dışarıda
+(30921, 18299)
+1445.771728515625
+kamera model=  FC2204
+focal lenght =  4.386
+altitude = :  1497.0
+rakım =:  1445.771728515625
+ucus_yuksekligi = : 77.228271484375
+yaw = : 18.4
+merkezi dışarıda
+dogru tahmin =  0
+yanlış tahmin =  0
+yanlış pozitif =  0
+doğruluk yüzdesi: 0.00
+UCUS 2022_k32_3_e1900.h5: kare=0 <=70m=None <=25m=None medyan=None

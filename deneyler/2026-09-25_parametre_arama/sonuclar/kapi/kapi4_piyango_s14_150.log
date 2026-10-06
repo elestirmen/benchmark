@@ -1,0 +1,72 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-26 01:00:30 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:00:30 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_   0.75  0.77 +0.2512 +0.1859  +0.0652 99.75/150 1.75/300.0   50.9/54.3  
+                                                   gruplar: g2b_clean=0.670  g2b_hard_v1=0.754  b2g_clean=0.715  b2g_hard_v1=0.842
+2026-09-26 01:02:30 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:02:30 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_   0.63  1.54 +0.1808 +0.1131  +0.0677 113.25/150 0.5/300.0   15.5/17.4  
+                                                   gruplar: g2b_clean=0.576  g2b_hard_v1=0.641  b2g_clean=0.591  b2g_hard_v1=0.706
+2026-09-26 01:04:30 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:04:30 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_   0.59  1.82 +0.1918 +0.1135  +0.0784 119.5/150 0.25/300.0   16.0/17.7  
+                                                   gruplar: g2b_clean=0.550  g2b_hard_v1=0.596  b2g_clean=0.562  b2g_hard_v1=0.667
+2026-09-26 01:06:32 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:06:32 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_   0.57  2.15 +0.1696 +0.0961  +0.0734 113.0/150 0.25/300.0   17.3/19.3  
+                                                   gruplar: g2b_clean=0.529  g2b_hard_v1=0.566  b2g_clean=0.546  b2g_hard_v1=0.638
+2026-09-26 01:08:32 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:08:32 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_   0.65  1.44 +0.1886 +0.1213  +0.0673 103.75/150 2.5/300.0   17.3/19.2  
+                                                   gruplar: g2b_clean=0.601  g2b_hard_v1=0.649  b2g_clean=0.610  b2g_hard_v1=0.725
+2026-09-26 01:10:32 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:10:32 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_   0.65  1.29 +0.1488 +0.0964  +0.0524 99.5/150 1.75/300.0   12.5/14.1  
+                                                   gruplar: g2b_clean=0.634  g2b_hard_v1=0.652  b2g_clean=0.607  b2g_hard_v1=0.708
+2026-09-26 01:12:33 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:12:33 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_   0.84  0.58 +0.1634 +0.1351  +0.0283 87.75/150 0.0/300.0   19.8/21.3  
+                                                   gruplar: g2b_clean=0.747  g2b_hard_v1=0.756  b2g_clean=0.797  b2g_hard_v1=1.065
+2026-09-26 01:14:53 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00008_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:14:53 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00008_helu_osigmoid_(1, 1)_   0.62  1.74 +0.2170 +0.1333  +0.0838 111.0/150 0.5/300.0   20.8/23.3  
+                                                   gruplar: g2b_clean=0.572  g2b_hard_v1=0.595  b2g_clean=0.589  b2g_hard_v1=0.711
+2026-09-26 01:17:06 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00009_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:17:06 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00009_helu_osigmoid_(1, 1)_   0.60  2.03 +0.1744 +0.1032  +0.0712 111.75/150 0.25/300.0   13.0/14.6  
+                                                   gruplar: g2b_clean=0.553  g2b_hard_v1=0.572  b2g_clean=0.567  b2g_hard_v1=0.689
+2026-09-26 01:19:13 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00010_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:19:13 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00010_helu_osigmoid_(1, 1)_   0.68  1.14 +0.1676 +0.1137  +0.0539 99.5/150 0.75/300.0   10.5/11.6  
+                                                   gruplar: g2b_clean=0.645  g2b_hard_v1=0.667  b2g_clean=0.647  b2g_hard_v1=0.766
+2026-09-26 01:21:25 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00011_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:21:25 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00011_helu_osigmoid_(1, 1)_   0.66  1.34 +0.1825 +0.1195  +0.0631 103.0/150 0.0/300.0   15.9/17.5  
+                                                   gruplar: g2b_clean=0.618  g2b_hard_v1=0.637  b2g_clean=0.621  b2g_hard_v1=0.757
+2026-09-26 01:23:33 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\p_s14\keras\P14_model_f32_k3_epoch_00012_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:23:33 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=sigmoid
+P14_model_f32_k3_epoch_00012_helu_osigmoid_(1, 1)_   0.59  1.96 +0.1919 +0.1120  +0.0799 116.25/150 0.0/300.0   13.1/14.3  
+                                                   gruplar: g2b_clean=0.558  g2b_hard_v1=0.580  b2g_clean=0.560  b2g_hard_v1=0.642
+
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 1/12
+  GECTI  oran= 0.57  P14_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  P14_model_f32_k3_epoch_00012_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  P14_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  P14_model_f32_k3_epoch_00009_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.62  P14_model_f32_k3_epoch_00008_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  P14_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.65  P14_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.65  P14_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.66  P14_model_f32_k3_epoch_00011_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.68  P14_model_f32_k3_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.75  P14_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.84  P14_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+Elenen adaylar benchmark'a sokulmamali.
+JSON yazildi: C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\sonuclar\kapi\kapi4_piyango_s14_150.json

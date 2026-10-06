@@ -1,0 +1,9 @@
+{
+  "input_normalization": "zero_1",
+  "enhancement": "none",
+  "color_mode": "grayscale",
+  "image_size": 544,
+  "output_activation": "sigmoid",
+  "output_color_mode": "grayscale",
+  "trained_by": "torch_flat_egitim.py (PyTorch, autoencoder_unified flat_bottleneck esdegeri)"
+}

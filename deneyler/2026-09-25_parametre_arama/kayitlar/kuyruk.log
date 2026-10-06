@@ -1,0 +1,7 @@
+2026-09-25 12:12:33 BASLA r2_s11_lrd --seed 11 --init-npz C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\egitim\r1_s11_ema\epoch_00006.npz --lr-schedule 3e-4:3,1e-4:3 --ema 0.9998
+2026-09-25 12:43:41 BITTI r2_s11_lrd CIKIS_KODU=0
+2026-09-25 12:43:42 BASLA r3_s11_aug --seed 11 --epochs 12 --ema 0.9998 --aug 0.5
+2026-09-25 13:23:12 BITTI r3_s11_aug CIKIS_KODU=0
+2026-09-25 13:23:12 BASLA r4_s11_f48 --seed 11 --epochs 12 --ema 0.9998 --filters 48
+2026-09-25 13:43:33 BITTI r4_s11_f48 CIKIS_KODU=127
+2026-09-25 13:43:33 BASLA r5_s12_ema --seed 12 --epochs 12 --ema 0.9998

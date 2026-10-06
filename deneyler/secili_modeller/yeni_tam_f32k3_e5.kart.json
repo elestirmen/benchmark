@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "yeni_tam_f32k3_e5",
+  "aciklama": "PyTorch, tam sonuclar_19 verisi, seed 42, epoch 5. Urgup 1000 sorgu global 0.564.",
+  "tarif": "zero_1, BCE, Adam 1e-3, batch 1, her epoch karistirma",
+  "kaynak_deney": "2026-09-24_zero1_tarif",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-24_zero1_tarif\\modeller\\adaylar\\tam_f32k3_e5\\TARAMA_tam_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5",
+  "raf_dosyasi": "yeni_tam_f32k3_e5.h5",
+  "sha256": "0a42a6027ba8d11fd971004929dc315074a2940cd9edf139eec83b5f8b6715fc",
+  "rafa_eklenme": "2026-09-25T11:17:42"
+}

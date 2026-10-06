@@ -1,0 +1,936 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+OpenCV CUDA devices: 0, has TM: False, build CUDA: False, build CUDA line: 
+2026-10-01 21:46:33.384737: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-01 21:46:33.386557: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-01 21:46:33.390055: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-01 21:46:34.491734: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:42] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2026-10-01 21:46:34.492413: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13500 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 5060 Ti, pci bus id: 0000:01:00.0, compute capability: 12.0
+[On isleme] 2022_tpu_f48k4_cb62.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+[On isleme] 2022_tpu_f48k4_cb62.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+(22987, 31656)
+(22987, 31656)
+1104.9439697265625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1104.9439697265625
+ucus_yuksekligi = : 656.0560302734375
+yaw = : 153.8
+2026-10-01 21:46:38.428038: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+(512, 512)
+TemplateMatching backend: CPU
+(4489, 4489)
+-1000000000.0 0.1754177063703537 (0, 0) (2362, 2222)
+konum:  (16954, 13640, 102, 118)
+uzaklik = 0.036 km
+[1/54] ERR=36m  ACC=100.0%  TM=0.175  LOC_SPD=0.00m/s  OF_SPD=0.00m/s (warmup) t=3.72s
+Kodun calisma suresi___________________________________________: 3.72 saniye
+1 / 54      dogru_tahmin: ,1,  yanlis_tahmin: ,0,  dogru pozitif: 1,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1101.2393798828125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1101.2393798828125
+ucus_yuksekligi = : 659.7606201171875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.17861905694007874 (0, 0) (2367, 2217)
+konum:  (17008, 13747, 109, 120)
+uzaklik = 0.036 km
+[2/54] ERR=35m  ACC=100.0%  TM=0.179  LOC_SPD=12.68m/s  OF_SPD=12.27m/s t=0.56s
+Kodun calisma suresi___________________________________________: 0.56 saniye
+2 / 54      dogru_tahmin: ,2,  yanlis_tahmin: ,0,  dogru pozitif: 2,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1099.5645751953125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1099.5645751953125
+ucus_yuksekligi = : 661.4354248046875
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.19475089013576508 (0, 0) (2365, 2219)
+konum:  (17053, 13840, 113, 118)
+uzaklik = 0.036 km
+[3/54] ERR=35m  ACC=100.0%  TM=0.195  LOC_SPD=10.01m/s  OF_SPD=10.12m/s t=0.56s
+Kodun calisma suresi___________________________________________: 0.56 saniye
+3 / 54      dogru_tahmin: ,3,  yanlis_tahmin: ,0,  dogru pozitif: 3,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1099.140869140625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1099.140869140625
+ucus_yuksekligi = : 661.859130859375
+yaw = : 153.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.23102429509162903 (0, 0) (2358, 2225)
+konum:  (17097, 13934, 110, 118)
+uzaklik = 0.034 km
+[4/54] ERR=34m  ACC=100.0%  TM=0.231  LOC_SPD=14.95m/s  OF_SPD=15.21m/s t=0.56s
+Kodun calisma suresi___________________________________________: 0.56 saniye
+4 / 54      dogru_tahmin: ,4,  yanlis_tahmin: ,0,  dogru pozitif: 4,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1098.4432373046875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1098.4432373046875
+ucus_yuksekligi = : 662.5567626953125
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.23485325276851654 (0, 0) (2350, 2227)
+konum:  (17140, 14027, 108, 119)
+uzaklik = 0.033 km
+[5/54] ERR=32m  ACC=100.0%  TM=0.235  LOC_SPD=10.01m/s  OF_SPD=10.01m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+5 / 54      dogru_tahmin: ,5,  yanlis_tahmin: ,0,  dogru pozitif: 5,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1096.9471435546875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1096.9471435546875
+ucus_yuksekligi = : 664.0528564453125
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.27628499269485474 (0, 0) (2349, 2228)
+konum:  (17178, 14116, 112, 122)
+uzaklik = 0.031 km
+[6/54] ERR=30m  ACC=100.0%  TM=0.276  LOC_SPD=14.95m/s  OF_SPD=15.20m/s t=0.55s
+Kodun calisma suresi___________________________________________: 0.55 saniye
+6 / 54      dogru_tahmin: ,6,  yanlis_tahmin: ,0,  dogru pozitif: 6,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1096.2950439453125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1096.2950439453125
+ucus_yuksekligi = : 664.7049560546875
+yaw = : 154.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.290889710187912 (0, 0) (2347, 2228)
+konum:  (17222, 14202, 109, 122)
+uzaklik = 0.030 km
+[7/54] ERR=30m  ACC=100.0%  TM=0.291  LOC_SPD=9.66m/s  OF_SPD=9.42m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+7 / 54      dogru_tahmin: ,7,  yanlis_tahmin: ,0,  dogru pozitif: 7,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1096.4080810546875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1096.4080810546875
+ucus_yuksekligi = : 664.5919189453125
+yaw = : 153.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.29423263669013977 (0, 0) (2350, 2223)
+konum:  (17266, 14280, 116, 118)
+uzaklik = 0.032 km
+[8/54] ERR=31m  ACC=100.0%  TM=0.294  LOC_SPD=13.82m/s  OF_SPD=13.62m/s t=0.55s
+Kodun calisma suresi___________________________________________: 0.55 saniye
+8 / 54      dogru_tahmin: ,8,  yanlis_tahmin: ,0,  dogru pozitif: 8,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1095.762451171875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1095.762451171875
+ucus_yuksekligi = : 665.237548828125
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3068290054798126 (0, 0) (2357, 2216)
+konum:  (17317, 14355, 115, 120)
+uzaklik = 0.034 km
+[9/54] ERR=34m  ACC=100.0%  TM=0.307  LOC_SPD=9.52m/s  OF_SPD=9.26m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+9 / 54      dogru_tahmin: ,9,  yanlis_tahmin: ,0,  dogru pozitif: 9,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1095.5833740234375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1734.0
+rakım =:  1095.5833740234375
+ucus_yuksekligi = : 664.4166259765625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3347647190093994 (0, 0) (2362, 2213)
+konum:  (17367, 14439, 113, 117)
+uzaklik = 0.036 km
+[10/54] ERR=35m  ACC=100.0%  TM=0.335  LOC_SPD=14.29m/s  OF_SPD=14.28m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+10 / 54      dogru_tahmin: ,10,  yanlis_tahmin: ,0,  dogru pozitif: 10,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1097.230224609375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1734.0
+rakım =:  1097.230224609375
+ucus_yuksekligi = : 662.769775390625
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.35124921798706055 (0, 0) (2363, 2211)
+konum:  (17416, 14522, 109, 113)
+uzaklik = 0.037 km
+[11/54] ERR=36m  ACC=100.0%  TM=0.351  LOC_SPD=13.82m/s  OF_SPD=13.77m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+11 / 54      dogru_tahmin: ,11,  yanlis_tahmin: ,0,  dogru pozitif: 11,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1097.559814453125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1097.559814453125
+ucus_yuksekligi = : 663.440185546875
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3708030879497528 (0, 0) (2365, 2216)
+konum:  (17467, 14617, 108, 112)
+uzaklik = 0.038 km
+[12/54] ERR=37m  ACC=100.0%  TM=0.371  LOC_SPD=10.01m/s  OF_SPD=10.43m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+12 / 54      dogru_tahmin: ,12,  yanlis_tahmin: ,0,  dogru pozitif: 12,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1096.6142578125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1096.6142578125
+ucus_yuksekligi = : 664.3857421875
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.35413259267807007 (0, 0) (2365, 2221)
+konum:  (17549, 14780, 110, 116)
+uzaklik = 0.037 km
+[13/54] ERR=36m  ACC=100.0%  TM=0.354  LOC_SPD=13.75m/s  OF_SPD=13.81m/s t=0.59s
+Kodun calisma suresi___________________________________________: 0.59 saniye
+13 / 54      dogru_tahmin: ,13,  yanlis_tahmin: ,0,  dogru pozitif: 13,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1096.4638671875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1096.4638671875
+ucus_yuksekligi = : 664.5361328125
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31688249111175537 (0, 0) (2361, 2217)
+konum:  (17412, 14712, 315, 316)
+uzaklik = 0.038 km
+[14/54] ERR=37m  ACC=100.0%  TM=0.317  LOC_SPD=11.08m/s  OF_SPD=10.92m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+14 / 54      dogru_tahmin: ,14,  yanlis_tahmin: ,0,  dogru pozitif: 14,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1095.1063232421875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1095.1063232421875
+ucus_yuksekligi = : 665.8936767578125
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.21659883856773376 (0, 0) (2362, 2217)
+konum:  (17467, 14815, 311, 315)
+uzaklik = 0.038 km
+[15/54] ERR=37m  ACC=100.0%  TM=0.217  LOC_SPD=11.57m/s  OF_SPD=11.40m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+15 / 54      dogru_tahmin: ,15,  yanlis_tahmin: ,0,  dogru pozitif: 15,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1094.17138671875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1094.17138671875
+ucus_yuksekligi = : 666.82861328125
+yaw = : 153.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.19913829863071442 (0, 0) (2361, 2216)
+konum:  (17511, 14899, 313, 317)
+uzaklik = 0.038 km
+[16/54] ERR=38m  ACC=100.0%  TM=0.199  LOC_SPD=14.35m/s  OF_SPD=14.48m/s t=0.56s
+Kodun calisma suresi___________________________________________: 0.56 saniye
+16 / 54      dogru_tahmin: ,16,  yanlis_tahmin: ,0,  dogru pozitif: 16,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1094.7607421875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1094.7607421875
+ucus_yuksekligi = : 666.2392578125
+yaw = : 153.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.19917403161525726 (0, 0) (2170, 1716)
+konum:  (17381, 14821, 506, 207)
+uzaklik = 0.115 km
+[17/54] ERR=114m  ACC=94.1%  TM=0.199  LOC_SPD=9.85m/s  OF_SPD=9.82m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+17 / 54      dogru_tahmin: ,16,  yanlis_tahmin: ,1,  dogru pozitif: 16,  yanlış pozitif: 1,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1092.0977783203125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1092.0977783203125
+ucus_yuksekligi = : 668.9022216796875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.18694855272769928 (0, 0) (3481, 311)
+kesişim yok
+uzaklik = 0.686 km
+[18/54] ERR=685m  ACC=88.9%  TM=0.187  LOC_SPD=15.18m/s  OF_SPD=15.46m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+18 / 54      dogru_tahmin: ,16,  yanlis_tahmin: ,2,  dogru pozitif: 16,  yanlış pozitif: 1,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1091.0948486328125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1091.0948486328125
+ucus_yuksekligi = : 669.9051513671875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.12938855588436127 (0, 0) (2178, 1061)
+kesişim yok
+uzaklik = 0.354 km
+[19/54] ERR=354m  ACC=84.2%  TM=0.129  LOC_SPD=12.02m/s  OF_SPD=12.04m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+19 / 54      dogru_tahmin: ,16,  yanlis_tahmin: ,3,  dogru pozitif: 16,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1090.47412109375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1090.47412109375
+ucus_yuksekligi = : 670.52587890625
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.14206631481647491 (0, 0) (2359, 2202)
+konum:  (17969, 15585, 314, 313)
+uzaklik = 0.066 km
+[20/54] ERR=66m  ACC=85.0%  TM=0.142  LOC_SPD=11.95m/s  OF_SPD=12.04m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+20 / 54      dogru_tahmin: ,17,  yanlis_tahmin: ,3,  dogru pozitif: 17,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1091.78271484375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1091.78271484375
+ucus_yuksekligi = : 669.21728515625
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.16054226458072662 (0, 0) (2356, 2200)
+kesişim yok
+uzaklik = 0.036 km
+[21/54] ERR=35m  ACC=85.7%  TM=0.161  LOC_SPD=9.97m/s  OF_SPD=9.93m/s t=0.59s
+Kodun calisma suresi___________________________________________: 0.59 saniye
+21 / 54      dogru_tahmin: ,18,  yanlis_tahmin: ,3,  dogru pozitif: 17,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1092.2518310546875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1092.2518310546875
+ucus_yuksekligi = : 668.7481689453125
+yaw = : 153.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.1667882353067398 (0, 0) (2362, 2216)
+konum:  (17871, 15585, 309, 322)
+uzaklik = 0.037 km
+[22/54] ERR=37m  ACC=86.4%  TM=0.167  LOC_SPD=10.82m/s  OF_SPD=10.96m/s t=0.59s
+Kodun calisma suresi___________________________________________: 0.59 saniye
+22 / 54      dogru_tahmin: ,19,  yanlis_tahmin: ,3,  dogru pozitif: 18,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1092.9000244140625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1092.9000244140625
+ucus_yuksekligi = : 668.0999755859375
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.16042150557041168 (0, 0) (2356, 2212)
+konum:  (18109, 15868, 118, 131)
+uzaklik = 0.034 km
+[23/54] ERR=34m  ACC=87.0%  TM=0.160  LOC_SPD=14.95m/s  OF_SPD=15.61m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+23 / 54      dogru_tahmin: ,20,  yanlis_tahmin: ,3,  dogru pozitif: 19,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1095.0838623046875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1095.0838623046875
+ucus_yuksekligi = : 665.9161376953125
+yaw = : 154.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.15102434158325195 (0, 0) (2364, 2226)
+konum:  (17963, 15769, 309, 315)
+uzaklik = 0.035 km
+[24/54] ERR=35m  ACC=87.5%  TM=0.151  LOC_SPD=9.52m/s  OF_SPD=9.73m/s t=0.55s
+Kodun calisma suresi___________________________________________: 0.55 saniye
+24 / 54      dogru_tahmin: ,21,  yanlis_tahmin: ,3,  dogru pozitif: 20,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1096.80224609375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1096.80224609375
+ucus_yuksekligi = : 664.19775390625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.16629758477210999 (0, 0) (2364, 2222)
+konum:  (18212, 16059, 115, 121)
+uzaklik = 0.036 km
+[25/54] ERR=35m  ACC=88.0%  TM=0.166  LOC_SPD=16.82m/s  OF_SPD=17.06m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+25 / 54      dogru_tahmin: ,22,  yanlis_tahmin: ,3,  dogru pozitif: 21,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1100.0443115234375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1100.0443115234375
+ucus_yuksekligi = : 660.9556884765625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.1843944489955902 (0, 0) (2367, 2223)
+konum:  (18252, 16144, 127, 129)
+uzaklik = 0.035 km
+[26/54] ERR=35m  ACC=88.5%  TM=0.184  LOC_SPD=10.82m/s  OF_SPD=10.53m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+26 / 54      dogru_tahmin: ,23,  yanlis_tahmin: ,3,  dogru pozitif: 22,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1102.8232421875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1102.8232421875
+ucus_yuksekligi = : 658.1767578125
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.17786428332328796 (0, 0) (2365, 2217)
+konum:  (18315, 16252, 117, 126)
+uzaklik = 0.036 km
+[27/54] ERR=35m  ACC=88.9%  TM=0.178  LOC_SPD=12.02m/s  OF_SPD=11.78m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+27 / 54      dogru_tahmin: ,24,  yanlis_tahmin: ,3,  dogru pozitif: 23,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1105.8314208984375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1105.8314208984375
+ucus_yuksekligi = : 655.1685791015625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.1886969804763794 (0, 0) (2957, 1072)
+konum:  (18365, 16348, 114, 121)
+uzaklik = 0.036 km
+[28/54] ERR=35m  ACC=89.3%  TM=0.189  LOC_SPD=10.33m/s  OF_SPD=10.45m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+28 / 54      dogru_tahmin: ,25,  yanlis_tahmin: ,3,  dogru pozitif: 24,  yanlış pozitif: 1,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1109.920166015625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1109.920166015625
+ucus_yuksekligi = : 651.079833984375
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.16703183948993683 (0, 0) (1816, 2209)
+konum:  (18011, 16236, 169, 322)
+uzaklik = 0.086 km
+[29/54] ERR=85m  ACC=86.2%  TM=0.167  LOC_SPD=14.95m/s  OF_SPD=14.74m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+29 / 54      dogru_tahmin: ,25,  yanlis_tahmin: ,4,  dogru pozitif: 24,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1112.5126953125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1112.5126953125
+ucus_yuksekligi = : 648.4873046875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.19851209223270416 (0, 0) (2363, 2220)
+konum:  (18280, 16371, 303, 308)
+uzaklik = 0.038 km
+[30/54] ERR=37m  ACC=86.7%  TM=0.199  LOC_SPD=10.45m/s  OF_SPD=10.23m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+30 / 54      dogru_tahmin: ,26,  yanlis_tahmin: ,4,  dogru pozitif: 25,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1115.519287109375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1115.519287109375
+ucus_yuksekligi = : 645.480712890625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.20800617337226868 (0, 0) (2361, 2221)
+konum:  (18530, 16660, 95, 107)
+uzaklik = 0.035 km
+[31/54] ERR=34m  ACC=87.1%  TM=0.208  LOC_SPD=15.02m/s  OF_SPD=14.99m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+31 / 54      dogru_tahmin: ,27,  yanlis_tahmin: ,4,  dogru pozitif: 26,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1118.834716796875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1118.834716796875
+ucus_yuksekligi = : 642.165283203125
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.22992776334285736 (0, 0) (2361, 2224)
+konum:  (18375, 16560, 300, 306)
+uzaklik = 0.037 km
+[32/54] ERR=37m  ACC=87.5%  TM=0.230  LOC_SPD=10.77m/s  OF_SPD=10.83m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+32 / 54      dogru_tahmin: ,28,  yanlis_tahmin: ,4,  dogru pozitif: 27,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1123.11962890625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1123.11962890625
+ucus_yuksekligi = : 637.88037109375
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.35731494426727295 (0, 0) (2361, 2225)
+konum:  (18624, 16847, 98, 109)
+uzaklik = 0.034 km
+[33/54] ERR=34m  ACC=87.9%  TM=0.357  LOC_SPD=15.02m/s  OF_SPD=14.91m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+33 / 54      dogru_tahmin: ,29,  yanlis_tahmin: ,4,  dogru pozitif: 28,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1127.85302734375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1127.85302734375
+ucus_yuksekligi = : 633.14697265625
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.35174432396888733 (0, 0) (2359, 2221)
+konum:  (18656, 16930, 115, 118)
+uzaklik = 0.032 km
+[34/54] ERR=32m  ACC=88.2%  TM=0.352  LOC_SPD=10.41m/s  OF_SPD=10.01m/s t=0.56s
+Kodun calisma suresi___________________________________________: 0.56 saniye
+34 / 54      dogru_tahmin: ,30,  yanlis_tahmin: ,4,  dogru pozitif: 29,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1135.06494140625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1135.06494140625
+ucus_yuksekligi = : 625.93505859375
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3482697308063507 (0, 0) (2348, 2213)
+konum:  (18701, 17017, 112, 118)
+uzaklik = 0.032 km
+[35/54] ERR=31m  ACC=88.6%  TM=0.348  LOC_SPD=15.02m/s  OF_SPD=14.32m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+35 / 54      dogru_tahmin: ,31,  yanlis_tahmin: ,4,  dogru pozitif: 30,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1144.484619140625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1144.484619140625
+ucus_yuksekligi = : 616.515380859375
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.35337933897972107 (0, 0) (2342, 2213)
+konum:  (18755, 17128, 112, 121)
+uzaklik = 0.030 km
+[36/54] ERR=30m  ACC=88.9%  TM=0.353  LOC_SPD=9.25m/s  OF_SPD=8.93m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+36 / 54      dogru_tahmin: ,32,  yanlis_tahmin: ,4,  dogru pozitif: 31,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1152.5137939453125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1152.5137939453125
+ucus_yuksekligi = : 608.4862060546875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3294316530227661 (0, 0) (2338, 2216)
+konum:  (18797, 17224, 113, 118)
+uzaklik = 0.028 km
+[37/54] ERR=28m  ACC=89.2%  TM=0.329  LOC_SPD=15.49m/s  OF_SPD=15.19m/s t=0.59s
+Kodun calisma suresi___________________________________________: 0.59 saniye
+37 / 54      dogru_tahmin: ,33,  yanlis_tahmin: ,4,  dogru pozitif: 32,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1162.600830078125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1162.600830078125
+ucus_yuksekligi = : 598.399169921875
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3542326092720032 (0, 0) (2333, 2216)
+konum:  (18847, 17326, 112, 114)
+uzaklik = 0.028 km
+[38/54] ERR=27m  ACC=89.5%  TM=0.354  LOC_SPD=11.21m/s  OF_SPD=10.55m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+38 / 54      dogru_tahmin: ,34,  yanlis_tahmin: ,4,  dogru pozitif: 33,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1168.5570068359375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1168.5570068359375
+ucus_yuksekligi = : 592.4429931640625
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3043781518936157 (0, 0) (2332, 2218)
+konum:  (18888, 17414, 117, 118)
+uzaklik = 0.026 km
+[39/54] ERR=26m  ACC=89.7%  TM=0.304  LOC_SPD=10.37m/s  OF_SPD=9.93m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+39 / 54      dogru_tahmin: ,35,  yanlis_tahmin: ,4,  dogru pozitif: 34,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1172.239501953125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1734.0
+rakım =:  1172.239501953125
+ucus_yuksekligi = : 587.760498046875
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2723613679409027 (0, 0) (2334, 2211)
+konum:  (18744, 17305, 310, 312)
+uzaklik = 0.040 km
+[40/54] ERR=39m  ACC=90.0%  TM=0.272  LOC_SPD=15.62m/s  OF_SPD=14.62m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+40 / 54      dogru_tahmin: ,36,  yanlis_tahmin: ,4,  dogru pozitif: 35,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1176.074462890625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1176.074462890625
+ucus_yuksekligi = : 584.925537109375
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2742220163345337 (0, 0) (2344, 2218)
+konum:  (18801, 17401, 300, 304)
+uzaklik = 0.039 km
+[41/54] ERR=38m  ACC=90.2%  TM=0.274  LOC_SPD=10.01m/s  OF_SPD=9.88m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+41 / 54      dogru_tahmin: ,37,  yanlis_tahmin: ,4,  dogru pozitif: 36,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1181.763427734375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1181.763427734375
+ucus_yuksekligi = : 579.236572265625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2810189127922058 (0, 0) (2345, 2217)
+konum:  (18846, 17485, 296, 302)
+uzaklik = 0.039 km
+[42/54] ERR=39m  ACC=90.5%  TM=0.281  LOC_SPD=14.29m/s  OF_SPD=13.49m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+42 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,4,  dogru pozitif: 37,  yanlış pozitif: 2,  dogru negatif: 2,  yanlış negatif: 1
+
+(22987, 31656)
+1185.8172607421875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1185.8172607421875
+ucus_yuksekligi = : 575.1827392578125
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.21269312500953674 (0, 0) (382, 832)
+kesişim yok
+uzaklik = 0.697 km
+[43/54] ERR=697m  ACC=88.4%  TM=0.213  LOC_SPD=10.33m/s  OF_SPD=9.98m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+43 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,5,  dogru pozitif: 37,  yanlış pozitif: 2,  dogru negatif: 3,  yanlış negatif: 1
+
+(22987, 31656)
+1188.31396484375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1188.31396484375
+ucus_yuksekligi = : 572.68603515625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.23572801053524017 (0, 0) (0, 3652)
+kesişim yok
+uzaklik = 0.790 km
+[44/54] ERR=789m  ACC=86.4%  TM=0.236  LOC_SPD=15.69m/s  OF_SPD=15.83m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+44 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,6,  dogru pozitif: 37,  yanlış pozitif: 2,  dogru negatif: 4,  yanlış negatif: 1
+
+(22987, 31656)
+1190.954345703125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1190.954345703125
+ucus_yuksekligi = : 570.045654296875
+yaw = : 153.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3372405767440796 (0, 0) (0, 3653)
+kesişim yok
+uzaklik = 0.790 km
+[45/54] ERR=790m  ACC=84.4%  TM=0.337  LOC_SPD=9.21m/s  OF_SPD=8.97m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+45 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,7,  dogru pozitif: 37,  yanlış pozitif: 2,  dogru negatif: 5,  yanlış negatif: 1
+
+(22987, 31656)
+1194.882568359375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1194.882568359375
+ucus_yuksekligi = : 566.117431640625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.34349435567855835 (0, 0) (1770, 4488)
+kesişim yok
+uzaklik = 0.686 km
+[46/54] ERR=685m  ACC=82.6%  TM=0.343  LOC_SPD=14.29m/s  OF_SPD=13.55m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+46 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,8,  dogru pozitif: 37,  yanlış pozitif: 2,  dogru negatif: 6,  yanlış negatif: 1
+
+(22987, 31656)
+1202.3204345703125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1202.3204345703125
+ucus_yuksekligi = : 558.6795654296875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2664637267589569 (0, 0) (35, 3484)
+kesişim yok
+uzaklik = 0.755 km
+[47/54] ERR=755m  ACC=80.9%  TM=0.266  LOC_SPD=11.57m/s  OF_SPD=11.77m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+47 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,9,  dogru pozitif: 37,  yanlış pozitif: 2,  dogru negatif: 7,  yanlış negatif: 1
+
+(22987, 31656)
+1208.6646728515625
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1208.6646728515625
+ucus_yuksekligi = : 552.3353271484375
+yaw = : 153.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2850974202156067 (0, 0) (3563, 1884)
+konum:  (20347, 18038, 96, 166)
+uzaklik = 0.336 km
+[48/54] ERR=335m  ACC=79.2%  TM=0.285  LOC_SPD=14.35m/s  OF_SPD=14.17m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+48 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,10,  dogru pozitif: 37,  yanlış pozitif: 3,  dogru negatif: 7,  yanlış negatif: 1
+
+(22987, 31656)
+1214.8587646484375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1214.8587646484375
+ucus_yuksekligi = : 546.1412353515625
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2965715527534485 (0, 0) (3540, 89)
+kesişim yok
+uzaklik = 0.751 km
+[49/54] ERR=751m  ACC=77.6%  TM=0.297  LOC_SPD=9.17m/s  OF_SPD=9.20m/s t=0.59s
+Kodun calisma suresi___________________________________________: 0.59 saniye
+49 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,11,  dogru pozitif: 37,  yanlış pozitif: 3,  dogru negatif: 8,  yanlış negatif: 1
+
+(22987, 31656)
+1223.078125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1223.078125
+ucus_yuksekligi = : 537.921875
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.26041340827941895 (0, 0) (3521, 1843)
+konum:  (20409, 17850, 123, 426)
+uzaklik = 0.349 km
+[50/54] ERR=348m  ACC=76.0%  TM=0.260  LOC_SPD=13.18m/s  OF_SPD=13.07m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+50 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,12,  dogru pozitif: 37,  yanlış pozitif: 4,  dogru negatif: 8,  yanlış negatif: 1
+
+(22987, 31656)
+1227.1180419921875
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1227.1180419921875
+ucus_yuksekligi = : 533.8819580078125
+yaw = : 153.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.19900596141815186 (0, 0) (397, 1254)
+konum:  (20366, 17853, 111, 271)
+uzaklik = 0.345 km
+[51/54] ERR=345m  ACC=74.5%  TM=0.199  LOC_SPD=12.62m/s  OF_SPD=11.44m/s t=0.57s
+Kodun calisma suresi___________________________________________: 0.57 saniye
+51 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,13,  dogru pozitif: 37,  yanlış pozitif: 5,  dogru negatif: 8,  yanlış negatif: 1
+
+(22987, 31656)
+1230.7230224609375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1230.7230224609375
+ucus_yuksekligi = : 530.2769775390625
+yaw = : 153.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.13948529958724976 (0, 0) (145, 2629)
+kesişim yok
+uzaklik = 0.636 km
+[52/54] ERR=635m  ACC=73.1%  TM=0.139  LOC_SPD=12.62m/s  OF_SPD=11.88m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+52 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,14,  dogru pozitif: 37,  yanlış pozitif: 5,  dogru negatif: 9,  yanlış negatif: 1
+
+(22987, 31656)
+1231.8353271484375
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1735.0
+rakım =:  1231.8353271484375
+ucus_yuksekligi = : 529.1646728515625
+yaw = : 153.6
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.12559184432029724 (0, 0) (2919, 623)
+kesişim yok
+uzaklik = 0.525 km
+[53/54] ERR=524m  ACC=71.7%  TM=0.126  LOC_SPD=3.43m/s  OF_SPD=2.20m/s t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+53 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,15,  dogru pozitif: 37,  yanlış pozitif: 5,  dogru negatif: 10,  yanlış negatif: 1
+
+(22987, 31656)
+1232.259033203125
+kamera model=  FC2204
+focal lenght =  4.68
+altitude = :  1730.0
+rakım =:  1232.259033203125
+ucus_yuksekligi = : 523.740966796875
+yaw = : -39.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.18427786231040955 (0, 0) (335, 1015)
+kesişim yok
+uzaklik = 0.677 km
+[54/54] ERR=677m  ACC=70.4%  TM=0.184  LOC_SPD=0.15m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.58s
+Kodun calisma suresi___________________________________________: 0.58 saniye
+54 / 54      dogru_tahmin: ,38,  yanlis_tahmin: ,16,  dogru pozitif: 37,  yanlış pozitif: 5,  dogru negatif: 11,  yanlış negatif: 1
+
+dogru tahmin =  38
+yanlış tahmin =  16
+yanlış pozitif =  5
+doğruluk yüzdesi: 70.37
+UCUS 2022_tpu_f48k4_cb62.h5: kare=54 <=70m=0.7037037037037037 <=25m=0.0 medyan=37.0

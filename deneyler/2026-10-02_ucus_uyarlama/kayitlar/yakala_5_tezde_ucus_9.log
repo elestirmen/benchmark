@@ -1,0 +1,1933 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+OpenCV CUDA devices: 0, has TM: False, build CUDA: False, build CUDA line: 
+2026-10-02 09:04:43.332905: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-02 09:04:43.334882: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-02 09:04:43.338119: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2027] TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0. CUDA kernels will be jit-compiled from PTX, which could take 30 minutes or longer.
+2026-10-02 09:04:44.470467: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:42] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2026-10-02 09:04:44.471121: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13500 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 5060 Ti, pci bus id: 0000:01:00.0, compute capability: 12.0
+[On isleme] topluluk_x1_2022.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+[On isleme] topluluk_x1_2022.h5: iyilestirme=HAM, olcek=minus1_1 (sozlesme kapali -> RUN_CFG degerleri)
+(22987, 31656)
+(22987, 31656)
+1096.1160888671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1554.0
+rakım =:  1096.1160888671875
+ucus_yuksekligi = : 483.8839111328125
+yaw = : -79.7
+2026-10-02 09:04:48.848956: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+(512, 512)
+TemplateMatching backend: CPU
+(4489, 4489)
+-1000000000.0 0.3472166955471039 (0, 0) (2265, 2271)
+konum:  (18945, 15667, 122, 128)
+uzaklik = 0.009 km
+[1/115] ERR=9m  ACC=100.0%  TM=0.347  LOC_SPD=0.00m/s  OF_SPD=0.00m/s (warmup) t=5.65s
+Kodun calisma suresi___________________________________________: 5.72 saniye
+1 / 115      dogru_tahmin: ,1,  yanlis_tahmin: ,0,  dogru pozitif: 1,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1098.2879638671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1098.2879638671875
+ucus_yuksekligi = : 482.7120361328125
+yaw = : -80.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4121626913547516 (0, 0) (2265, 2271)
+konum:  (18702, 15640, 126, 117)
+uzaklik = 0.008 km
+[2/115] ERR=8m  ACC=100.0%  TM=0.412  LOC_SPD=8.89m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+2 / 115      dogru_tahmin: ,2,  yanlis_tahmin: ,0,  dogru pozitif: 2,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1098.1533203125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1098.1533203125
+ucus_yuksekligi = : 484.8466796875
+yaw = : -80.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.36535754799842834 (0, 0) (2259, 2260)
+konum:  (18490, 15603, 124, 118)
+uzaklik = 0.008 km
+[3/115] ERR=8m  ACC=100.0%  TM=0.365  LOC_SPD=12.80m/s  OF_SPD=13.51m/s t=0.86s
+Kodun calisma suresi___________________________________________: 0.93 saniye
+3 / 115      dogru_tahmin: ,3,  yanlis_tahmin: ,0,  dogru pozitif: 3,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1097.8304443359375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1558.0
+rakım =:  1097.8304443359375
+ucus_yuksekligi = : 486.1695556640625
+yaw = : -79.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3273390531539917 (0, 0) (2258, 2250)
+konum:  (18347, 15558, 127, 130)
+uzaklik = 0.005 km
+[4/115] ERR=5m  ACC=100.0%  TM=0.327  LOC_SPD=13.91m/s  OF_SPD=15.06m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+4 / 115      dogru_tahmin: ,4,  yanlis_tahmin: ,0,  dogru pozitif: 4,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1083.523193359375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1083.523193359375
+ucus_yuksekligi = : 498.476806640625
+yaw = : 102.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.25008881092071533 (0, 0) (2237, 2183)
+konum:  (15773, 14466, 288, 322)
+uzaklik = 0.059 km
+[5/115] ERR=58m  ACC=100.0%  TM=0.250  LOC_SPD=11.50m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.77s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+5 / 115      dogru_tahmin: ,5,  yanlis_tahmin: ,0,  dogru pozitif: 5,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1084.4786376953125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1084.4786376953125
+ucus_yuksekligi = : 497.5213623046875
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3494938611984253 (0, 0) (2242, 2186)
+konum:  (16191, 14699, 106, 121)
+uzaklik = 0.018 km
+[6/115] ERR=18m  ACC=100.0%  TM=0.349  LOC_SPD=16.27m/s  OF_SPD=17.08m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+6 / 115      dogru_tahmin: ,6,  yanlis_tahmin: ,0,  dogru pozitif: 6,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1083.16162109375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1083.16162109375
+ucus_yuksekligi = : 497.83837890625
+yaw = : 101.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2938164472579956 (0, 0) (2242, 2199)
+konum:  (16397, 14748, 118, 120)
+uzaklik = 0.014 km
+[7/115] ERR=13m  ACC=100.0%  TM=0.294  LOC_SPD=12.58m/s  OF_SPD=13.36m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+7 / 115      dogru_tahmin: ,7,  yanlis_tahmin: ,0,  dogru pozitif: 7,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1084.8865966796875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1084.8865966796875
+ucus_yuksekligi = : 496.1134033203125
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31279605627059937 (0, 0) (2236, 2209)
+konum:  (16593, 14793, 126, 119)
+uzaklik = 0.011 km
+[8/115] ERR=10m  ACC=100.0%  TM=0.313  LOC_SPD=15.36m/s  OF_SPD=16.02m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+8 / 115      dogru_tahmin: ,8,  yanlis_tahmin: ,0,  dogru pozitif: 8,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1087.071533203125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1087.071533203125
+ucus_yuksekligi = : 493.928466796875
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.36782005429267883 (0, 0) (2229, 2217)
+konum:  (16796, 14832, 120, 119)
+uzaklik = 0.010 km
+[9/115] ERR=9m  ACC=100.0%  TM=0.368  LOC_SPD=15.73m/s  OF_SPD=15.73m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+9 / 115      dogru_tahmin: ,9,  yanlis_tahmin: ,0,  dogru pozitif: 9,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1089.65478515625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1089.65478515625
+ucus_yuksekligi = : 491.34521484375
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3600436747074127 (0, 0) (2228, 2218)
+konum:  (17001, 14867, 119, 121)
+uzaklik = 0.010 km
+[10/115] ERR=10m  ACC=100.0%  TM=0.360  LOC_SPD=15.73m/s  OF_SPD=16.07m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+10 / 115      dogru_tahmin: ,10,  yanlis_tahmin: ,0,  dogru pozitif: 10,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1091.8018798828125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1091.8018798828125
+ucus_yuksekligi = : 489.1981201171875
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.37484219670295715 (0, 0) (2227, 2217)
+konum:  (17205, 14900, 125, 125)
+uzaklik = 0.010 km
+[11/115] ERR=10m  ACC=100.0%  TM=0.375  LOC_SPD=15.81m/s  OF_SPD=16.02m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.92 saniye
+11 / 115      dogru_tahmin: ,11,  yanlis_tahmin: ,0,  dogru pozitif: 11,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1095.1314697265625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1095.1314697265625
+ucus_yuksekligi = : 485.8685302734375
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3614468574523926 (0, 0) (2228, 2214)
+konum:  (17412, 14932, 121, 125)
+uzaklik = 0.010 km
+[12/115] ERR=10m  ACC=100.0%  TM=0.361  LOC_SPD=15.36m/s  OF_SPD=15.97m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+12 / 115      dogru_tahmin: ,12,  yanlis_tahmin: ,0,  dogru pozitif: 12,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1095.1492919921875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1095.1492919921875
+ucus_yuksekligi = : 485.8507080078125
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3982696533203125 (0, 0) (2235, 2212)
+konum:  (17620, 14961, 128, 128)
+uzaklik = 0.011 km
+[13/115] ERR=10m  ACC=100.0%  TM=0.398  LOC_SPD=12.58m/s  OF_SPD=13.07m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+13 / 115      dogru_tahmin: ,13,  yanlis_tahmin: ,0,  dogru pozitif: 13,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1097.7523193359375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1097.7523193359375
+ucus_yuksekligi = : 483.2476806640625
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3564568758010864 (0, 0) (2240, 2210)
+konum:  (17637, 14801, 317, 321)
+uzaklik = 0.049 km
+[14/115] ERR=49m  ACC=100.0%  TM=0.356  LOC_SPD=15.05m/s  OF_SPD=15.92m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.91 saniye
+14 / 115      dogru_tahmin: ,14,  yanlis_tahmin: ,0,  dogru pozitif: 14,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1104.3157958984375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1104.3157958984375
+ucus_yuksekligi = : 477.6842041015625
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.291967511177063 (0, 0) (2233, 2208)
+konum:  (17843, 14835, 318, 321)
+uzaklik = 0.051 km
+[15/115] ERR=50m  ACC=100.0%  TM=0.292  LOC_SPD=16.12m/s  OF_SPD=16.32m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+15 / 115      dogru_tahmin: ,15,  yanlis_tahmin: ,0,  dogru pozitif: 15,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1105.679931640625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1105.679931640625
+ucus_yuksekligi = : 475.320068359375
+yaw = : 101.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.29299768805503845 (0, 0) (2228, 2209)
+konum:  (18241, 15064, 117, 122)
+uzaklik = 0.011 km
+[16/115] ERR=11m  ACC=100.0%  TM=0.293  LOC_SPD=15.35m/s  OF_SPD=15.70m/s t=0.77s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+16 / 115      dogru_tahmin: ,16,  yanlis_tahmin: ,0,  dogru pozitif: 16,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1103.9862060546875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1103.9862060546875
+ucus_yuksekligi = : 477.0137939453125
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.248934805393219 (0, 0) (2230, 2213)
+konum:  (18451, 15100, 116, 122)
+uzaklik = 0.011 km
+[17/115] ERR=10m  ACC=100.0%  TM=0.249  LOC_SPD=15.80m/s  OF_SPD=16.15m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+17 / 115      dogru_tahmin: ,17,  yanlis_tahmin: ,0,  dogru pozitif: 17,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1103.6475830078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1103.6475830078125
+ucus_yuksekligi = : 477.3524169921875
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2457737922668457 (0, 0) (2226, 2213)
+konum:  (18648, 15129, 130, 131)
+uzaklik = 0.012 km
+[18/115] ERR=11m  ACC=100.0%  TM=0.246  LOC_SPD=15.74m/s  OF_SPD=16.08m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+18 / 115      dogru_tahmin: ,18,  yanlis_tahmin: ,0,  dogru pozitif: 18,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1105.5872802734375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1105.5872802734375
+ucus_yuksekligi = : 475.4127197265625
+yaw = : 101.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.30665111541748047 (0, 0) (2228, 2211)
+konum:  (18863, 15167, 119, 126)
+uzaklik = 0.011 km
+[19/115] ERR=11m  ACC=100.0%  TM=0.307  LOC_SPD=12.58m/s  OF_SPD=13.00m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+19 / 115      dogru_tahmin: ,19,  yanlis_tahmin: ,0,  dogru pozitif: 19,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1104.9202880859375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1104.9202880859375
+ucus_yuksekligi = : 476.0797119140625
+yaw = : 101.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3632989227771759 (0, 0) (2236, 2211)
+konum:  (19073, 15201, 118, 128)
+uzaklik = 0.010 km
+[20/115] ERR=10m  ACC=100.0%  TM=0.363  LOC_SPD=15.43m/s  OF_SPD=16.18m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+20 / 115      dogru_tahmin: ,20,  yanlis_tahmin: ,0,  dogru pozitif: 20,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1105.0748291015625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1105.0748291015625
+ucus_yuksekligi = : 475.9251708984375
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31651386618614197 (0, 0) (2236, 2211)
+konum:  (19272, 15224, 125, 140)
+uzaklik = 0.012 km
+[21/115] ERR=11m  ACC=100.0%  TM=0.317  LOC_SPD=15.36m/s  OF_SPD=15.85m/s t=0.77s
+Kodun calisma suresi___________________________________________: 0.84 saniye
+21 / 115      dogru_tahmin: ,21,  yanlis_tahmin: ,0,  dogru pozitif: 21,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1102.984375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1102.984375
+ucus_yuksekligi = : 478.015625
+yaw = : 100.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.16094082593917847 (0, 0) (2229, 2214)
+konum:  (19478, 15263, 131, 133)
+uzaklik = 0.011 km
+[22/115] ERR=10m  ACC=100.0%  TM=0.161  LOC_SPD=15.36m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+22 / 115      dogru_tahmin: ,22,  yanlis_tahmin: ,0,  dogru pozitif: 22,  yanlış pozitif: 0,  dogru negatif: 0,  yanlış negatif: 0
+
+(22987, 31656)
+1102.742431640625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1102.742431640625
+ucus_yuksekligi = : 478.257568359375
+yaw = : 93.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.15539784729480743 (0, 0) (117, 435)
+kesişim yok
+uzaklik = 0.833 km
+[23/115] ERR=833m  ACC=95.7%  TM=0.155  LOC_SPD=10.37m/s  OF_SPD=11.61m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+23 / 115      dogru_tahmin: ,22,  yanlis_tahmin: ,1,  dogru pozitif: 22,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1110.10205078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1110.10205078125
+ucus_yuksekligi = : 471.89794921875
+yaw = : -79.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2991061210632324 (0, 0) (2251, 2276)
+konum:  (20087, 15002, 138, 120)
+uzaklik = 0.012 km
+[24/115] ERR=11m  ACC=95.8%  TM=0.299  LOC_SPD=9.81m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.92s
+Kodun calisma suresi___________________________________________: 1.01 saniye
+24 / 115      dogru_tahmin: ,23,  yanlis_tahmin: ,1,  dogru pozitif: 23,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1114.647705078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1114.647705078125
+ucus_yuksekligi = : 468.352294921875
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.37622421979904175 (0, 0) (2258, 2275)
+konum:  (19893, 14968, 131, 118)
+uzaklik = 0.011 km
+[25/115] ERR=10m  ACC=96.0%  TM=0.376  LOC_SPD=10.06m/s  OF_SPD=10.38m/s t=0.85s
+Kodun calisma suresi___________________________________________: 0.93 saniye
+25 / 115      dogru_tahmin: ,24,  yanlis_tahmin: ,1,  dogru pozitif: 24,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1117.8363037109375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1558.0
+rakım =:  1117.8363037109375
+ucus_yuksekligi = : 466.1636962890625
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3787368834018707 (0, 0) (2260, 2273)
+konum:  (19690, 14931, 122, 114)
+uzaklik = 0.011 km
+[26/115] ERR=10m  ACC=96.2%  TM=0.379  LOC_SPD=12.85m/s  OF_SPD=12.87m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+26 / 115      dogru_tahmin: ,25,  yanlis_tahmin: ,1,  dogru pozitif: 25,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1114.847900390625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1558.0
+rakım =:  1114.847900390625
+ucus_yuksekligi = : 469.152099609375
+yaw = : -78.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.320948988199234 (0, 0) (2261, 2274)
+konum:  (19482, 14893, 122, 122)
+uzaklik = 0.011 km
+[27/115] ERR=10m  ACC=96.3%  TM=0.321  LOC_SPD=12.53m/s  OF_SPD=12.72m/s t=0.83s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+27 / 115      dogru_tahmin: ,26,  yanlis_tahmin: ,1,  dogru pozitif: 26,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1110.1998291015625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1558.0
+rakım =:  1110.1998291015625
+ucus_yuksekligi = : 473.8001708984375
+yaw = : -80.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.30820411443710327 (0, 0) (2264, 2272)
+konum:  (19274, 14861, 135, 117)
+uzaklik = 0.009 km
+[28/115] ERR=8m  ACC=96.4%  TM=0.308  LOC_SPD=12.06m/s  OF_SPD=12.58m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+28 / 115      dogru_tahmin: ,27,  yanlis_tahmin: ,1,  dogru pozitif: 27,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1111.01318359375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1111.01318359375
+ucus_yuksekligi = : 471.98681640625
+yaw = : -80.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3199840784072876 (0, 0) (2264, 2266)
+konum:  (19077, 14825, 125, 116)
+uzaklik = 0.009 km
+[29/115] ERR=8m  ACC=96.6%  TM=0.320  LOC_SPD=12.45m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+29 / 115      dogru_tahmin: ,28,  yanlis_tahmin: ,1,  dogru pozitif: 28,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1110.8023681640625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1110.8023681640625
+ucus_yuksekligi = : 472.1976318359375
+yaw = : -80.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3776562511920929 (0, 0) (2266, 2262)
+konum:  (18871, 14788, 118, 115)
+uzaklik = 0.009 km
+[30/115] ERR=8m  ACC=96.7%  TM=0.378  LOC_SPD=12.76m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+30 / 115      dogru_tahmin: ,29,  yanlis_tahmin: ,1,  dogru pozitif: 29,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1107.45263671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1107.45263671875
+ucus_yuksekligi = : 475.54736328125
+yaw = : -79.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4345483183860779 (0, 0) (2263, 2265)
+konum:  (18656, 14744, 114, 119)
+uzaklik = 0.008 km
+[31/115] ERR=7m  ACC=96.8%  TM=0.435  LOC_SPD=16.27m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.84s
+Kodun calisma suresi___________________________________________: 0.92 saniye
+31 / 115      dogru_tahmin: ,30,  yanlis_tahmin: ,1,  dogru pozitif: 30,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1111.3819580078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1111.3819580078125
+ucus_yuksekligi = : 471.6180419921875
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4744325280189514 (0, 0) (2261, 2271)
+konum:  (18448, 14719, 137, 123)
+uzaklik = 0.013 km
+[32/115] ERR=12m  ACC=96.9%  TM=0.474  LOC_SPD=12.59m/s  OF_SPD=12.98m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+32 / 115      dogru_tahmin: ,31,  yanlis_tahmin: ,1,  dogru pozitif: 31,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1114.389404296875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1114.389404296875
+ucus_yuksekligi = : 468.610595703125
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3987025320529938 (0, 0) (2264, 2277)
+konum:  (18242, 14686, 123, 123)
+uzaklik = 0.011 km
+[33/115] ERR=10m  ACC=97.0%  TM=0.399  LOC_SPD=15.35m/s  OF_SPD=15.93m/s t=0.86s
+Kodun calisma suresi___________________________________________: 0.94 saniye
+33 / 115      dogru_tahmin: ,32,  yanlis_tahmin: ,1,  dogru pozitif: 32,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1114.1292724609375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1114.1292724609375
+ucus_yuksekligi = : 468.8707275390625
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31082087755203247 (0, 0) (2262, 2278)
+konum:  (18034, 14651, 121, 132)
+uzaklik = 0.012 km
+[34/115] ERR=11m  ACC=97.1%  TM=0.311  LOC_SPD=15.74m/s  OF_SPD=16.07m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+34 / 115      dogru_tahmin: ,33,  yanlis_tahmin: ,1,  dogru pozitif: 33,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1107.949462890625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1107.949462890625
+ucus_yuksekligi = : 475.050537109375
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.37959858775138855 (0, 0) (2260, 2283)
+konum:  (17819, 14611, 127, 140)
+uzaklik = 0.010 km
+[35/115] ERR=10m  ACC=97.1%  TM=0.380  LOC_SPD=15.20m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.82s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+35 / 115      dogru_tahmin: ,34,  yanlis_tahmin: ,1,  dogru pozitif: 34,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1101.4501953125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1101.4501953125
+ucus_yuksekligi = : 481.5498046875
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4051746428012848 (0, 0) (2260, 2283)
+konum:  (17621, 14579, 118, 137)
+uzaklik = 0.011 km
+[36/115] ERR=10m  ACC=97.2%  TM=0.405  LOC_SPD=12.65m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+36 / 115      dogru_tahmin: ,35,  yanlis_tahmin: ,1,  dogru pozitif: 35,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1098.0810546875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1098.0810546875
+ucus_yuksekligi = : 484.9189453125
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.43835964798927307 (0, 0) (2260, 2284)
+konum:  (17416, 14550, 113, 132)
+uzaklik = 0.012 km
+[37/115] ERR=11m  ACC=97.3%  TM=0.438  LOC_SPD=15.73m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.88s
+Kodun calisma suresi___________________________________________: 0.96 saniye
+37 / 115      dogru_tahmin: ,36,  yanlis_tahmin: ,1,  dogru pozitif: 36,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1094.294921875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1094.294921875
+ucus_yuksekligi = : 488.705078125
+yaw = : -79.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.36158064007759094 (0, 0) (2258, 2277)
+konum:  (17205, 14510, 119, 135)
+uzaklik = 0.010 km
+[38/115] ERR=10m  ACC=97.4%  TM=0.362  LOC_SPD=15.65m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.86s
+Kodun calisma suresi___________________________________________: 0.95 saniye
+38 / 115      dogru_tahmin: ,37,  yanlis_tahmin: ,1,  dogru pozitif: 37,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1093.0411376953125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1093.0411376953125
+ucus_yuksekligi = : 489.9588623046875
+yaw = : -80.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.42170020937919617 (0, 0) (2259, 2270)
+konum:  (17005, 14478, 118, 128)
+uzaklik = 0.010 km
+[39/115] ERR=9m  ACC=97.4%  TM=0.422  LOC_SPD=15.19m/s  OF_SPD=15.61m/s t=0.92s
+Kodun calisma suresi___________________________________________: 0.99 saniye
+39 / 115      dogru_tahmin: ,38,  yanlis_tahmin: ,1,  dogru pozitif: 38,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1089.8917236328125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1089.8917236328125
+ucus_yuksekligi = : 493.1082763671875
+yaw = : -80.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.42904743552207947 (0, 0) (2263, 2264)
+konum:  (16800, 14433, 117, 131)
+uzaklik = 0.008 km
+[40/115] ERR=8m  ACC=97.5%  TM=0.429  LOC_SPD=12.77m/s  OF_SPD=12.87m/s t=0.83s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+40 / 115      dogru_tahmin: ,39,  yanlis_tahmin: ,1,  dogru pozitif: 39,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1087.9002685546875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1557.0
+rakım =:  1087.9002685546875
+ucus_yuksekligi = : 495.0997314453125
+yaw = : -81.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4561038911342621 (0, 0) (2261, 2262)
+konum:  (16592, 14401, 124, 128)
+uzaklik = 0.008 km
+[41/115] ERR=7m  ACC=97.6%  TM=0.456  LOC_SPD=15.46m/s  OF_SPD=16.05m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.91 saniye
+41 / 115      dogru_tahmin: ,40,  yanlis_tahmin: ,1,  dogru pozitif: 40,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1084.965576171875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1084.965576171875
+ucus_yuksekligi = : 497.034423828125
+yaw = : -79.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.42089128494262695 (0, 0) (2260, 2264)
+konum:  (16385, 14357, 122, 138)
+uzaklik = 0.006 km
+[42/115] ERR=6m  ACC=97.6%  TM=0.421  LOC_SPD=12.38m/s  OF_SPD=12.74m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+42 / 115      dogru_tahmin: ,41,  yanlis_tahmin: ,1,  dogru pozitif: 41,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1082.9664306640625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1556.0
+rakım =:  1082.9664306640625
+ucus_yuksekligi = : 499.0335693359375
+yaw = : -80.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4443047046661377 (0, 0) (2267, 2265)
+konum:  (16187, 14326, 117, 130)
+uzaklik = 0.008 km
+[43/115] ERR=8m  ACC=97.7%  TM=0.444  LOC_SPD=15.68m/s  OF_SPD=15.85m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+43 / 115      dogru_tahmin: ,42,  yanlis_tahmin: ,1,  dogru pozitif: 42,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1081.7403564453125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1081.7403564453125
+ucus_yuksekligi = : 499.2596435546875
+yaw = : -80.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3479720950126648 (0, 0) (2269, 2264)
+konum:  (15984, 14297, 109, 128)
+uzaklik = 0.010 km
+[44/115] ERR=9m  ACC=97.7%  TM=0.348  LOC_SPD=15.89m/s  OF_SPD=16.22m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+44 / 115      dogru_tahmin: ,43,  yanlis_tahmin: ,1,  dogru pozitif: 43,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1080.3856201171875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1555.0
+rakım =:  1080.3856201171875
+ucus_yuksekligi = : 500.6143798828125
+yaw = : -77.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2354433685541153 (0, 0) (2255, 2274)
+konum:  (15790, 14249, 96, 153)
+uzaklik = 0.009 km
+[45/115] ERR=8m  ACC=97.8%  TM=0.235  LOC_SPD=9.22m/s  OF_SPD=10.13m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+45 / 115      dogru_tahmin: ,44,  yanlis_tahmin: ,1,  dogru pozitif: 44,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1083.315673828125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1550.0
+rakım =:  1083.315673828125
+ucus_yuksekligi = : 492.684326171875
+yaw = : 101.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3710600435733795 (0, 0) (2242, 2212)
+konum:  (15694, 13754, 109, 135)
+uzaklik = 0.011 km
+[46/115] ERR=10m  ACC=97.8%  TM=0.371  LOC_SPD=8.34m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+46 / 115      dogru_tahmin: ,45,  yanlis_tahmin: ,1,  dogru pozitif: 45,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1085.93505859375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1550.0
+rakım =:  1085.93505859375
+ucus_yuksekligi = : 490.06494140625
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3989536166191101 (0, 0) (2251, 2197)
+konum:  (15904, 13782, 113, 123)
+uzaklik = 0.015 km
+[47/115] ERR=14m  ACC=97.9%  TM=0.399  LOC_SPD=12.59m/s  OF_SPD=13.06m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+47 / 115      dogru_tahmin: ,46,  yanlis_tahmin: ,1,  dogru pozitif: 46,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1087.2056884765625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1550.0
+rakım =:  1087.2056884765625
+ucus_yuksekligi = : 488.7943115234375
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.33740705251693726 (0, 0) (2250, 2200)
+konum:  (16109, 13817, 113, 124)
+uzaklik = 0.014 km
+[48/115] ERR=14m  ACC=97.9%  TM=0.337  LOC_SPD=15.73m/s  OF_SPD=15.83m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+48 / 115      dogru_tahmin: ,47,  yanlis_tahmin: ,1,  dogru pozitif: 47,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1090.904541015625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1550.0
+rakım =:  1090.904541015625
+ucus_yuksekligi = : 485.095458984375
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3452247083187103 (0, 0) (2246, 2206)
+konum:  (16307, 13857, 117, 125)
+uzaklik = 0.012 km
+[49/115] ERR=12m  ACC=98.0%  TM=0.345  LOC_SPD=15.36m/s  OF_SPD=15.43m/s t=0.86s
+Kodun calisma suresi___________________________________________: 0.93 saniye
+49 / 115      dogru_tahmin: ,48,  yanlis_tahmin: ,1,  dogru pozitif: 48,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1094.3958740234375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1549.0
+rakım =:  1094.3958740234375
+ucus_yuksekligi = : 480.6041259765625
+yaw = : 101.6
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.32856497168540955 (0, 0) (2245, 2211)
+konum:  (16508, 13895, 122, 127)
+uzaklik = 0.011 km
+[50/115] ERR=10m  ACC=98.0%  TM=0.329  LOC_SPD=15.35m/s  OF_SPD=15.70m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+50 / 115      dogru_tahmin: ,49,  yanlis_tahmin: ,1,  dogru pozitif: 49,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1098.275146484375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1548.0
+rakım =:  1098.275146484375
+ucus_yuksekligi = : 475.724853515625
+yaw = : 101.6
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3326278030872345 (0, 0) (2238, 2213)
+konum:  (16721, 13938, 113, 122)
+uzaklik = 0.009 km
+[51/115] ERR=9m  ACC=98.0%  TM=0.333  LOC_SPD=12.96m/s  OF_SPD=12.55m/s t=0.77s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+51 / 115      dogru_tahmin: ,50,  yanlis_tahmin: ,1,  dogru pozitif: 50,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1098.60107421875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1548.0
+rakım =:  1098.60107421875
+ucus_yuksekligi = : 475.39892578125
+yaw = : 101.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.32172587513923645 (0, 0) (2243, 2217)
+konum:  (16923, 13972, 115, 123)
+uzaklik = 0.008 km
+[52/115] ERR=8m  ACC=98.1%  TM=0.322  LOC_SPD=14.97m/s  OF_SPD=15.21m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+52 / 115      dogru_tahmin: ,51,  yanlis_tahmin: ,1,  dogru pozitif: 51,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1099.1905517578125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1548.0
+rakım =:  1099.1905517578125
+ucus_yuksekligi = : 474.8094482421875
+yaw = : 101.6
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3494974672794342 (0, 0) (2239, 2216)
+konum:  (17130, 14005, 116, 127)
+uzaklik = 0.008 km
+[53/115] ERR=8m  ACC=98.1%  TM=0.349  LOC_SPD=15.81m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+53 / 115      dogru_tahmin: ,52,  yanlis_tahmin: ,1,  dogru pozitif: 52,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1101.337646484375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1547.0
+rakım =:  1101.337646484375
+ucus_yuksekligi = : 471.662353515625
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.28514352440834045 (0, 0) (2235, 2215)
+konum:  (17333, 14036, 117, 126)
+uzaklik = 0.010 km
+[54/115] ERR=9m  ACC=98.1%  TM=0.285  LOC_SPD=15.73m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.76s
+Kodun calisma suresi___________________________________________: 0.84 saniye
+54 / 115      dogru_tahmin: ,53,  yanlis_tahmin: ,1,  dogru pozitif: 53,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1113.3912353515625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1547.0
+rakım =:  1113.3912353515625
+ucus_yuksekligi = : 459.6087646484375
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.34646958112716675 (0, 0) (2241, 2214)
+konum:  (17538, 14069, 120, 125)
+uzaklik = 0.010 km
+[55/115] ERR=10m  ACC=98.2%  TM=0.346  LOC_SPD=15.74m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+55 / 115      dogru_tahmin: ,54,  yanlis_tahmin: ,1,  dogru pozitif: 54,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1127.6219482421875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1547.0
+rakım =:  1127.6219482421875
+ucus_yuksekligi = : 445.3780517578125
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4291520118713379 (0, 0) (2237, 2214)
+konum:  (17739, 14104, 132, 117)
+uzaklik = 0.011 km
+[56/115] ERR=10m  ACC=98.2%  TM=0.429  LOC_SPD=15.35m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+56 / 115      dogru_tahmin: ,55,  yanlis_tahmin: ,1,  dogru pozitif: 55,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1137.5457763671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1547.0
+rakım =:  1137.5457763671875
+ucus_yuksekligi = : 435.4542236328125
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4323767423629761 (0, 0) (2235, 2214)
+konum:  (17956, 14145, 115, 105)
+uzaklik = 0.011 km
+[57/115] ERR=10m  ACC=98.2%  TM=0.432  LOC_SPD=15.81m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+57 / 115      dogru_tahmin: ,56,  yanlis_tahmin: ,1,  dogru pozitif: 56,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1133.2098388671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1547.0
+rakım =:  1133.2098388671875
+ucus_yuksekligi = : 439.7901611328125
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3414493799209595 (0, 0) (2242, 2217)
+konum:  (17965, 13983, 309, 312)
+uzaklik = 0.049 km
+[58/115] ERR=49m  ACC=98.3%  TM=0.341  LOC_SPD=12.34m/s  OF_SPD=11.82m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+58 / 115      dogru_tahmin: ,57,  yanlis_tahmin: ,1,  dogru pozitif: 57,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1126.1328125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1547.0
+rakım =:  1126.1328125
+ucus_yuksekligi = : 446.8671875
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2743934988975525 (0, 0) (2243, 2214)
+konum:  (18378, 14220, 111, 110)
+uzaklik = 0.008 km
+[59/115] ERR=7m  ACC=98.3%  TM=0.274  LOC_SPD=15.74m/s  OF_SPD=15.43m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+59 / 115      dogru_tahmin: ,58,  yanlis_tahmin: ,1,  dogru pozitif: 58,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1116.766845703125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1546.0
+rakım =:  1116.766845703125
+ucus_yuksekligi = : 455.233154296875
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3242390751838684 (0, 0) (2238, 2214)
+konum:  (18580, 14255, 116, 109)
+uzaklik = 0.008 km
+[60/115] ERR=7m  ACC=98.3%  TM=0.324  LOC_SPD=15.73m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+60 / 115      dogru_tahmin: ,59,  yanlis_tahmin: ,1,  dogru pozitif: 59,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1111.2149658203125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1546.0
+rakım =:  1111.2149658203125
+ucus_yuksekligi = : 460.7850341796875
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.40770867466926575 (0, 0) (2240, 2216)
+konum:  (18778, 14283, 121, 115)
+uzaklik = 0.009 km
+[61/115] ERR=8m  ACC=98.4%  TM=0.408  LOC_SPD=15.43m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.78s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+61 / 115      dogru_tahmin: ,60,  yanlis_tahmin: ,1,  dogru pozitif: 60,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1112.7862548828125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1112.7862548828125
+ucus_yuksekligi = : 458.2137451171875
+yaw = : 101.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3329167664051056 (0, 0) (2235, 2217)
+konum:  (18981, 14315, 122, 117)
+uzaklik = 0.010 km
+[62/115] ERR=9m  ACC=98.4%  TM=0.333  LOC_SPD=15.73m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.73s
+Kodun calisma suresi___________________________________________: 0.80 saniye
+62 / 115      dogru_tahmin: ,61,  yanlis_tahmin: ,1,  dogru pozitif: 61,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1116.4345703125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1116.4345703125
+ucus_yuksekligi = : 454.5654296875
+yaw = : 101.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.338052898645401 (0, 0) (2237, 2216)
+konum:  (19189, 14350, 119, 119)
+uzaklik = 0.009 km
+[63/115] ERR=8m  ACC=98.4%  TM=0.338  LOC_SPD=15.43m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.77s
+Kodun calisma suresi___________________________________________: 0.84 saniye
+63 / 115      dogru_tahmin: ,62,  yanlis_tahmin: ,1,  dogru pozitif: 62,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1116.287353515625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1116.287353515625
+ucus_yuksekligi = : 454.712646484375
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3721424639225006 (0, 0) (2234, 2213)
+konum:  (19395, 14383, 118, 118)
+uzaklik = 0.009 km
+[64/115] ERR=9m  ACC=98.4%  TM=0.372  LOC_SPD=12.59m/s  OF_SPD=12.54m/s t=0.76s
+Kodun calisma suresi___________________________________________: 0.83 saniye
+64 / 115      dogru_tahmin: ,63,  yanlis_tahmin: ,1,  dogru pozitif: 63,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1119.2537841796875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1119.2537841796875
+ucus_yuksekligi = : 451.7462158203125
+yaw = : 101.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3992423415184021 (0, 0) (2232, 2213)
+konum:  (19600, 14416, 118, 116)
+uzaklik = 0.010 km
+[65/115] ERR=10m  ACC=98.5%  TM=0.399  LOC_SPD=15.80m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+65 / 115      dogru_tahmin: ,64,  yanlis_tahmin: ,1,  dogru pozitif: 64,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1119.4029541015625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1119.4029541015625
+ucus_yuksekligi = : 451.5970458984375
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3825710713863373 (0, 0) (2237, 2211)
+konum:  (19810, 14452, 116, 113)
+uzaklik = 0.010 km
+[66/115] ERR=9m  ACC=98.5%  TM=0.383  LOC_SPD=15.36m/s  OF_SPD=15.58m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+66 / 115      dogru_tahmin: ,65,  yanlis_tahmin: ,1,  dogru pozitif: 65,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1117.618896484375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1117.618896484375
+ucus_yuksekligi = : 452.381103515625
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3295615315437317 (0, 0) (2238, 2212)
+konum:  (20013, 14482, 123, 118)
+uzaklik = 0.010 km
+[67/115] ERR=10m  ACC=98.5%  TM=0.330  LOC_SPD=15.80m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+67 / 115      dogru_tahmin: ,66,  yanlis_tahmin: ,1,  dogru pozitif: 66,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1119.4134521484375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1119.4134521484375
+ucus_yuksekligi = : 450.5865478515625
+yaw = : 101.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.28098320960998535 (0, 0) (2234, 2211)
+konum:  (20219, 14516, 119, 118)
+uzaklik = 0.010 km
+[68/115] ERR=10m  ACC=98.5%  TM=0.281  LOC_SPD=15.36m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.85s
+Kodun calisma suresi___________________________________________: 0.94 saniye
+68 / 115      dogru_tahmin: ,67,  yanlis_tahmin: ,1,  dogru pozitif: 67,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1118.3104248046875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1543.0
+rakım =:  1118.3104248046875
+ucus_yuksekligi = : 450.6895751953125
+yaw = : 101.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.30297231674194336 (0, 0) (2232, 2210)
+konum:  (20425, 14554, 120, 115)
+uzaklik = 0.010 km
+[69/115] ERR=9m  ACC=98.6%  TM=0.303  LOC_SPD=15.81m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.86s
+Kodun calisma suresi___________________________________________: 0.96 saniye
+69 / 115      dogru_tahmin: ,68,  yanlis_tahmin: ,1,  dogru pozitif: 68,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1119.27880859375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1543.0
+rakım =:  1119.27880859375
+ucus_yuksekligi = : 449.72119140625
+yaw = : 101.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2861909866333008 (0, 0) (2235, 2214)
+konum:  (20622, 14591, 129, 115)
+uzaklik = 0.009 km
+[70/115] ERR=9m  ACC=98.6%  TM=0.286  LOC_SPD=15.35m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.84s
+Kodun calisma suresi___________________________________________: 0.92 saniye
+70 / 115      dogru_tahmin: ,69,  yanlis_tahmin: ,1,  dogru pozitif: 69,  yanlış pozitif: 0,  dogru negatif: 1,  yanlış negatif: 0
+
+(22987, 31656)
+1119.986328125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1543.0
+rakım =:  1119.986328125
+ucus_yuksekligi = : 449.013671875
+yaw = : 93.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.16058260202407837 (0, 0) (132, 3827)
+kesişim yok
+uzaklik = 0.787 km
+[71/115] ERR=787m  ACC=97.2%  TM=0.161  LOC_SPD=7.26m/s  OF_SPD=8.17m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+71 / 115      dogru_tahmin: ,69,  yanlis_tahmin: ,2,  dogru pozitif: 69,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1129.063232421875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1543.0
+rakım =:  1129.063232421875
+ucus_yuksekligi = : 439.936767578125
+yaw = : -80.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2970510721206665 (0, 0) (2244, 2282)
+konum:  (20765, 14243, 141, 88)
+uzaklik = 0.008 km
+[72/115] ERR=7m  ACC=97.2%  TM=0.297  LOC_SPD=8.89m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.78s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+72 / 115      dogru_tahmin: ,70,  yanlis_tahmin: ,2,  dogru pozitif: 70,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1128.6885986328125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1543.0
+rakım =:  1128.6885986328125
+ucus_yuksekligi = : 440.3114013671875
+yaw = : -79.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2543632686138153 (0, 0) (2259, 2262)
+konum:  (20588, 14203, 145, 96)
+uzaklik = 0.010 km
+[73/115] ERR=9m  ACC=97.3%  TM=0.254  LOC_SPD=12.04m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.77s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+73 / 115      dogru_tahmin: ,71,  yanlis_tahmin: ,2,  dogru pozitif: 71,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1128.3475341796875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1543.0
+rakım =:  1128.3475341796875
+ucus_yuksekligi = : 440.6524658203125
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.25040602684020996 (0, 0) (2276, 2261)
+konum:  (20382, 14157, 134, 105)
+uzaklik = 0.009 km
+[74/115] ERR=8m  ACC=97.3%  TM=0.250  LOC_SPD=15.99m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.76s
+Kodun calisma suresi___________________________________________: 0.84 saniye
+74 / 115      dogru_tahmin: ,72,  yanlis_tahmin: ,2,  dogru pozitif: 72,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1127.4588623046875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1127.4588623046875
+ucus_yuksekligi = : 442.5411376953125
+yaw = : -79.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31306394934654236 (0, 0) (2253, 2266)
+konum:  (20178, 14125, 125, 109)
+uzaklik = 0.009 km
+[75/115] ERR=8m  ACC=97.3%  TM=0.313  LOC_SPD=15.51m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+75 / 115      dogru_tahmin: ,73,  yanlis_tahmin: ,2,  dogru pozitif: 73,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1127.029052734375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1127.029052734375
+ucus_yuksekligi = : 443.970947265625
+yaw = : -79.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3221641182899475 (0, 0) (2253, 2268)
+konum:  (19962, 14095, 134, 107)
+uzaklik = 0.009 km
+[76/115] ERR=8m  ACC=97.4%  TM=0.322  LOC_SPD=12.52m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+76 / 115      dogru_tahmin: ,74,  yanlis_tahmin: ,2,  dogru pozitif: 74,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1124.1175537109375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1124.1175537109375
+ucus_yuksekligi = : 446.8824462890625
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.28969699144363403 (0, 0) (2256, 2270)
+konum:  (19765, 14063, 312, 308)
+uzaklik = 0.051 km
+[77/115] ERR=50m  ACC=97.4%  TM=0.290  LOC_SPD=15.51m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.84s
+Kodun calisma suresi___________________________________________: 0.91 saniye
+77 / 115      dogru_tahmin: ,75,  yanlis_tahmin: ,2,  dogru pozitif: 75,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1119.41845703125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1119.41845703125
+ucus_yuksekligi = : 451.58154296875
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.23196694254875183 (0, 0) (2269, 2274)
+konum:  (19555, 14027, 123, 107)
+uzaklik = 0.008 km
+[78/115] ERR=8m  ACC=97.4%  TM=0.232  LOC_SPD=15.58m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.78s
+Kodun calisma suresi___________________________________________: 0.85 saniye
+78 / 115      dogru_tahmin: ,76,  yanlis_tahmin: ,2,  dogru pozitif: 76,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1119.0635986328125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1119.0635986328125
+ucus_yuksekligi = : 451.9364013671875
+yaw = : -79.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31576231122016907 (0, 0) (2262, 2271)
+konum:  (19346, 13992, 119, 111)
+uzaklik = 0.009 km
+[79/115] ERR=9m  ACC=97.5%  TM=0.316  LOC_SPD=16.18m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+79 / 115      dogru_tahmin: ,77,  yanlis_tahmin: ,2,  dogru pozitif: 77,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1115.9892578125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1115.9892578125
+ucus_yuksekligi = : 455.0107421875
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31123456358909607 (0, 0) (2256, 2272)
+konum:  (19144, 13956, 117, 115)
+uzaklik = 0.008 km
+[80/115] ERR=8m  ACC=97.5%  TM=0.311  LOC_SPD=14.98m/s  OF_SPD=15.36m/s t=0.78s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+80 / 115      dogru_tahmin: ,78,  yanlis_tahmin: ,2,  dogru pozitif: 78,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1116.6767578125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1116.6767578125
+ucus_yuksekligi = : 454.3232421875
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3407277464866638 (0, 0) (2263, 2270)
+konum:  (18939, 13924, 111, 111)
+uzaklik = 0.010 km
+[81/115] ERR=9m  ACC=97.5%  TM=0.341  LOC_SPD=12.95m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+81 / 115      dogru_tahmin: ,79,  yanlis_tahmin: ,2,  dogru pozitif: 79,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1114.772705078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1114.772705078125
+ucus_yuksekligi = : 456.227294921875
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4176079034805298 (0, 0) (2261, 2268)
+konum:  (18736, 13885, 170, 221)
+uzaklik = 0.027 km
+[82/115] ERR=26m  ACC=97.6%  TM=0.418  LOC_SPD=15.35m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+82 / 115      dogru_tahmin: ,80,  yanlis_tahmin: ,2,  dogru pozitif: 80,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1119.4365234375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1119.4365234375
+ucus_yuksekligi = : 450.5634765625
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3110711872577667 (0, 0) (2270, 2308)
+konum:  (18535, 13854, 313, 350)
+uzaklik = 0.057 km
+[83/115] ERR=57m  ACC=97.6%  TM=0.311  LOC_SPD=15.74m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+83 / 115      dogru_tahmin: ,81,  yanlis_tahmin: ,2,  dogru pozitif: 81,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1124.04052734375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1124.04052734375
+ucus_yuksekligi = : 445.95947265625
+yaw = : -79.3
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.22141732275485992 (0, 0) (2264, 2266)
+konum:  (18335, 13819, 101, 106)
+uzaklik = 0.009 km
+[84/115] ERR=9m  ACC=97.6%  TM=0.221  LOC_SPD=15.35m/s  OF_SPD=15.47m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+84 / 115      dogru_tahmin: ,82,  yanlis_tahmin: ,2,  dogru pozitif: 82,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1128.2882080078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1128.2882080078125
+ucus_yuksekligi = : 441.7117919921875
+yaw = : -79.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3015572428703308 (0, 0) (2265, 2263)
+konum:  (18126, 13784, 100, 104)
+uzaklik = 0.009 km
+[85/115] ERR=8m  ACC=97.6%  TM=0.302  LOC_SPD=15.81m/s  OF_SPD=15.47m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+85 / 115      dogru_tahmin: ,83,  yanlis_tahmin: ,2,  dogru pozitif: 83,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1121.9061279296875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1121.9061279296875
+ucus_yuksekligi = : 448.0938720703125
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3403044641017914 (0, 0) (2262, 2263)
+konum:  (17910, 13735, 115, 123)
+uzaklik = 0.006 km
+[86/115] ERR=6m  ACC=97.7%  TM=0.340  LOC_SPD=15.36m/s  OF_SPD=15.56m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+86 / 115      dogru_tahmin: ,84,  yanlis_tahmin: ,2,  dogru pozitif: 84,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1115.1800537109375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1115.1800537109375
+ucus_yuksekligi = : 455.8199462890625
+yaw = : -79.4
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2837499678134918 (0, 0) (2269, 2264)
+konum:  (17692, 13702, 123, 123)
+uzaklik = 0.005 km
+[87/115] ERR=5m  ACC=97.7%  TM=0.284  LOC_SPD=12.58m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+87 / 115      dogru_tahmin: ,85,  yanlis_tahmin: ,2,  dogru pozitif: 85,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1111.5950927734375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1111.5950927734375
+ucus_yuksekligi = : 459.4049072265625
+yaw = : -79.5
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.26299136877059937 (0, 0) (2297, 2267)
+konum:  (17500, 13670, 109, 123)
+uzaklik = 0.016 km
+[88/115] ERR=16m  ACC=97.7%  TM=0.263  LOC_SPD=18.07m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.79s
+Kodun calisma suresi___________________________________________: 0.86 saniye
+88 / 115      dogru_tahmin: ,86,  yanlis_tahmin: ,2,  dogru pozitif: 86,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1108.1781005859375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1545.0
+rakım =:  1108.1781005859375
+ucus_yuksekligi = : 462.8218994140625
+yaw = : -79.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.25270843505859375 (0, 0) (2259, 2261)
+konum:  (17290, 13634, 115, 122)
+uzaklik = 0.007 km
+[89/115] ERR=6m  ACC=97.8%  TM=0.253  LOC_SPD=13.09m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.82s
+Kodun calisma suresi___________________________________________: 0.90 saniye
+89 / 115      dogru_tahmin: ,87,  yanlis_tahmin: ,2,  dogru pozitif: 87,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1094.47119140625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1619.0
+rakım =:  1094.47119140625
+ucus_yuksekligi = : 550.52880859375
+yaw = : 162.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31633833050727844 (0, 0) (2241, 2205)
+konum:  (18353, 15737, 90, 130)
+uzaklik = 0.012 km
+[90/115] ERR=12m  ACC=97.8%  TM=0.316  LOC_SPD=6.54m/s  OF_SPD=0.00m/s (low_inlier_ratio) t=0.80s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+90 / 115      dogru_tahmin: ,88,  yanlis_tahmin: ,2,  dogru pozitif: 88,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1094.0338134765625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1613.0
+rakım =:  1094.0338134765625
+ucus_yuksekligi = : 544.9661865234375
+yaw = : 162.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.30901750922203064 (0, 0) (2234, 2197)
+konum:  (18381, 15809, 86, 133)
+uzaklik = 0.016 km
+[91/115] ERR=15m  ACC=97.8%  TM=0.309  LOC_SPD=26.91m/s  OF_SPD=24.47m/s t=0.80s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+91 / 115      dogru_tahmin: ,89,  yanlis_tahmin: ,2,  dogru pozitif: 89,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1093.8277587890625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1607.0
+rakım =:  1093.8277587890625
+ucus_yuksekligi = : 539.1722412109375
+yaw = : 162.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2975192368030548 (0, 0) (2241, 2191)
+konum:  (18410, 15893, 79, 130)
+uzaklik = 0.016 km
+[92/115] ERR=16m  ACC=97.8%  TM=0.298  LOC_SPD=13.26m/s  OF_SPD=13.33m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.91 saniye
+92 / 115      dogru_tahmin: ,90,  yanlis_tahmin: ,2,  dogru pozitif: 90,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1094.8765869140625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1602.0
+rakım =:  1094.8765869140625
+ucus_yuksekligi = : 533.1234130859375
+yaw = : 162.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.30924803018569946 (0, 0) (2241, 2185)
+konum:  (18436, 15973, 71, 123)
+uzaklik = 0.017 km
+[93/115] ERR=17m  ACC=97.8%  TM=0.309  LOC_SPD=12.65m/s  OF_SPD=11.98m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+93 / 115      dogru_tahmin: ,91,  yanlis_tahmin: ,2,  dogru pozitif: 91,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1098.130126953125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1595.0
+rakım =:  1098.130126953125
+ucus_yuksekligi = : 522.869873046875
+yaw = : 161.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3529340624809265 (0, 0) (2247, 2188)
+konum:  (18462, 16059, 76, 119)
+uzaklik = 0.018 km
+[94/115] ERR=17m  ACC=97.9%  TM=0.353  LOC_SPD=13.40m/s  OF_SPD=13.41m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+94 / 115      dogru_tahmin: ,92,  yanlis_tahmin: ,2,  dogru pozitif: 92,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1102.178955078125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1589.0
+rakım =:  1102.178955078125
+ucus_yuksekligi = : 512.821044921875
+yaw = : 162.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3650560677051544 (0, 0) (2249, 2196)
+konum:  (18496, 16155, 78, 113)
+uzaklik = 0.016 km
+[95/115] ERR=16m  ACC=97.9%  TM=0.365  LOC_SPD=13.98m/s  OF_SPD=14.70m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+95 / 115      dogru_tahmin: ,93,  yanlis_tahmin: ,2,  dogru pozitif: 93,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1104.883544921875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1583.0
+rakım =:  1104.883544921875
+ucus_yuksekligi = : 504.116455078125
+yaw = : 160.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.4137767255306244 (0, 0) (2248, 2199)
+konum:  (18526, 16252, 94, 114)
+uzaklik = 0.013 km
+[96/115] ERR=13m  ACC=97.9%  TM=0.414  LOC_SPD=13.93m/s  OF_SPD=15.01m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+96 / 115      dogru_tahmin: ,94,  yanlis_tahmin: ,2,  dogru pozitif: 94,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1107.839111328125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1577.0
+rakım =:  1107.839111328125
+ucus_yuksekligi = : 495.160888671875
+yaw = : 160.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3443879187107086 (0, 0) (2249, 2199)
+konum:  (18556, 16340, 103, 105)
+uzaklik = 0.013 km
+[97/115] ERR=13m  ACC=97.9%  TM=0.344  LOC_SPD=13.36m/s  OF_SPD=13.47m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.89 saniye
+97 / 115      dogru_tahmin: ,95,  yanlis_tahmin: ,2,  dogru pozitif: 95,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1111.0233154296875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1571.0
+rakım =:  1111.0233154296875
+ucus_yuksekligi = : 485.9766845703125
+yaw = : 160.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.23663431406021118 (0, 0) (2249, 2203)
+konum:  (18586, 16426, 106, 103)
+uzaklik = 0.013 km
+[98/115] ERR=13m  ACC=98.0%  TM=0.237  LOC_SPD=13.22m/s  OF_SPD=13.85m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.92 saniye
+98 / 115      dogru_tahmin: ,96,  yanlis_tahmin: ,2,  dogru pozitif: 96,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1114.189453125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1565.0
+rakım =:  1114.189453125
+ucus_yuksekligi = : 476.810546875
+yaw = : 160.9
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.271607905626297 (0, 0) (2253, 2206)
+konum:  (18615, 16510, 110, 104)
+uzaklik = 0.013 km
+[99/115] ERR=12m  ACC=98.0%  TM=0.272  LOC_SPD=13.36m/s  OF_SPD=13.75m/s t=0.83s
+Kodun calisma suresi___________________________________________: 0.91 saniye
+99 / 115      dogru_tahmin: ,97,  yanlis_tahmin: ,2,  dogru pozitif: 97,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1118.0093994140625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1559.0
+rakım =:  1118.0093994140625
+ucus_yuksekligi = : 466.9906005859375
+yaw = : 160.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.3006252348423004 (0, 0) (2255, 2207)
+konum:  (18651, 16595, 108, 104)
+uzaklik = 0.013 km
+[100/115] ERR=12m  ACC=98.0%  TM=0.301  LOC_SPD=13.22m/s  OF_SPD=13.58m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.88 saniye
+100 / 115      dogru_tahmin: ,98,  yanlis_tahmin: ,2,  dogru pozitif: 98,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1121.330322265625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1554.0
+rakım =:  1121.330322265625
+ucus_yuksekligi = : 458.669677734375
+yaw = : 160.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.31624311208724976 (0, 0) (2259, 2210)
+konum:  (18481, 16472, 316, 315)
+uzaklik = 0.047 km
+[101/115] ERR=46m  ACC=98.0%  TM=0.316  LOC_SPD=23.90m/s  OF_SPD=24.96m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.92 saniye
+101 / 115      dogru_tahmin: ,99,  yanlis_tahmin: ,2,  dogru pozitif: 99,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1128.1060791015625
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1544.0
+rakım =:  1128.1060791015625
+ucus_yuksekligi = : 441.8939208984375
+yaw = : 160.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.30570167303085327 (0, 0) (2262, 2205)
+konum:  (18709, 16786, 164, 158)
+uzaklik = 0.014 km
+[102/115] ERR=13m  ACC=98.0%  TM=0.306  LOC_SPD=11.62m/s  OF_SPD=11.12m/s t=0.79s
+Kodun calisma suresi___________________________________________: 0.87 saniye
+102 / 115      dogru_tahmin: ,100,  yanlis_tahmin: ,2,  dogru pozitif: 100,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1138.2891845703125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1535.0
+rakım =:  1138.2891845703125
+ucus_yuksekligi = : 422.7108154296875
+yaw = : 160.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.308054119348526 (0, 0) (2265, 2210)
+konum:  (18743, 16909, 203, 199)
+uzaklik = 0.012 km
+[103/115] ERR=12m  ACC=98.1%  TM=0.308  LOC_SPD=14.45m/s  OF_SPD=14.40m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.93 saniye
+103 / 115      dogru_tahmin: ,101,  yanlis_tahmin: ,2,  dogru pozitif: 101,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1144.728271484375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1528.0
+rakım =:  1144.728271484375
+ucus_yuksekligi = : 409.271728515625
+yaw = : 160.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2500191926956177 (0, 0) (2264, 2213)
+konum:  (18769, 16996, 221, 220)
+uzaklik = 0.011 km
+[104/115] ERR=10m  ACC=98.1%  TM=0.250  LOC_SPD=14.78m/s  OF_SPD=14.87m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.91 saniye
+104 / 115      dogru_tahmin: ,102,  yanlis_tahmin: ,2,  dogru pozitif: 102,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1153.52783203125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1522.0
+rakım =:  1153.52783203125
+ucus_yuksekligi = : 394.47216796875
+yaw = : 161.1
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.23238766193389893 (0, 0) (2268, 2212)
+konum:  (18795, 17079, 240, 236)
+uzaklik = 0.012 km
+[105/115] ERR=12m  ACC=98.1%  TM=0.232  LOC_SPD=15.44m/s  OF_SPD=14.70m/s t=0.82s
+Kodun calisma suresi___________________________________________: 0.92 saniye
+105 / 115      dogru_tahmin: ,103,  yanlis_tahmin: ,2,  dogru pozitif: 103,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1162.0399169921875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1516.0
+rakım =:  1162.0399169921875
+ucus_yuksekligi = : 379.9600830078125
+yaw = : 161.2
+rotated_part3 sınır dışında
+(22987, 31656)
+1169.6546630859375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1509.0
+rakım =:  1169.6546630859375
+ucus_yuksekligi = : 365.3453369140625
+yaw = : 161.1
+rotated_part3 sınır dışında
+(22987, 31656)
+1174.90185546875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1502.0
+rakım =:  1174.90185546875
+ucus_yuksekligi = : 353.09814453125
+yaw = : 160.8
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.167110875248909 (0, 0) (2254, 2208)
+konum:  (18754, 17221, 418, 419)
+uzaklik = 0.027 km
+[108/115] ERR=27m  ACC=96.3%  TM=0.167  LOC_SPD=14.80m/s  OF_SPD=16.28m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.96 saniye
+108 / 115      dogru_tahmin: ,104,  yanlis_tahmin: ,2,  dogru pozitif: 104,  yanlış pozitif: 0,  dogru negatif: 2,  yanlış negatif: 0
+
+(22987, 31656)
+1179.0196533203125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1495.0
+rakım =:  1179.0196533203125
+ucus_yuksekligi = : 341.9803466796875
+yaw = : 161.0
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.22634245455265045 (0, 0) (323, 4361)
+kesişim yok
+uzaklik = 0.853 km
+[109/115] ERR=853m  ACC=95.4%  TM=0.226  LOC_SPD=11.27m/s  OF_SPD=11.35m/s t=0.84s
+Kodun calisma suresi___________________________________________: 0.96 saniye
+109 / 115      dogru_tahmin: ,104,  yanlis_tahmin: ,3,  dogru pozitif: 104,  yanlış pozitif: 0,  dogru negatif: 3,  yanlış negatif: 0
+
+(22987, 31656)
+1184.73974609375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1487.0
+rakım =:  1184.73974609375
+ucus_yuksekligi = : 328.26025390625
+yaw = : 162.2
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.25574740767478943 (0, 0) (3860, 2430)
+konum:  (20437, 18033, 198, 131)
+uzaklik = 0.449 km
+[110/115] ERR=448m  ACC=94.5%  TM=0.256  LOC_SPD=16.33m/s  OF_SPD=17.23m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.93 saniye
+110 / 115      dogru_tahmin: ,104,  yanlis_tahmin: ,4,  dogru pozitif: 104,  yanlış pozitif: 1,  dogru negatif: 3,  yanlış negatif: 0
+
+(22987, 31656)
+1187.5604248046875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1479.0
+rakım =:  1187.5604248046875
+ucus_yuksekligi = : 317.4395751953125
+yaw = : 161.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.2470223307609558 (0, 0) (3859, 2422)
+konum:  (20477, 17760, 437, 476)
+uzaklik = 0.472 km
+[111/115] ERR=472m  ACC=93.7%  TM=0.247  LOC_SPD=12.24m/s  OF_SPD=12.20m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.95 saniye
+111 / 115      dogru_tahmin: ,104,  yanlis_tahmin: ,5,  dogru pozitif: 104,  yanlış pozitif: 2,  dogru negatif: 3,  yanlış negatif: 0
+
+(22987, 31656)
+1189.6004638671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1472.0
+rakım =:  1189.6004638671875
+ucus_yuksekligi = : 308.3995361328125
+yaw = : 161.7
+(512, 512)
+(4489, 4489)
+-1000000000.0 0.19853711128234863 (0, 0) (3751, 668)
+kesişim yok
+uzaklik = 0.651 km
+[112/115] ERR=650m  ACC=92.9%  TM=0.199  LOC_SPD=16.95m/s  OF_SPD=16.91m/s t=0.81s
+Kodun calisma suresi___________________________________________: 0.95 saniye
+112 / 115      dogru_tahmin: ,104,  yanlis_tahmin: ,6,  dogru pozitif: 104,  yanlış pozitif: 2,  dogru negatif: 4,  yanlış negatif: 0
+
+(22987, 31656)
+1199.7723388671875
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1457.0
+rakım =:  1199.7723388671875
+ucus_yuksekligi = : 283.2276611328125
+yaw = : 126.8
+rotated_part3 sınır dışında
+(22987, 31656)
+1209.822021484375
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1449.0
+rakım =:  1209.822021484375
+ucus_yuksekligi = : 265.177978515625
+yaw = : 126.6
+merkezi dışarıda
+(22987, 31656)
+1220.2003173828125
+kamera model=  L1D-20c
+focal lenght =  10.26
+altitude = :  1442.0
+rakım =:  1220.2003173828125
+ucus_yuksekligi = : 247.7996826171875
+yaw = : 126.6
+merkezi dışarıda
+dogru tahmin =  104
+yanlış tahmin =  6
+yanlış pozitif =  2
+doğruluk yüzdesi: 94.55
+UCUS topluluk_x1_2022.h5: kare=110 <=70m=0.9454545454545454 <=25m=0.8636363636363636 medyan=10.0

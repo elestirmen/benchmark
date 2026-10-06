@@ -1,0 +1,80 @@
+{
+ "RAW|train|100|clean,hard_v1|42": {
+  "spec": "RAW",
+  "summary": {
+   "bing2google/clean": 0.65,
+   "bing2google/hard_v1": 0.63,
+   "google2bing/clean": 0.755,
+   "google2bing/hard_v1": 0.74,
+   "mean": 0.6938,
+   "n": 800,
+   "s5": 0.6362
+  },
+  "seconds": 109.6
+ },
+ "top_modeller/_03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__cb62bfb86ad0.h5|train|100|clean,hard_v1|42": {
+  "spec": "top_modeller/_03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__cb62bfb86ad0.h5",
+  "summary": {
+   "bing2google/clean": 0.9,
+   "bing2google/hard_v1": 0.81,
+   "google2bing/clean": 0.88,
+   "google2bing/hard_v1": 0.855,
+   "mean": 0.8612,
+   "n": 800,
+   "s5": 0.7738
+  },
+  "seconds": 1138.6
+ },
+ "top_modeller/model_k_32_3_epoch_01900_sigmoid__1__1__f7ba9bc4d7bb.h5|train|100|clean,hard_v1|42": {
+  "spec": "top_modeller/model_k_32_3_epoch_01900_sigmoid__1__1__f7ba9bc4d7bb.h5",
+  "summary": {
+   "bing2google/clean": 0.895,
+   "bing2google/hard_v1": 0.74,
+   "google2bing/clean": 0.845,
+   "google2bing/hard_v1": 0.795,
+   "mean": 0.8187,
+   "n": 800,
+   "s5": 0.6887
+  },
+  "seconds": 368.2
+ },
+ "models_pipeline/20260909_223425/flat_f24_k4/_benchmark_adayi/_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "models_pipeline/20260909_223425/flat_f24_k4/_benchmark_adayi/_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.505,
+   "bing2google/hard_v1": 0.35,
+   "google2bing/clean": 0.55,
+   "google2bing/hard_v1": 0.615,
+   "mean": 0.505,
+   "n": 800,
+   "s5": 0.4612
+  },
+  "seconds": 361.7
+ },
+ "top_modeller/01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__b48bdc1ed522.h5|train|100|clean,hard_v1|42": {
+  "spec": "top_modeller/01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__b48bdc1ed522.h5",
+  "summary": {
+   "bing2google/clean": 0.82,
+   "bing2google/hard_v1": 0.74,
+   "google2bing/clean": 0.84,
+   "google2bing/hard_v1": 0.81,
+   "mean": 0.8025,
+   "n": 800,
+   "s5": 0.7188
+  },
+  "seconds": 685.6
+ },
+ "top_modeller/06_modeller___17_10_2022__16_25_gpu_model_f40_k3_epoch__epoch__sigmoi__f__d9829f8fe8c2.h5|train|100|clean,hard_v1|42": {
+  "spec": "top_modeller/06_modeller___17_10_2022__16_25_gpu_model_f40_k3_epoch__epoch__sigmoi__f__d9829f8fe8c2.h5",
+  "summary": {
+   "bing2google/clean": 0.71,
+   "bing2google/hard_v1": 0.69,
+   "google2bing/clean": 0.73,
+   "google2bing/hard_v1": 0.745,
+   "mean": 0.7188,
+   "n": 800,
+   "s5": 0.6675
+  },
+  "seconds": 296.3
+ }
+}

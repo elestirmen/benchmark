@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "2022_tpu_f48k4_e1100",
+  "aciklama": "2022 TPU f48_k4 epoch 1100. Urgup 4000 sorgu global 0.614.",
+  "tarif": "",
+  "kaynak_deney": "2022",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\models\\tpu_model_f48_k4_epoch_01100_sigmoid_(1, 1)_.h5",
+  "raf_dosyasi": "2022_tpu_f48k4_e1100.h5",
+  "sha256": "da4c80642e725c14019ec9058d438bc7ee2d316bc9a865fab8e7b6e926f139a2",
+  "rafa_eklenme": "2026-09-25T11:17:43"
+}

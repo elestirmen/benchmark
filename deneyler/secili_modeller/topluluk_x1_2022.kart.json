@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "topluluk_x1_2022",
+  "aciklama": "EN BASARILI (2026-09-26): 2022 TPU cb62 + k_32_3 e1900 + deneme6 f32_k5 sigmoid cikti ortalamasi. Urgup 4000 sorgu (2022 ile ayni) global 0.718 (RAW 0.477, +0.241; en iyi tekil TPU cb62 0.659); Urgup 1000 sorgu 0.719 (RAW 0.461). Kapi 4 grup 0.406. Adana 0.955 (RAW 0.972). TTA bu modeli bozar (0.469).",
+  "tarif": "egitimsiz: deney_araclari/topluluk.py",
+  "kaynak_deney": "2026-09-25_parametre_arama",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\topluluklar\\x1_2022_tpu_k323_d6.h5",
+  "raf_dosyasi": "topluluk_x1_2022.h5",
+  "sha256": "d7bc263a7909d659c968c2391617b1c3cabd9d069b0f724df065f019a3d543ca",
+  "rafa_eklenme": "2026-09-26T01:30:24"
+}

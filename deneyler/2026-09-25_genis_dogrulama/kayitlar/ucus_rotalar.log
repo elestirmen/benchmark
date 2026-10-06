@@ -1,0 +1,152 @@
+2026-10-01 20:31:08 ROTALAR BASLADI
+2026-10-01 20:31:08 HARITA urgup topluluk_x1_2022
+HARITA C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus_haritalari\topluluk_x1_2022_urgup_geo.tif  (448 s)
+2026-10-01 20:38:52 HARITA urgup 2022_deneme6_f32k5
+HARITA C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus_haritalari\2022_deneme6_f32k5_urgup_geo.tif  (104 s)
+2026-10-01 20:40:43 HARITA urgup RAW_kimlik
+HARITA C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus_haritalari\RAW_kimlik_urgup_geo.tif  (35 s)
+2026-10-01 20:41:24 HARITA urgup 2022_k32_3_e1900
+HARITA C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus_haritalari\2022_k32_3_e1900_urgup_geo.tif  (75 s)
+2026-10-01 20:42:44 HARITA urgup 2022_tpu_f48k4_cb62
+HARITA C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_genis_dogrulama\modeller\ucus_haritalari\2022_tpu_f48k4_cb62_urgup_geo.tif  (95 s)
+2026-10-01 20:44:25 TEST 1_tezde_ucus_5 topluluk_x1_2022
+1_tezde_ucus_5 UCUS topluluk_x1_2022.h5: kare=216 <=70m=0.9166666666666666 <=25m=0.8888888888888888 medyan=11.0
+2026-10-01 20:47:29 TEST 1_tezde_ucus_5 2022_deneme6_f32k5
+1_tezde_ucus_5 UCUS 2022_deneme6_f32k5.h5: kare=216 <=70m=0.9259259259259259 <=25m=0.875 medyan=11.0
+2026-10-01 20:50:02 TEST 1_tezde_ucus_5 RAW_kimlik
+1_tezde_ucus_5 UCUS RAW_kimlik.h5: kare=216 <=70m=0.9675925925925926 <=25m=0.8611111111111112 medyan=12.0
+2026-10-01 20:52:15 TEST 1_tezde_ucus_5 2022_k32_3_e1900
+1_tezde_ucus_5 UCUS 2022_k32_3_e1900.h5: kare=216 <=70m=0.8981481481481481 <=25m=0.8611111111111112 medyan=12.0
+2026-10-01 20:54:40 TEST 1_tezde_ucus_5 2022_tpu_f48k4_cb62
+1_tezde_ucus_5 UCUS 2022_tpu_f48k4_cb62.h5: kare=216 <=70m=0.8796296296296297 <=25m=0.8379629629629629 medyan=12.0
+2026-10-01 20:57:09 TEST 2_tezde_ucus_6 topluluk_x1_2022
+2_tezde_ucus_6 UCUS topluluk_x1_2022.h5: kare=146 <=70m=0.8493150684931506 <=25m=0.773972602739726 medyan=17.0
+2026-10-01 20:59:12 TEST 2_tezde_ucus_6 2022_deneme6_f32k5
+2_tezde_ucus_6 UCUS 2022_deneme6_f32k5.h5: kare=146 <=70m=0.8013698630136986 <=25m=0.7123287671232876 medyan=19.0
+2026-10-01 21:01:00 TEST 2_tezde_ucus_6 RAW_kimlik
+2_tezde_ucus_6 UCUS RAW_kimlik.h5: kare=146 <=70m=0.7465753424657534 <=25m=0.6506849315068494 medyan=20.0
+2026-10-01 21:02:31 TEST 2_tezde_ucus_6 2022_k32_3_e1900
+2_tezde_ucus_6 UCUS 2022_k32_3_e1900.h5: kare=146 <=70m=0.8287671232876712 <=25m=0.7397260273972602 medyan=16.0
+2026-10-01 21:04:08 TEST 2_tezde_ucus_6 2022_tpu_f48k4_cb62
+2_tezde_ucus_6 UCUS 2022_tpu_f48k4_cb62.h5: kare=146 <=70m=0.8082191780821918 <=25m=0.636986301369863 medyan=19.0
+2026-10-01 21:05:53 TEST 3_tezde_ucus_7 topluluk_x1_2022
+3_tezde_ucus_7 UCUS topluluk_x1_2022.h5: kare=135 <=70m=0.8222222222222222 <=25m=0.725925925925926 medyan=14.0
+2026-10-01 21:07:57 TEST 3_tezde_ucus_7 2022_deneme6_f32k5
+3_tezde_ucus_7 UCUS 2022_deneme6_f32k5.h5: kare=135 <=70m=0.725925925925926 <=25m=0.5777777777777777 medyan=18.0
+2026-10-01 21:09:42 TEST 3_tezde_ucus_7 RAW_kimlik
+3_tezde_ucus_7 UCUS RAW_kimlik.h5: kare=135 <=70m=0.8074074074074075 <=25m=0.6814814814814815 medyan=15.0
+2026-10-01 21:11:14 TEST 3_tezde_ucus_7 2022_k32_3_e1900
+3_tezde_ucus_7 UCUS 2022_k32_3_e1900.h5: kare=135 <=70m=0.8222222222222222 <=25m=0.674074074074074 medyan=16.0
+2026-10-01 21:12:55 TEST 3_tezde_ucus_7 2022_tpu_f48k4_cb62
+3_tezde_ucus_7 UCUS 2022_tpu_f48k4_cb62.h5: kare=135 <=70m=0.7703703703703704 <=25m=0.6666666666666666 medyan=16.0
+2026-10-01 21:14:38 TEST 4_tezde_ucus_8 topluluk_x1_2022
+4_tezde_ucus_8 UCUS topluluk_x1_2022.h5: kare=115 <=70m=0.6347826086956522 <=25m=0.3826086956521739 medyan=38.0
+2026-10-01 21:16:19 TEST 4_tezde_ucus_8 2022_deneme6_f32k5
+4_tezde_ucus_8 UCUS 2022_deneme6_f32k5.h5: kare=115 <=70m=0.5652173913043478 <=25m=0.2608695652173913 medyan=47.0
+2026-10-01 21:17:45 TEST 4_tezde_ucus_8 RAW_kimlik
+4_tezde_ucus_8 UCUS RAW_kimlik.h5: kare=115 <=70m=0.591304347826087 <=25m=0.28695652173913044 medyan=49.0
+2026-10-01 21:18:58 TEST 4_tezde_ucus_8 2022_k32_3_e1900
+4_tezde_ucus_8 UCUS 2022_k32_3_e1900.h5: kare=115 <=70m=0.6521739130434783 <=25m=0.41739130434782606 medyan=40.0
+2026-10-01 21:20:20 TEST 4_tezde_ucus_8 2022_tpu_f48k4_cb62
+4_tezde_ucus_8 UCUS 2022_tpu_f48k4_cb62.h5: kare=115 <=70m=0.5826086956521739 <=25m=0.3739130434782609 medyan=42.0
+2026-10-01 21:21:44 TEST 5_tezde_ucus_9 topluluk_x1_2022
+5_tezde_ucus_9 UCUS topluluk_x1_2022.h5: kare=110 <=70m=0.9454545454545454 <=25m=0.8636363636363636 medyan=10.0
+2026-10-01 21:23:21 TEST 5_tezde_ucus_9 2022_deneme6_f32k5
+5_tezde_ucus_9 UCUS 2022_deneme6_f32k5.h5: kare=110 <=70m=0.8909090909090909 <=25m=0.6909090909090909 medyan=11.0
+2026-10-01 21:24:44 TEST 5_tezde_ucus_9 RAW_kimlik
+5_tezde_ucus_9 UCUS RAW_kimlik.h5: kare=110 <=70m=0.7636363636363637 <=25m=0.6 medyan=11.0
+2026-10-01 21:25:55 TEST 5_tezde_ucus_9 2022_k32_3_e1900
+5_tezde_ucus_9 UCUS 2022_k32_3_e1900.h5: kare=110 <=70m=0.9363636363636364 <=25m=0.8636363636363636 medyan=10.0
+2026-10-01 21:27:14 TEST 5_tezde_ucus_9 2022_tpu_f48k4_cb62
+5_tezde_ucus_9 UCUS 2022_tpu_f48k4_cb62.h5: kare=110 <=70m=0.8818181818181818 <=25m=0.7545454545454545 medyan=10.0
+2026-10-01 21:28:36 TEST 6_tezde_ucus_4 topluluk_x1_2022
+6_tezde_ucus_4 UCUS topluluk_x1_2022.h5: kare=167 <=70m=0.9221556886227545 <=25m=0.8502994011976048 medyan=12.0
+2026-10-01 21:31:00 TEST 6_tezde_ucus_4 2022_deneme6_f32k5
+6_tezde_ucus_4 UCUS 2022_deneme6_f32k5.h5: kare=167 <=70m=0.9161676646706587 <=25m=0.8143712574850299 medyan=13.0
+2026-10-01 21:33:02 TEST 6_tezde_ucus_4 RAW_kimlik
+6_tezde_ucus_4 UCUS RAW_kimlik.h5: kare=167 <=70m=0.8562874251497006 <=25m=0.7365269461077845 medyan=13.0
+2026-10-01 21:34:48 TEST 6_tezde_ucus_4 2022_k32_3_e1900
+6_tezde_ucus_4 UCUS 2022_k32_3_e1900.h5: kare=167 <=70m=0.7964071856287425 <=25m=0.7365269461077845 medyan=13.0
+2026-10-01 21:36:45 TEST 6_tezde_ucus_4 2022_tpu_f48k4_cb62
+6_tezde_ucus_4 UCUS 2022_tpu_f48k4_cb62.h5: kare=167 <=70m=0.8682634730538922 <=25m=0.6946107784431138 medyan=14.0
+2026-10-01 21:38:42 TEST guzergah_1 topluluk_x1_2022
+guzergah_1 UCUS topluluk_x1_2022.h5: kare=81 <=70m=0.9629629629629629 <=25m=0.7407407407407407 medyan=22.0
+2026-10-01 21:39:53 TEST guzergah_1 2022_deneme6_f32k5
+guzergah_1 UCUS 2022_deneme6_f32k5.h5: kare=81 <=70m=0.9012345679012346 <=25m=0.6172839506172839 medyan=23.0
+2026-10-01 21:40:53 TEST guzergah_1 RAW_kimlik
+guzergah_1 UCUS RAW_kimlik.h5: kare=81 <=70m=0.5061728395061729 <=25m=0.24691358024691357 medyan=65.0
+2026-10-01 21:41:43 TEST guzergah_1 2022_k32_3_e1900
+guzergah_1 UCUS 2022_k32_3_e1900.h5: kare=81 <=70m=0.9629629629629629 <=25m=0.8024691358024691 medyan=22.0
+2026-10-01 21:42:40 TEST guzergah_1 2022_tpu_f48k4_cb62
+guzergah_1 UCUS 2022_tpu_f48k4_cb62.h5: kare=81 <=70m=0.8641975308641975 <=25m=0.5679012345679012 medyan=23.0
+2026-10-01 21:43:38 TEST guzergah_1_donus topluluk_x1_2022
+guzergah_1_donus UCUS topluluk_x1_2022.h5: kare=54 <=70m=0.8148148148148148 <=25m=0.018518518518518517 medyan=36.0
+2026-10-01 21:44:29 TEST guzergah_1_donus 2022_deneme6_f32k5
+guzergah_1_donus UCUS 2022_deneme6_f32k5.h5: kare=54 <=70m=0.7037037037037037 <=25m=0.0 medyan=35.0
+2026-10-01 21:45:12 TEST guzergah_1_donus RAW_kimlik
+guzergah_1_donus UCUS RAW_kimlik.h5: kare=54 <=70m=0.5370370370370371 <=25m=0.018518518518518517 medyan=65.0
+2026-10-01 21:45:48 TEST guzergah_1_donus 2022_k32_3_e1900
+guzergah_1_donus UCUS 2022_k32_3_e1900.h5: kare=54 <=70m=0.7962962962962963 <=25m=0.018518518518518517 medyan=36.0
+2026-10-01 21:46:28 TEST guzergah_1_donus 2022_tpu_f48k4_cb62
+guzergah_1_donus UCUS 2022_tpu_f48k4_cb62.h5: kare=54 <=70m=0.7037037037037037 <=25m=0.0 medyan=37.0
+2026-10-01 21:47:12 TEST guzergah_2_tezde_ucus_1 topluluk_x1_2022
+guzergah_2_tezde_ucus_1 UCUS topluluk_x1_2022.h5: kare=145 <=70m=0.8689655172413793 <=25m=0.20689655172413793 medyan=34.0
+2026-10-01 21:49:51 TEST guzergah_2_tezde_ucus_1 2022_deneme6_f32k5
+guzergah_2_tezde_ucus_1 UCUS 2022_deneme6_f32k5.h5: kare=145 <=70m=0.8068965517241379 <=25m=0.1793103448275862 medyan=35.0
+2026-10-01 21:51:28 TEST guzergah_2_tezde_ucus_1 RAW_kimlik
+guzergah_2_tezde_ucus_1 UCUS RAW_kimlik.h5: kare=145 <=70m=0.4482758620689655 <=25m=0.10344827586206896 medyan=165.0
+2026-10-01 21:52:50 TEST guzergah_2_tezde_ucus_1 2022_k32_3_e1900
+guzergah_2_tezde_ucus_1 UCUS 2022_k32_3_e1900.h5: kare=145 <=70m=0.896551724137931 <=25m=0.20689655172413793 medyan=34.0
+2026-10-01 21:54:21 TEST guzergah_2_tezde_ucus_1 2022_tpu_f48k4_cb62
+guzergah_2_tezde_ucus_1 UCUS 2022_tpu_f48k4_cb62.h5: kare=145 <=70m=0.7931034482758621 <=25m=0.15862068965517243 medyan=35.0
+2026-10-01 21:55:57 TEST guzergah_3_tezde_ucus_2 topluluk_x1_2022
+guzergah_3_tezde_ucus_2 UCUS topluluk_x1_2022.h5: kare=200 <=70m=0.975 <=25m=0.89 medyan=22.0
+2026-10-01 21:58:43 TEST guzergah_3_tezde_ucus_2 2022_deneme6_f32k5
+guzergah_3_tezde_ucus_2 UCUS 2022_deneme6_f32k5.h5: kare=200 <=70m=0.97 <=25m=0.87 medyan=21.0
+2026-10-01 22:00:53 TEST guzergah_3_tezde_ucus_2 RAW_kimlik
+guzergah_3_tezde_ucus_2 UCUS RAW_kimlik.h5: kare=200 <=70m=0.93 <=25m=0.825 medyan=22.0
+2026-10-01 22:02:41 TEST guzergah_3_tezde_ucus_2 2022_k32_3_e1900
+guzergah_3_tezde_ucus_2 UCUS 2022_k32_3_e1900.h5: kare=200 <=70m=0.975 <=25m=0.895 medyan=21.0
+2026-10-01 22:04:41 TEST guzergah_3_tezde_ucus_2 2022_tpu_f48k4_cb62
+guzergah_3_tezde_ucus_2 UCUS 2022_tpu_f48k4_cb62.h5: kare=200 <=70m=0.95 <=25m=0.8 medyan=22.0
+2026-10-01 22:06:41 TEST guzergah_4_tezde_ucus_3 topluluk_x1_2022
+guzergah_4_tezde_ucus_3 UCUS topluluk_x1_2022.h5: kare=210 <=70m=0.8380952380952381 <=25m=0.5523809523809524 medyan=23.0
+2026-10-01 22:09:13 TEST guzergah_4_tezde_ucus_3 2022_deneme6_f32k5
+guzergah_4_tezde_ucus_3 UCUS 2022_deneme6_f32k5.h5: kare=210 <=70m=0.7904761904761904 <=25m=0.5380952380952381 medyan=23.0
+2026-10-01 22:11:22 TEST guzergah_4_tezde_ucus_3 RAW_kimlik
+guzergah_4_tezde_ucus_3 UCUS RAW_kimlik.h5: kare=210 <=70m=0.780952380952381 <=25m=0.4238095238095238 medyan=28.0
+2026-10-01 22:13:12 TEST guzergah_4_tezde_ucus_3 2022_k32_3_e1900
+guzergah_4_tezde_ucus_3 UCUS 2022_k32_3_e1900.h5: kare=210 <=70m=0.819047619047619 <=25m=0.5333333333333333 medyan=24.0
+2026-10-01 22:15:14 TEST guzergah_4_tezde_ucus_3 2022_tpu_f48k4_cb62
+guzergah_4_tezde_ucus_3 UCUS 2022_tpu_f48k4_cb62.h5: kare=210 <=70m=0.680952380952381 <=25m=0.4 medyan=40.0
+2026-10-01 22:17:21 TEST guzergah_6_to_tagar topluluk_x1_2022
+guzergah_6_to_tagar UCUS topluluk_x1_2022.h5: kare=130 <=70m=0.7538461538461538 <=25m=0.6615384615384615 medyan=15.0
+2026-10-01 22:19:33 TEST guzergah_6_to_tagar 2022_deneme6_f32k5
+guzergah_6_to_tagar UCUS 2022_deneme6_f32k5.h5: kare=130 <=70m=0.6076923076923076 <=25m=0.4461538461538462 medyan=33.0
+2026-10-01 22:21:16 TEST guzergah_6_to_tagar RAW_kimlik
+guzergah_6_to_tagar UCUS RAW_kimlik.h5: kare=130 <=70m=0.5384615384615384 <=25m=0.3923076923076923 medyan=51.0
+2026-10-01 22:22:45 TEST guzergah_6_to_tagar 2022_k32_3_e1900
+guzergah_6_to_tagar UCUS 2022_k32_3_e1900.h5: kare=130 <=70m=0.7153846153846154 <=25m=0.6153846153846154 medyan=15.0
+2026-10-01 22:24:23 TEST guzergah_6_to_tagar 2022_tpu_f48k4_cb62
+guzergah_6_to_tagar UCUS 2022_tpu_f48k4_cb62.h5: kare=130 <=70m=0.5615384615384615 <=25m=0.3923076923076923 medyan=37.0
+2026-10-01 22:26:03 TEST guzergah_7_to_gurlevek topluluk_x1_2022
+guzergah_7_to_gurlevek UCUS topluluk_x1_2022.h5: kare=144 <=70m=0.7569444444444444 <=25m=0.5069444444444444 medyan=23.0
+2026-10-01 22:29:06 TEST guzergah_7_to_gurlevek 2022_deneme6_f32k5
+guzergah_7_to_gurlevek UCUS 2022_deneme6_f32k5.h5: kare=144 <=70m=0.7986111111111112 <=25m=0.4236111111111111 medyan=36.0
+2026-10-01 22:30:49 TEST guzergah_7_to_gurlevek RAW_kimlik
+guzergah_7_to_gurlevek UCUS RAW_kimlik.h5: kare=144 <=70m=0.625 <=25m=0.2916666666666667 medyan=54.0
+2026-10-01 22:32:17 TEST guzergah_7_to_gurlevek 2022_k32_3_e1900
+guzergah_7_to_gurlevek UCUS 2022_k32_3_e1900.h5: kare=144 <=70m=0.5138888888888888 <=25m=0.3333333333333333 medyan=53.0
+2026-10-01 22:33:54 TEST guzergah_7_to_gurlevek 2022_tpu_f48k4_cb62
+guzergah_7_to_gurlevek UCUS 2022_tpu_f48k4_cb62.h5: kare=144 <=70m=0.4444444444444444 <=25m=0.2569444444444444 medyan=238.0
+2026-10-01 22:35:35 TEST guzergah_8_koy_vadi topluluk_x1_2022
+guzergah_8_koy_vadi UCUS topluluk_x1_2022.h5: kare=0 <=70m=None <=25m=None medyan=None
+2026-10-01 22:36:33 TEST guzergah_8_koy_vadi 2022_deneme6_f32k5
+guzergah_8_koy_vadi UCUS 2022_deneme6_f32k5.h5: kare=0 <=70m=None <=25m=None medyan=None
+2026-10-01 22:37:26 TEST guzergah_8_koy_vadi RAW_kimlik
+guzergah_8_koy_vadi UCUS RAW_kimlik.h5: kare=0 <=70m=None <=25m=None medyan=None
+2026-10-01 22:38:18 TEST guzergah_8_koy_vadi 2022_k32_3_e1900
+guzergah_8_koy_vadi UCUS 2022_k32_3_e1900.h5: kare=0 <=70m=None <=25m=None medyan=None
+2026-10-01 22:39:11 TEST guzergah_8_koy_vadi 2022_tpu_f48k4_cb62
+guzergah_8_koy_vadi UCUS 2022_tpu_f48k4_cb62.h5: kare=0 <=70m=None <=25m=None medyan=None
+2026-10-01 22:40:03 ROTALAR BITTI

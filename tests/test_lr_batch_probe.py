@@ -50,9 +50,11 @@ class ProbeJobTests(unittest.TestCase):
 
     def test_probe_includes_the_current_setting_as_a_control(self):
         names = {job["name"] for job in probe.build_probe_jobs(6)}
+        self.assertIn("lr1e-3_b1", names)
+        # Eski sweep ayari tarihsel kontrol olarak kalir.
         self.assertIn("lr1e-3_b2", names)
         control = next(
-            job for job in probe.build_probe_jobs(6) if job["name"] == "lr1e-3_b2"
+            job for job in probe.build_probe_jobs(6) if job["name"] == "lr1e-3_b1"
         )
         self.assertEqual(pipeline.BASELINE_JOB["LEARNING_RATE"], control["LEARNING_RATE"])
         self.assertEqual(pipeline.BASELINE_JOB["BATCH_SIZE"], control["BATCH_SIZE"])

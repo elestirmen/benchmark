@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "2022_deneme6_f32k5",
+  "aciklama": "2022 deneme_6 f32_k5 (karma k5/k3). Urgup 4000 sorgu global 0.601.",
+  "tarif": "",
+  "kaynak_deney": "2022",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\models\\01_deneme_6__gpu_model_f32_k5_epoch__epoch__sigmoid__1__1__07_10_2022__5__b48bdc1ed522.h5",
+  "raf_dosyasi": "2022_deneme6_f32k5.h5",
+  "sha256": "b48bdc1ed522c201197188905c87964f1aa42d31fcd03b796583a8ed9cfa457a",
+  "rafa_eklenme": "2026-09-25T11:17:43"
+}

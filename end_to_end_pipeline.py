@@ -27,9 +27,30 @@ TRAINING_SCRIPT_NAME = "autoencoder_unified.py"
 BENCHMARK_SCRIPT = r"C:\d_surucusu\visual_navigation\benchmark\run_urgup_cevresi_models.py"
 MODEL_VALIDATOR_SCRIPT = r"C:\d_surucusu\visual_navigation\benchmark\validate_trained_models.py"
 MARGIN_GATE_SCRIPT = r"C:\d_surucusu\visual_navigation\benchmark\margin_gate.py"
-# Kapi ornek sayisi. 20 ornek siniflari ayirmaya yeter (dogrulandi), 60 ornek
-# oran tahminini stabilize eder ve yine bir dakika altinda kalir.
-MARGIN_GATE_SAMPLES = 60
+# Kapi ornek sayisi. 20 ornek siniflari (cokmus / RAW / kazanan) ayirmaya
+# yeter; ama batch 1 checkpointleri birbirine yakin ve kapi artik sampiyonu
+# SECIYOR. 2026-09-24'te 60 ornek bunun icin gurultulu cikti: ayni checkpoint
+# 60 ornekte 0.37, 150 ornekte 0.51 (karma f32_k53 e1). 150 ornekle siralama
+# resmi benchmark'la uyusur: k_32_3 0.42 / TPU 0.43 / deneme_6 0.46 /
+# 06_modeller 0.52 / RAW 0.53 (resmi global 0.620 / 0.659 / 0.601 / 0.504 /
+# 0.461). Maliyet checkpoint basina ~1 dk CPU.
+MARGIN_GATE_SAMPLES = 150
+# Kapi gruplari. Resmi global skor dort grubun ortalamasidir (G2B/B2G x
+# clean/hard_v1); eski kapi yalniz G2B clean olcuyordu ve yeni modellerin
+# en zayif oldugu B2G hard_v1'i gormuyordu. 2026-09-25 kalibrasyonu (resmi
+# sonucu bilinen 39 model, deneyler/2026-09-25_parametre_arama):
+# Spearman(kapi, resmi RAW farki) Urgup 1000 sorguda 4 grup -0.909 / eski
+# -0.718, Urgup 4000 sorguda -0.918 / -0.847. 4 grupta RAW baraji 0.584;
+# TPU cb62 0.440, k_32_3 0.442, deneme_6 0.480, yeni topluluk3 0.495,
+# 06_modeller 0.536. Maliyet ~4x (dort kirpma kumesi).
+MARGIN_GATE_VARIANTS = ("clean", "hard_v1")
+MARGIN_GATE_BIDIRECTIONAL = True
+# Kapi sampiyonunun yansima TTA'li surumu de kapidan gecer; daha iyiyse benchmark'a
+# o girer (consider_tta_champion). Bos tuple = kapali.
+BENCHMARK_TTA_TRANSFORMS = (
+    "id", "fliplr", "flipud", "rot180", "rot90", "rot270", "transpose", "antitranspose",
+)
+TTA_BUILDER_SCRIPT = r"C:\d_surucusu\visual_navigation\benchmark\deney_araclari\yansima_toplulugu.py"
 # Epoch checkpointleri buraya tasinir. model_files_in() alt klasorlere
 # bakmadigi icin benchmark yalniz ust klasordeki adaylari calistirir.
 EPOCH_CHECKPOINT_DIR = "_epochs"
@@ -52,6 +73,12 @@ BENCHMARK_CANDIDATE_DIR = "_benchmark_adayi"
 # bakarak yapmak sonuclari iyimser gosterir.
 MARGIN_GATE_AOI = "train"
 BENCHMARK_CWD = r"C:\d_surucusu\visual_navigation\benchmark"
+# Tek kok: her pipeline kosusu deneyler/pipeline_<run_id>/ altinda modeller/,
+# sonuclar/ (benchmark + TUM_SONUCLAR.xlsx) ve kayitlar/ ile durur. Eski
+# kosular (models_pipeline/<run_id> + outputs/end_to_end_pipeline_<run_id>)
+# yerlerinde kalir ve resume icin o yollar kullanilir.
+DENEYLER_DIR = Path(BENCHMARK_CWD) / "deneyler"
+PIPELINE_RUN_PREFIX = "pipeline_"
 MODELS_PIPELINE_DIR = Path(BENCHMARK_CWD) / "models_pipeline"
 BENCHMARK_MAX_QUERIES = 1000
 # Cikarim batch geri cekilme merdiveni. run_urgup_cevresi_models.py varsayilani
@@ -59,8 +86,15 @@ BENCHMARK_MAX_QUERIES = 1000
 # GPU OOM alip kayboldu. --batch-size bilimsel degil operasyonel bir ayardir
 # (benchmark/README.md), yani resume sirasinda degistirilmesi sonuclari bozmaz.
 BENCHMARK_BATCH_ATTEMPTS = (16, 8, 4, 2)
-DEFAULT_BATCH_SIZE = 2
+# Egitim batch'i. 1, 2022 kazananlarinin tarifidir (bkz. NEDEN BU SWEEP BOYLE).
+DEFAULT_BATCH_SIZE = 1
 LEGACY_BATCH_SIZE = 8
+# Benchmark'in HER modele verdigi giris normalizasyonu
+# (run_urgup_cevresi_models.core_arguments: --normalization minus1_1).
+# Egitim normalizasyonundan BAGIMSIZDIR: zero_1 ile egitilen bir model de
+# benchmark'ta minus1_1 ile beslenir. Marj kapisi benchmark'in olctugunu
+# olcmek zorunda oldugu icin bu degeri kullanir, egitiminkini degil.
+BENCHMARK_INPUT_NORMALIZATION = "minus1_1"
 RAW_MODEL_ID = "RAW_BASELINE"
 BENCHMARK_VARIANTS = ("clean", "hard_v1")
 BENCHMARK_SEARCH_MODES = (
@@ -74,13 +108,69 @@ BENCHMARK_SEARCH_MODES = (
 
 # main() calisirken en yeni yarim run otomatik secilir.
 PIPELINE_RUN_ID = None
+PIPELINE_RUN_DIR = None
 PIPELINE_MODELS_ROOT = None
 PIPELINE_BENCHMARK_ROOT = None
 
 
 # =====================================================================
-# NEDEN BU SWEEP BOYLE
+# NEDEN BU SWEEP BOYLE (2026-09-24 guncellemesi)
 # =====================================================================
+# 2026-09-10 sweepinin butun isleri (flat_bottleneck f24-f96, batch 2-32,
+# minus1_1) RAW'in altinda kaldi: en iyisi flat_f24_k4 global success_25m
+# 0.378, RAW 0.461 (1000 sorgu). Mimari kazananlarla birebir aynidir; fark
+# egitim tarifindedir ve uc olcumle bulundu:
+#
+#   1. BATCH_SIZE=1 BELIRLEYICI EKSEN. Ekim 2022 checkpoint adlari
+#      (_14_10_2022__16_10_GPU_model_f32_k3_epoch_00001_...(1_ 1)_.h5)
+#      arsiv/autoencoder_gpu_froom_kaggle.py sablonudur: npz, /255 giris ve
+#      etiket, BCE, Adam 1e-3, model.fit(batch_size=1, shuffle=True). Ayni
+#      f32_k3 mimarisi, ayni veri ve tarifle yalniz batch degistirilerek
+#      (PyTorch esdegeri, hizli vekil benchmark; bkz. asagidaki tablo):
+#        batch 8: epoch 1/3/5 = 0.301 / 0.311 / 0.265
+#        batch 1: epoch 1/2/3/4/5 = 0.326 / 0.608 / 0.753 / 0.748 / 0.625
+#      Eski sweep batch'i tam ters yone (8/16/32) tariyordu.
+#   2. GIRIS [0, 1] (zero_1). TPU ve k_32_3 kazananlarinin Bern verisindeki
+#      BCE'si zero_1 girisle 0.39-0.41, minus1_1 ile 1.19-1.25: [0, 1] ile
+#      egitildiler.
+#      Benchmark ise HER modeli minus1_1 ile besler; kazananlar bu yuzden
+#      2x kontrastli girisle calisip Urgup'te doygun, ikili bir koyu-yapi
+#      haritasi uretir (cikti std 0.26-0.33; eski pipeline modelleri
+#      0.03-0.09). Eski pipeline egitimi bilerek minus1_1'e esitlemisti.
+#      batch 1'de minus1_1 epoch 1-5: 0.515 / 0.388 / 0.505 / 0.515 / 0.440;
+#      zero_1'in tepesi daha yuksek (0.753).
+#   3. CHECKPOINT KALITESI EPOCHTAN EPOCHA VE SEED'E GORE DALGALANIR (batch 1
+#      SGD'nin dogasi). Tam veri, seed 42: epoch 2/5/6 = 0.641 / 0.809 / 0.670
+#      (vekil). 2022 serileri de boyle (TPU f48_k4: e50 0.28, e650 0.78,
+#      e1300 0.49, e1900 0.85; urgup_bes_nokta_global_100). Her epoch diske
+#      yazilir ve marj kapisi HEPSINI olcer; TEKRAR isleri bu yuzden var.
+#
+# RESMI BENCHMARK (1000 sorgu, global success_25m ortalamasi, 2026-09-24):
+#   RAW 0.461 | eski pipeline en iyi (flat_f24_k4) 0.378
+#   bu tarif, 3100 ornek e3 (kapi 0.53) 0.479
+#   bu tarif, tam veri e5   (kapi 0.50) 0.564 -- roi_500m 0.788, roi_1000m 0.754
+#   bu pipeline (TF), z1_f32_k3_b1 run 20260924_065751 (kapi 0.51) 0.569 --
+#     roi_500m 0.803; yukaridaki PyTorch esdegeriyle ayni
+#   uc bu-tarif modelinin ciktisi ortalanarak (kapi 0.47; 38.355 parametre,
+#   TPU'dan kucuk) 0.615 -- roi_500m 0.793
+#   2022 (4000 sorgu): 06_modeller 0.504 | deneme_6 0.601 | TPU e1100 0.614 |
+#   k_32_3 0.620 | TPU 0.659. Tek modelde kalan fark global aramadadir:
+#   roi_500m'de tam veri e5 (0.788) deneme_6 (0.789) ile ayni. Kapi degerleri
+#   150 orneklik olcumdur. Araclar: deney_araclari/, veriler: deneyler/2026-09-24_zero1_tarif/.
+#
+# Hizli vekil (outputs disinda, 2 x 6x6 km egitim bolgesi, ayni
+# coarse_to_fine_search + hard_v1) eski modellerin sirasini dogru verdi ama
+# yeni modelleri IYIMSER olcer: 36 km2 aramada yanlis tepe az, 486 km2'de cok.
+# Bu yuzden secici marj kapisidir (150 ornek), vekil degil.
+#
+# Mimari eksenleri (batch 1, zero_1): f48_k4 6 epochta kapi 0.57 (60 ornek),
+# karma k5/k3 (deneme_6 f32_k5 mimarisi) tam veride en iyi 0.52 (f32_k3 0.40);
+# output19_ps (dolu yol etiketleri) kapi 0.65 -- Bern sonuclar_19 daha iyi.
+# Taban bu yuzden deneme_6 serisinin f32_k3 mimarisidir.
+# ---------------------------------------------------------------------
+# ONCEKI GEREKCE (2026-09-10). Mimari sinifi / sigmoid / BCE bulgulari
+# gecerlidir; batch ekseni yorumu (buyuk batch) yukaridaki olcumle curudu.
+# ---------------------------------------------------------------------
 # Onceki sweep (16 is, MODEL_TYPE="classic", OUTPUT_ACTIVATION="tanh",
 # EPOCHS=20) filtre sayisi / kernel / optimizer / lr / loss eksenlerini
 # tariyordu ve tamamlanan 4 isin hepsi RAW baseline'in ~50 kati kotu cikti
@@ -111,44 +201,38 @@ PIPELINE_BENCHMARK_ROOT = None
 # tarar. Gecilecek baraj artik RAW degil, top_modeller'in kendisidir.
 # =====================================================================
 
-# 2022'de benchmark'ta 0.703 success_25m alan konfigurasyon
-# (top_modeller/_03_model_tpu_f48_k4_s1_elu...sigmoid). Mimari birebir
-# yeniden uretildi: 50.089 parametre, katman katman ayni.
+# Taban: diger_modeller/deneme_6 f32_k3 serisi (06.10.2022) ile katman katman
+# ayni mimari -- 12.785 parametre, Conv 32/16/8 + ConvT 8/16/32 + Conv 1, k3,
+# ELU, sigmoid -- ve 2022 Kaggle tarifi (zero_1, BCE, Adam 1e-3, batch 1).
+# O serinin sifirdan egitilmis epoch-1 checkpointi vekilde 0.710 alir; ayni
+# tarifin 2026 tekrari (tam veri, epoch 5) 0.809.
 BASELINE_JOB = {
     "MODEL_TYPE": "flat_bottleneck",
-    "FILTER_COUNT": 48,
-    "KERNEL_SIZE": (4, 4),
+    "FILTER_COUNT": 32,
+    "KERNEL_SIZE": (3, 3),
     "STRIDES": (1, 1),
     "FLAT_DEPTH": 3,
     "HIDDEN_ACTIVATION": "elu",
     "OUTPUT_ACTIVATION": "sigmoid",
-    "INPUT_NORMALIZATION": "minus1_1",
+    # [0, 1] giris kazananlarin egitim normalizasyonudur. Benchmark yine
+    # minus1_1 besler (BENCHMARK_INPUT_NORMALIZATION); bu fark bilerek korunur,
+    # cunku kazananlarin Urgup'teki davranisi tam olarak bu farka dayanir.
+    "INPUT_NORMALIZATION": "zero_1",
     "BATCH_SIZE": DEFAULT_BATCH_SIZE,
-    # Epoch butcesi OLCULDU (f48/k4/d3, batch 2, 2608 step/epoch, bu GPU):
-    #   122 ms/step -> 5.3 dk/epoch
-    #    50 epoch ->  4.4 saat/is      100 epoch ->  8.9 saat/is
-    #   200 epoch -> 17.7 saat/is      400 epoch -> 35.5 saat/is
-    # Karsilastirma: classic_f32 9.2 dk/epoch, yani flat_bottleneck tam
-    # cozunurluge ragmen 1.7x daha hizli (kanal sayisi cok daha az).
+    # Her epoch yeniden karistir (2022: model.fit(numpy, shuffle=True)). Eski
+    # egitim scripti yollari bir kez karistirip her epoch ayni sirayla
+    # dolasiyordu; batch 1'de sira SGD yorungesinin kendisidir.
+    "SHUFFLE_TRAIN": True,
+    # 12 epoch: batch 1'de iyi checkpointler epoch 3-5'te cikti ve kalite
+    # epochtan epocha dalgalanir; 12 epoch kapiya 12 aday verir. TF 2.10 bu
+    # GPU'da batch 1'de ~122 ms/adim (paylasimli GPU, 2026-09-24 olcumu),
+    # 5.218 adim/epoch -> ~10.6 dk/epoch, 12 epoch ~2.1 saat.
     #
-    # Eski basarisiz kosu 20 epoch = ~104k ornek gormustu. Kazanan 2022
-    # modelleri "epoch 1100-2000" checkpointleriydi ama kucuk, RAM'e sigan bir
-    # veri kumesi uzerinde; dolayisiyla dogru karsilastirma epoch degil GORULEN
-    # ORNEK sayisidir. 100 epoch = ~522k ornek, basarisiz kosunun 5 kati.
-    #
-    # 100 epoch, is basina bir gecelik birim olacak sekilde secildi. Egitim
-    # scripti her epoch best_val_loss / best_mae / best_ssim checkpointlerini
-    # kaydeder, bu yuzden marj kapisi ara checkpointleri de degerlendirebilir;
-    # en iyi epochu tahmin etmek yerine olcmek mumkundur.
-    # 2026-09-09'da OLCULDU: BCE ile 75 epoch kosan job 1'in en ayirt edici
-    # checkpointi EPOCH 2 (oran 0.363), epoch 8'den sonrasi degersiz ve epoch
-    # 20'de truth NCC 0.003 -- yani 100 epoch bilgi tasiyan pencerenin ~50 kati.
-    # 20 epoch iki sebeple secildi: (a) tepe bolgesini (1-8) fazlasiyla kapsar,
-    # (b) batch ekseninin ust ucuna kazananin adim sayisini verir --
-    # BATCH_SIZE=32'de 20 epoch ~3.260 gradyan adimi, tpu kazananinin ~3.300
-    # adimiyla ayni mertebe. Epoch sayisi tum batch'lerde ayni tutulur, boylece
-    # GORULEN ORNEK sabit kalir ve batch tek degisken olur.
-    "EPOCHS": 20,
+    # Eski not (2026-09-09, batch 2, minus1_1): job 1'in en ayirt edici
+    # checkpointi epoch 2'ydi ve epoch 8'den sonrasi degersizdi. Bu, eski
+    # tarifin (batch 2) davranisidir; batch 1'de tepe daha gec ve cok daha
+    # yuksek cikar.
+    "EPOCHS": 12,
     "LEARNING_RATE": 0.001,
     "OPTIMIZER": "adam",
     # 2026-09-08 loss probe'u (models_pipeline/_loss_probe/probe_summary.json)
@@ -191,69 +275,42 @@ def job(name, **overrides):
     return result
 
 
-# Her is, bilinen kazanan noktadan TEK bir eksende ayrilir; boylece sonucun
-# hangi degiskenden kaynaklandigi yorumlanabilir.
+# Her is, taban noktadan TEK bir eksende ayrilir (tekrarlar hic ayrilmaz);
+# boylece sonucun hangi degiskenden kaynaklandigi yorumlanabilir. Isler
+# bilgi degerine gore siralidir: --max-jobs N bastan N is calistirir.
+#
+# Adlar 2026-09-10 sweepinden bilerek farklidir (z1_/m11_ oneki): eski bir
+# run klasoru resume edilse bile ayni adli, farkli tarifle tamamlanmis bir
+# benchmark yeni isin sonucu gibi benimsenmez.
 TRAINING_JOBS = [
-    # Kazanan konfigurasyonun yeniden uretimi. Bu is basarisiz olursa
-    # sorun mimaride degil egitim verisinde/tarifindedir; sweep'in geri
-    # kalanini calistirmanin anlami yoktur.
-    job("flat_f48_k4_sigmoid_repro"),
+    # Tarifin kendisi.
+    job("z1_f32_k3_b1"),
 
-    # BATCH EKSENI -- kazananin yeniden uretilmemis TEK degiskeni.
-    # tpu_model_f48_k4_epoch_01100 TPU'da egitildi ve arsivin kendi satiri
-    # BATCH_SIZE = 128 * num_replicas (~1024) diyor: ~3.100 goruntu x 1100
-    # epoch = ~3,4M ornek, ama yalnizca ~3.300 adimda. Bizim epoch-2 tepemiz
-    # ~5.200 adim, yani adim sayisi ayni mertebede; fark bizim adimlarimizin
-    # batch-2 gurultulu, onlarinkinin batch-1024 temiz gradyan olmasi.
-    # lr_batch_probe yalniz batch 2 ve 8'i denedi. Epoch sayisi sabit oldugu
-    # icin bu isler ayni ornegi gorur, yalniz gradyan gurultusu degisir.
-    job("bce_b8", BATCH_SIZE=8),
-    job("bce_b16", BATCH_SIZE=16),
-    job("bce_b32", BATCH_SIZE=32),
+    # TEKRARLAR: ayni konfigurasyon, farkli rastgele agirlik baslangici
+    # (egitim scripti TF seed'ini sabitlemez). batch 1'de checkpoint kalitesi
+    # baslangica gore de dalgalanir: 3100 orneklik iki seed'in en iyi kapi
+    # orani 0.42 ve 0.51 cikti. Her tekrar kapiya 12 yeni aday verir.
+    job("z1_f32_k3_b1_tekrar2"),
+    job("z1_f32_k3_b1_tekrar3"),
 
-    # Kapasite: kazanan nokta 50k parametrede. Olculen egilim, kapasite
-    # arttikca ayirt ediciligin DUSTUGU yonunde; bu eksen o egilimin
-    # kazanan bolgede nerede tepe yaptigini bulur.
-    job("flat_f24_k4", FILTER_COUNT=24),
-    job("flat_f32_k4", FILTER_COUNT=32),
-    job("flat_f64_k4", FILTER_COUNT=64),
-    job("flat_f96_k4", FILTER_COUNT=96),
+    # BATCH EKSENI KONTROLU. 2 eski pipeline varsayilaniydi; 8'de vekil
+    # epoch 1-5 boyunca 0.27-0.31'de kaldi.
+    job("z1_f32_k3_b2", BATCH_SIZE=2),
+    job("z1_f32_k3_b8", BATCH_SIZE=8),
 
-    # Alici alan: kernel k ve derinlik d icin ~1 + 2*d*(k-1) piksel.
-    # Kaynaklar-arasi dokunun hangi olcekte kararli oldugunu belirler.
-    job("flat_f48_k3", KERNEL_SIZE=(3, 3)),
-    job("flat_f48_k5", KERNEL_SIZE=(5, 5)),
-    job("flat_f48_k7", KERNEL_SIZE=(7, 7)),
+    # NORMALIZASYON KONTROLU: batch 1'de eski pipeline girisi.
+    job("m11_f32_k3_b1", INPUT_NORMALIZATION="minus1_1"),
 
-    # Darboga derinligi: f/2^d zinciri. d=2 daha genis darboga,
-    # d=4 daha sikistirilmis temsil.
-    job("flat_f48_d2", FLAT_DEPTH=2),
-    job("flat_f48_d4", FLAT_DEPTH=4),
+    # 2022 serilerinin diger noktalari: Ekim 2022 f40_k3 ve f32_k5 serileri
+    # de ilk epochlarda iyiydi (urgup_bes_nokta_global_100); k_32_3 serisi
+    # ReLU'luydu. f48_k4 (TPU mimarisi) batch 1'de 6 epochta vekil 0.343'te
+    # kaldigi icin listede yok.
+    job("z1_f40_k3_b1", FILTER_COUNT=40),
+    job("z1_f32_k5_b1", KERNEL_SIZE=(5, 5)),
+    job("z1_f32_k3_relu_b1", HIDDEN_ACTIVATION="relu"),
 
-    # Cikis aktivasyonu kontrolu. Kazananlar sigmoid; bu is ayni mimariyi
-    # tanh ile egiterek farkin gercekten aktivasyondan mi geldigini olcer.
-    # BCE etiketleri [0, 1] ister, tanh ise [-1, 1] uretir (OUTPUT_RANGES), yani
-    # bu is taban kaybi devralamaz; kaybi acikca weighted_hybrid'e sabitlenmistir
-    # (bu isin BCE oncesindeki degeri). Sonuc olarak job 1 ile arasinda IKI
-    # degisken farkeder, aktivasyon ve kayip; BCE matematiksel olarak sigmoid'e
-    # bagli oldugu icin bu konfound kacinilmazdir.
-    job("flat_f48_tanh", OUTPUT_ACTIVATION="tanh",
-        LOSS_FUNCTION="weighted_hybrid"),
-
-    # Kayip fonksiyonu. weighted_hybrid koyu piksellere agirlik verir;
-    # bu iki is agirliklandirmanin ayirt ediciligi nasil etkiledigini olcer.
-    job("flat_f48_hybrid_loss", LOSS_FUNCTION="hybrid"),
-    job("flat_f48_ssim_loss", LOSS_FUNCTION="ssim"),
-
-    # Gizli aktivasyon.
-    job("flat_f48_relu", HIDDEN_ACTIVATION="relu"),
-
-    # Kontrol grubu: eski sweep'in mimari sinifi, ayni epoch butcesiyle.
-    # Kapasite/indirme hipotezini test eder ve eski sonucun 20 epochtan mi
-    # yoksa mimariden mi kaynaklandigini ayirir.
-    job("classic_f32_k3_control", MODEL_TYPE="classic", FILTER_COUNT=32,
-        KERNEL_SIZE=(3, 3), OUTPUT_ACTIVATION="tanh",
-        LOSS_FUNCTION="weighted_hybrid"),
+    # KARISTIRMA KONTROLU: eski egitim scriptinin her epoch ayni sirasi.
+    job("z1_f32_k3_b1_sabit_sira", SHUFFLE_TRAIN=False),
 ]
 
 
@@ -267,6 +324,7 @@ CONFIG_KEYS = (
     "OUTPUT_ACTIVATION",
     "INPUT_NORMALIZATION",
     "BATCH_SIZE",
+    "SHUFFLE_TRAIN",
     "EPOCHS",
     "LEARNING_RATE",
     "OPTIMIZER",
@@ -317,7 +375,13 @@ def parse_args(argv=None):
 # Olculen maliyetler (bu GPU).
 MEASURED_MINUTES_PER_EPOCH = 5.3            # flat_bottleneck f48/k4/d3, batch 2
 MEASURED_CLASSIC_MINUTES_PER_EPOCH = 9.2    # classic f32/k3, ayni GPU
-BENCHMARK_MINUTES_PER_CHECKPOINT = 50.0
+# batch 1: TF 2.10 f32/k3/d3 adim basina ~122 ms (paylasimli GPU,
+# 2026-09-24), 5.218 adim/epoch. Bu batch'te sure agirlikla adim yukunden
+# gelir; mimari maliyeti yalniz kismen etkiler (bkz. estimate_minutes_per_epoch).
+MEASURED_B1_MINUTES_PER_EPOCH = 10.6        # flat_bottleneck f32/k3/d3, batch 1
+# 1000 sorgu, iki yon: benchmark.log "MODEL TARAMA SURESI" yon basina ~48 dk
+# (flat_f24_k4, 2026-09-10). Onceki 50 dk degeri tek yonu sayiyordu.
+BENCHMARK_MINUTES_PER_CHECKPOINT = 96.0
 # Benchmark'a giren aday: YALNIZ marj kapisinin sectigi sampiyon.
 # 2026-09-09'da olculdu: job 1'in best_val_loss / best_mae / best_ssim
 # dosyalarinin oranlari 1.155 / 1.50 / 1.71, yani olculen 16 checkpointin en
@@ -325,7 +389,7 @@ BENCHMARK_MINUTES_PER_CHECKPOINT = 50.0
 # ayirt ediciligi olcmuyorlar. Dordunu benchmark'a sokmak is basina
 # 4 x 50 dk = ~3,3 saat GPU'yu bilinen kotu adaylara harcamak demekti.
 BENCHMARK_CHECKPOINTS_PER_JOB = 1
-MARGIN_GATE_MINUTES_PER_CHECKPOINT = 1.0
+MARGIN_GATE_MINUTES_PER_CHECKPOINT = 2.0  # 4 grup (2026-09-25): ~4x kirpma, CPU
 
 
 def estimate_minutes_per_epoch(training_job):
@@ -342,6 +406,14 @@ def estimate_minutes_per_epoch(training_job):
     """
     if str(training_job.get("MODEL_TYPE")) != "flat_bottleneck":
         return MEASURED_CLASSIC_MINUTES_PER_EPOCH
+    if int(training_job["BATCH_SIZE"]) == 1:
+        # batch 1'de olculen f32/k3 suresinin yarisi adim yuku sayilir;
+        # yalniz kalan yarisi mimarinin conv maliyetiyle olceklenir.
+        compute_scale = (
+            (float(training_job["FILTER_COUNT"]) / 32.0) ** 2
+            * (float(training_job["KERNEL_SIZE"][0]) / 3.0) ** 2
+        )
+        return MEASURED_B1_MINUTES_PER_EPOCH * (0.5 + 0.5 * compute_scale)
     filter_scale = (float(training_job["FILTER_COUNT"]) / 48.0) ** 2
     kernel_scale = (float(training_job["KERNEL_SIZE"][0]) / 4.0) ** 2
     return MEASURED_MINUTES_PER_EPOCH * filter_scale * kernel_scale
@@ -378,7 +450,7 @@ def print_job_plan(jobs):
     print(f"Gorev sayisi: {len(jobs)} | tahmini toplam: {total:.1f} saat")
     print(
         f"{'#':>3} {'gorev':30} {'mimari':16} {'f':>4} {'k':>2} {'d':>2} "
-        f"{'cikis':8} {'kayip':16} {'ep':>4} {'saat':>6}"
+        f"{'cikis':8} {'kayip':20} {'norm':9} {'b':>3} {'ep':>4} {'saat':>6}"
     )
     for position, training_job in enumerate(jobs, start=1):
         print(
@@ -388,21 +460,30 @@ def print_job_plan(jobs):
             f"{training_job['KERNEL_SIZE'][0]:>2} "
             f"{training_job['FLAT_DEPTH']:>2} "
             f"{training_job['OUTPUT_ACTIVATION']:8} "
-            f"{training_job['LOSS_FUNCTION']:16} "
+            f"{training_job['LOSS_FUNCTION']:20} "
+            f"{training_job['INPUT_NORMALIZATION']:9} "
+            f"{training_job['BATCH_SIZE']:>3} "
             f"{training_job['EPOCHS']:>4} "
             f"{estimate_job_hours(training_job):>6.1f}"
         )
 
 
 def configure_run_paths(run_id):
-    global PIPELINE_RUN_ID, PIPELINE_MODELS_ROOT, PIPELINE_BENCHMARK_ROOT
+    global PIPELINE_RUN_ID, PIPELINE_RUN_DIR, PIPELINE_MODELS_ROOT, PIPELINE_BENCHMARK_ROOT
     if not re.fullmatch(r"\d{8}_\d{6}", run_id):
         raise ValueError(f"Gecersiz pipeline run-id: {run_id}")
     PIPELINE_RUN_ID = run_id
-    PIPELINE_MODELS_ROOT = MODELS_PIPELINE_DIR / run_id
-    PIPELINE_BENCHMARK_ROOT = (
-        Path(BENCHMARK_CWD) / "outputs" / f"end_to_end_pipeline_{run_id}"
-    )
+    run_dir = DENEYLER_DIR / f"{PIPELINE_RUN_PREFIX}{run_id}"
+    legacy_models = MODELS_PIPELINE_DIR / run_id
+    legacy_outputs = Path(BENCHMARK_CWD) / "outputs" / f"end_to_end_pipeline_{run_id}"
+    if not run_dir.exists() and (legacy_models.exists() or legacy_outputs.exists()):
+        PIPELINE_RUN_DIR = None
+        PIPELINE_MODELS_ROOT = legacy_models
+        PIPELINE_BENCHMARK_ROOT = legacy_outputs
+    else:
+        PIPELINE_RUN_DIR = run_dir
+        PIPELINE_MODELS_ROOT = run_dir / "modeller"
+        PIPELINE_BENCHMARK_ROOT = run_dir / "sonuclar"
 
 
 def read_json(path, default=None):
@@ -578,6 +659,8 @@ def build_job_status_rows(selected_names=None):
                 "HIDDEN_ACTIVATION": training_job["HIDDEN_ACTIVATION"],
                 "OUTPUT_ACTIVATION": training_job["OUTPUT_ACTIVATION"],
                 "LOSS_FUNCTION": training_job["LOSS_FUNCTION"],
+                "INPUT_NORMALIZATION": training_job["INPUT_NORMALIZATION"],
+                "BATCH_SIZE": training_job["BATCH_SIZE"],
                 "EPOCHS": training_job["EPOCHS"],
                 "estimated_hours": round(estimate_job_hours(training_job), 1),
             }
@@ -705,14 +788,20 @@ def refresh_combined_summary(shared_raw_dir, selected_names=None):
 
 
 def latest_pipeline_run_id():
-    if not MODELS_PIPELINE_DIR.is_dir():
-        return None
-    candidates = sorted(
-        path.name
-        for path in MODELS_PIPELINE_DIR.iterdir()
-        if path.is_dir() and re.fullmatch(r"\d{8}_\d{6}", path.name)
-    )
-    return candidates[-1] if candidates else None
+    candidates = set()
+    if MODELS_PIPELINE_DIR.is_dir():
+        candidates.update(
+            path.name
+            for path in MODELS_PIPELINE_DIR.iterdir()
+            if path.is_dir() and re.fullmatch(r"\d{8}_\d{6}", path.name)
+        )
+    if DENEYLER_DIR.is_dir():
+        pattern = rf"{re.escape(PIPELINE_RUN_PREFIX)}(\d{{8}}_\d{{6}})"
+        for path in DENEYLER_DIR.iterdir():
+            match = re.fullmatch(pattern, path.name)
+            if path.is_dir() and match:
+                candidates.add(match.group(1))
+    return max(candidates) if candidates else None
 
 
 def choose_run_id(args):
@@ -1132,11 +1221,20 @@ def run_margin_gate(training_job, model_dir):
         str(MARGIN_GATE_SAMPLES),
         "--aoi",
         MARGIN_GATE_AOI,
+        # Egitim normalizasyonu DEGIL: kapi benchmark'in olctugunu olcmeli.
+        # zero_1 ile egitilen bir aday benchmark'ta minus1_1 ile beslenir;
+        # kapiyi zero_1 ile calistirmak baska bir modeli olcmek olurdu (2022
+        # kazananlari zero_1 kapisinda 0.80-2.66'ya, minus1_1'de 0.32-0.33'e
+        # cikar/iner: outputs/margin_gate/top_zero1.json vs validate.json).
         "--normalization",
-        str(training_job.get("INPUT_NORMALIZATION", "minus1_1")),
+        BENCHMARK_INPUT_NORMALIZATION,
+        "--variants",
+        ",".join(MARGIN_GATE_VARIANTS),
         "--json-out",
         str(gate_path),
     ]
+    if MARGIN_GATE_BIDIRECTIONAL:
+        command.append("--bidirectional")
     for path in candidates:
         command.extend(["--model", str(path)])
     try:
@@ -1188,13 +1286,67 @@ def run_margin_gate(training_job, model_dir):
             "RAW barajini gecmedi. Benchmark sonucunun da zayif olmasi beklenir."
         )
     champion_path = promote_margin_gate_champion(model_dir, report)
+    champion_path, tta_info = consider_tta_champion(training_job, model_dir, champion_path, best)
     stage_benchmark_champion(model_dir, champion_path)
     return {
         "best_false_peak_ratio": best,
         "raw_false_peak_ratio": float(raw_ratio),
         "passed": passed,
         "collapsed": False,
+        "tta": tta_info,
     }
+
+
+def consider_tta_champion(training_job, model_dir, champion_path, champion_ratio):
+    """Sampiyonun yansima TTA'li surumunu kapidan gecir; daha ayirt ediciyse onu sec.
+
+    2026-09-25/26 olcumu (deneyler/2026-09-25_parametre_arama): bu sweepin tarifiyle
+    egitilen modellerde 8 donusumlu TTA kapiyi 0.517 -> 0.482, resmi 1000 sorguluk
+    global'i 0.564 -> 0.673 yapti. Ama 2022 kazananlarinin doygun ciktisinda TTA
+    bozar (TPU cb62 0.440 -> 0.518). Bu yuzden karari her seferinde kapi verir.
+    TTA modeli yalniz standart katmanlarla kurulur (deney_araclari/yansima_toplulugu.py),
+    benchmark degismeden yukler. Hicbir hata gorevi durdurmaz: sampiyon aynen doner.
+    """
+    if not BENCHMARK_TTA_TRANSFORMS or champion_path is None:
+        return champion_path, None
+    champion = Path(champion_path)
+    tta_dir = model_dir / "_tta"
+    tta_path = tta_dir / f"{champion.stem}_tta{len(BENCHMARK_TTA_TRANSFORMS)}.h5"
+    gate_path = PIPELINE_BENCHMARK_ROOT / "_margin_gate" / f"{training_job['name']}_tta.json"
+    env = dict(os.environ, CUDA_VISIBLE_DEVICES="-1")
+    try:
+        tta_dir.mkdir(parents=True, exist_ok=True)
+        if not tta_path.is_file():
+            subprocess.run(
+                [PYTHON_EXEC, TTA_BUILDER_SCRIPT, str(champion),
+                 "--transforms", ",".join(BENCHMARK_TTA_TRANSFORMS), "--out", str(tta_path)],
+                cwd=BENCHMARK_CWD, check=True, env=env,
+            )
+        command = [
+            PYTHON_EXEC, MARGIN_GATE_SCRIPT, "--samples", str(MARGIN_GATE_SAMPLES),
+            "--aoi", MARGIN_GATE_AOI, "--normalization", BENCHMARK_INPUT_NORMALIZATION,
+            "--variants", ",".join(MARGIN_GATE_VARIANTS), "--json-out", str(gate_path),
+            "--model", str(tta_path),
+        ]
+        if MARGIN_GATE_BIDIRECTIONAL:
+            command.append("--bidirectional")
+        subprocess.run(command, cwd=BENCHMARK_CWD, check=True)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f"[TTA] UYARI: TTA adayi kurulamadi/olculemedi ({exc}); sampiyon aynen kullanilacak.")
+        return champion_path, {"error": str(exc)}
+    entry = (read_json(gate_path, {}) or {}).get("results", {}).get(tta_path.name, {})
+    ratio = entry.get("false_peak_ratio") if isinstance(entry, dict) else None
+    if not isinstance(ratio, (int, float)) or not math.isfinite(float(ratio)):
+        print("[TTA] UYARI: TTA orani okunamadi; sampiyon aynen kullanilacak.")
+        return champion_path, {"error": "oran_yok"}
+    chosen = float(ratio) < float(champion_ratio)
+    print(
+        f"[TTA] {training_job['name']} | sampiyon={float(champion_ratio):.3f} | "
+        f"TTA{len(BENCHMARK_TTA_TRANSFORMS)}={float(ratio):.3f} | "
+        f"benchmark adayi={'TTA' if chosen else 'sampiyon'}"
+    )
+    info = {"ratio": float(ratio), "champion_ratio": float(champion_ratio), "chosen": chosen, "path": str(tta_path)}
+    return (tta_path if chosen else champion_path), info
 
 
 def benchmark_oom_detected(output_dir):
@@ -1437,8 +1589,8 @@ def main(argv=None):
     )
     print(f"Benchmark sorgu sayisi: {BENCHMARK_MAX_QUERIES}")
     print(
-        f"Egitim batch: gorev basina (kontrol={DEFAULT_BATCH_SIZE}); "
-        "OOM durumunda kademeli yariya iner"
+        f"Egitim batch: gorev basina (taban={DEFAULT_BATCH_SIZE}); "
+        "OOM durumunda is atlanir, batch degistirilmez"
     )
     print(
         f"Cikarim batch merdiveni: {list(BENCHMARK_BATCH_ATTEMPTS)} "
@@ -1574,10 +1726,32 @@ def main(argv=None):
                 )
         write_job_completion_marker(actual_job, output_dir)
         refresh_combined_summary(shared_raw_dir, selected_names)
+        refresh_results_dashboard()
         print(f"\n=== [{training_job['name']}] GOREV TAMAMLANDI ===\n")
 
     print("=== TUM GOREVLER BASARIYLA TAMAMLANDI ===")
     print(f"Birlesik rapor: {PIPELINE_BENCHMARK_ROOT / 'TUM_SONUCLAR.xlsx'}")
+    print(f"Tum kosularin panosu: {DENEYLER_DIR / 'PANO.md'}")
+
+
+def refresh_results_dashboard():
+    """deneyler/PANO.md + PANO.xlsx'i yeniler (tum kosular tek tabloda).
+
+    En iyi caba: pano kosuyu asla durdurmaz. Kosu kokleri benchmark klasoru
+    disindaysa (testlerin gecici klasorleri) gercek pano yazilmaz.
+    """
+    try:
+        Path(PIPELINE_BENCHMARK_ROOT).resolve().relative_to(Path(BENCHMARK_CWD).resolve())
+    except (TypeError, ValueError, OSError):
+        return
+    try:
+        if BENCHMARK_CWD not in sys.path:
+            sys.path.insert(0, BENCHMARK_CWD)
+        import sonuc_panosu
+
+        sonuc_panosu.main([])
+    except Exception as exc:  # noqa: BLE001 - pano kosuyu durdurmamali
+        print(f"[PANO] UYARI: sonuc panosu guncellenemedi ({exc}); kosu devam ediyor.")
 
 
 if __name__ == "__main__":

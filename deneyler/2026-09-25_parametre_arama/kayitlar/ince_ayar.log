@@ -1,0 +1,51 @@
+2026-09-25 17:00:09 BASLA ft_tam_e5
+2026-09-25 17:10:16 BITTI ft_tam_e5 CIKIS_KODU=0
+2026-09-25 17:10:16 BASLA ft_s2_e7
+2026-09-25 17:18:44 BITTI ft_s2_e7 CIKIS_KODU=0
+2026-09-25 17:18:44 BASLA ft_uzun_e27
+2026-09-25 17:40:28 BITTI ft_uzun_e27 CIKIS_KODU=0
+2026-09-25 17:40:28 BASLA kapi ince ayar
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.54  FT_uzun_ema_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.54  FT_uzun_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  FT_uzun_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  FT_uzun_ema_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  FT_uzun_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  FT_uzun_ema_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  FT_uzun_ema_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.55  FT_uzun_ema_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  FT_uzun_ema_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  FT_s2_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  FT_uzun_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.56  FT_uzun_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.57  FT_tam_ema_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  FT_uzun_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  FT_tam_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  FT_s2_ema_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  FT_tam_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  FT_tam_ema_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  FT_tam_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  FT_tam_ema_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  FT_tam_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  FT_tam_ema_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.61  FT_tam_ema_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.61  FT_tam_ema_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.61  FT_tam_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.62  FT_s2_ema_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  FT_tam_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.64  FT_s2_ema_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.67  FT_s2_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.69  FT_s2_ema_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.71  FT_s2_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.73  FT_s2_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.73  FT_s2_ema_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.75  FT_s2_ema_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.82  FT_s2_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.98  FT_s2_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+2026-09-25 18:42:35 BITTI kapi ince ayar cikis=0
+2026-09-25 18:42:35 INCE AYAR KUYRUGU BITTI
+2026-09-25 18:42:47 BASLA g8_tta_k4
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.47  tta4_x1_2022_tpu_k323_d6.h5
+  GECTI  oran= 0.52  tta4_2022_tpu_cb62.h5
+2026-09-25 19:24:58 BITTI g8_tta_k4 cikis=0

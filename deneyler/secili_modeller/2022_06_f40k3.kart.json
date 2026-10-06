@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "2022_06_f40k3",
+  "aciklama": "2022 06_modeller f40_k3. Urgup 4000 sorgu global 0.504.",
+  "tarif": "",
+  "kaynak_deney": "2022",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\models\\06_modeller___17_10_2022__16_25_gpu_model_f40_k3_epoch__epoch__sigmoi__f__d9829f8fe8c2.h5",
+  "raf_dosyasi": "2022_06_f40k3.h5",
+  "sha256": "d9829f8fe8c2a526e06703a05ca0cdbfc7b3f2cb78f521936b44950396414f68",
+  "rafa_eklenme": "2026-09-25T11:17:43"
+}

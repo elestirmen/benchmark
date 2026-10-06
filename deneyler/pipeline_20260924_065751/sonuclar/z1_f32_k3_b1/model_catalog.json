@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "model_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\20260924_065751\\z1_f32_k3_b1\\_benchmark_adayi",
+  "patterns": [
+    "*.h5",
+    "*.keras",
+    "*.hdf5"
+  ],
+  "max_models": null,
+  "sampling_mode": "full",
+  "stats": {
+    "sampling_mode": "full",
+    "discovered_files": 1,
+    "unique_content_files": 1,
+    "series_count": 1,
+    "sampled_files_before_content_dedup": 1,
+    "selected_models": 1,
+    "identical_files_skipped": 0,
+    "duplicate_name_groups": 0,
+    "conflicting_name_groups": 0
+  },
+  "models": [
+    {
+      "relative_path": "_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5",
+      "sha256": "7815ed362b0c41a7e4ca658bf158d95506b49879036103741fedbeebbb303b73",
+      "model_id": "JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3__7815ed362b0c",
+      "path": "C:\\d_surucusu\\visual_navigation\\benchmark\\models_pipeline\\20260924_065751\\z1_f32_k3_b1\\_benchmark_adayi\\_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5",
+      "size_bytes": 222400,
+      "mtime_ns": 1790224942401270400,
+      "series_id": "job_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3__4d29c6b117",
+      "series_key": "./_job_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3",
+      "checkpoint_number": -1,
+      "selection_points": [
+        "full"
+      ],
+      "selection_origins": [
+        "job_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3__4d29c6b117:full:_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5"
+      ],
+      "duplicate_paths": []
+    }
+  ]
+}

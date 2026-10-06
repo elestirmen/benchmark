@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scientific_semantics_version": 2,
+  "model_sha256": "f7ba9bc4d7bbda63096e23db7738f1e4c9798c0072b0ab8135bfc1f5b1f9253d",
+  "source_map": "E:\\tez__ayna\\python_calismalar\\AutoEncoder_pix2pix\\karlik_30_cm_bingmap_utm.tif",
+  "source_size": 1737613857,
+  "source_mtime_ns": 1694552576000000000,
+  "tile_size": 544,
+  "overlap": 32,
+  "normalization": "zero_1",
+  "enhancement": "none",
+  "output_value_mode": "auto",
+  "geotiff_container": "BigTIFF"
+}

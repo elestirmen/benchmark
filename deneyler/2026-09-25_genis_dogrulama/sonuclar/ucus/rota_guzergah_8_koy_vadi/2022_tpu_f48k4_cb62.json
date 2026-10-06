@@ -1,0 +1,18 @@
+{
+  "model": "2022_tpu_f48k4_cb62.h5",
+  "model_sha256": "cb62bfb86ad05abb0e29ce0a84ae4b98916953f1e6ac0e93967e6136603c0229",
+  "harita": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\ucus_haritalari\\2022_tpu_f48k4_cb62_geo.tif",
+  "anlik": "C:\\d_surucusu\\visual_navigation\\template-matching\\guzergahlar\\guzergah_8_koy_vadi",
+  "protokol": "F1: minus1_1 + none, kesisimsiz kare = tekil sablon",
+  "kare": 0,
+  "max_frames": 0,
+  "success_25m": null,
+  "success_50m": null,
+  "success_70m": null,
+  "tm_basari_yuzde": null,
+  "kesisim_yok_kare": 0,
+  "medyan_m": null,
+  "ortalama_m": null,
+  "sure_s": 48.59280204772949,
+  "kareler": []
+}

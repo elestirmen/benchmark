@@ -1,0 +1,18 @@
+{
+  "model": "RAW_kimlik.h5",
+  "model_sha256": "e3240b0f9ec6ebb9543c705b9632d86d83c2347ae7d77ed125c4e772582c26f5",
+  "harita": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\ucus_haritalari\\RAW_kimlik_geo.tif",
+  "anlik": "C:\\d_surucusu\\visual_navigation\\template-matching\\guzergahlar\\guzergah_8_koy_vadi",
+  "protokol": "F1: minus1_1 + none, kesisimsiz kare = tekil sablon",
+  "kare": 0,
+  "max_frames": 0,
+  "success_25m": null,
+  "success_50m": null,
+  "success_70m": null,
+  "tm_basari_yuzde": null,
+  "kesisim_yok_kare": 0,
+  "medyan_m": null,
+  "ortalama_m": null,
+  "sure_s": 48.85153293609619,
+  "kareler": []
+}

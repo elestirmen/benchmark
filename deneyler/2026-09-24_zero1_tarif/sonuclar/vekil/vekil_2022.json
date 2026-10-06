@@ -1,0 +1,62 @@
+{
+ "diger_modeller/deneme_6/GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_06_10_2022_.h5|train|100|clean,hard_v1|42": {
+  "spec": "diger_modeller/deneme_6/GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_06_10_2022_.h5",
+  "summary": {
+   "bing2google/clean": 0.745,
+   "bing2google/hard_v1": 0.635,
+   "google2bing/clean": 0.77,
+   "google2bing/hard_v1": 0.69,
+   "mean": 0.71,
+   "n": 800,
+   "s5": 0.6525,
+   "region:train_ne": 0.5375,
+   "region:train_nw": 0.8825
+  },
+  "seconds": 355.6
+ },
+ "diger_modeller/deneme_6/GPU_model_f32_k5_epoch_00001_sigmoid_(1_ 1)_07_10_2022_.h5|train|100|clean,hard_v1|42": {
+  "spec": "diger_modeller/deneme_6/GPU_model_f32_k5_epoch_00001_sigmoid_(1_ 1)_07_10_2022_.h5",
+  "summary": {
+   "bing2google/clean": 0.78,
+   "bing2google/hard_v1": 0.7,
+   "google2bing/clean": 0.745,
+   "google2bing/hard_v1": 0.73,
+   "mean": 0.7388,
+   "n": 800,
+   "s5": 0.6837,
+   "region:train_ne": 0.5875,
+   "region:train_nw": 0.89
+  },
+  "seconds": 450.0
+ },
+ "diger_modeller/modeller/_14_10_2022__16_10_GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_.h5|train|100|clean,hard_v1|42": {
+  "spec": "diger_modeller/modeller/_14_10_2022__16_10_GPU_model_f32_k3_epoch_00001_sigmoid_(1_ 1)_.h5",
+  "summary": {
+   "bing2google/clean": 0.595,
+   "bing2google/hard_v1": 0.485,
+   "google2bing/clean": 0.645,
+   "google2bing/hard_v1": 0.65,
+   "mean": 0.5938,
+   "n": 800,
+   "s5": 0.535,
+   "region:train_ne": 0.445,
+   "region:train_nw": 0.7425
+  },
+  "seconds": 259.8
+ },
+ "diger_modeller/deneme_6/GPU_model_f32_k3_epoch_00100_sigmoid_(1_ 1)_06_10_2022_.h5|train|100|clean,hard_v1|42": {
+  "spec": "diger_modeller/deneme_6/GPU_model_f32_k3_epoch_00100_sigmoid_(1_ 1)_06_10_2022_.h5",
+  "summary": {
+   "bing2google/clean": 0.625,
+   "bing2google/hard_v1": 0.55,
+   "google2bing/clean": 0.715,
+   "google2bing/hard_v1": 0.67,
+   "mean": 0.64,
+   "n": 800,
+   "s5": 0.5863,
+   "region:train_ne": 0.4775,
+   "region:train_nw": 0.8025
+  },
+  "seconds": 226.1
+ }
+}

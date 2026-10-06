@@ -185,27 +185,40 @@ def ncc(left: np.ndarray, right: np.ndarray) -> float:
     return float((a * b).sum() / denominator)
 
 
+def ncc_matrix(
+    query_templates: Sequence[np.ndarray],
+    map_templates: Sequence[np.ndarray],
+) -> np.ndarray:
+    """Tum sorgu/harita ciftlerinin ncc() degeri tek matris carpimiyla.
+
+    ncc() ile ayni nicelik (sifir ortalama, norm carpimina bolum, payda
+    ~0 ise 0); 150 ornekte ikili donguden yuzlerce kat hizlidir.
+    """
+
+    def centered(templates: Sequence[np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
+        rows = np.stack([np.asarray(t, dtype=np.float64).ravel() for t in templates])
+        rows -= rows.mean(axis=1, keepdims=True)
+        return rows, np.sqrt((rows * rows).sum(axis=1))
+
+    queries, query_norms = centered(query_templates)
+    maps, map_norms = centered(map_templates)
+    numerator = queries @ maps.T
+    denominator = np.outer(query_norms, map_norms)
+    safe = np.where(denominator < 1e-9, 1.0, denominator)
+    return np.where(denominator < 1e-9, 0.0, numerator / safe)
+
+
 def score_pairs(
     query_templates: Sequence[np.ndarray],
     map_templates: Sequence[np.ndarray],
 ) -> dict[str, object]:
     """Gercek konum ve en iyi yanlis konum NCC'lerinden marj istatistigi."""
     count = len(query_templates)
-    truth = np.array(
-        [ncc(query_templates[i], map_templates[i]) for i in range(count)],
-        dtype=np.float64,
-    )
-    wrong = np.array(
-        [
-            max(
-                ncc(query_templates[i], map_templates[j])
-                for j in range(count)
-                if j != i
-            )
-            for i in range(count)
-        ],
-        dtype=np.float64,
-    )
+    scores = ncc_matrix(query_templates, map_templates)
+    truth = np.diag(scores).astype(np.float64)
+    off_diagonal = scores.copy()
+    np.fill_diagonal(off_diagonal, -np.inf)
+    wrong = off_diagonal.max(axis=1).astype(np.float64)
     margin = truth - wrong
     rejected = sum(
         1
@@ -257,13 +270,157 @@ def load_source_chips(
     return query_chips, map_chips
 
 
+# Benchmark'in dort grubu: yon (g2b = Google sorgu / Bing harita, b2g = tersi)
+# x sorgu varyanti. Varsayilan tek grup (g2b_clean) eski davranistir; resmi
+# global skor dort grubun ortalamasi oldugu icin --bidirectional ve
+# --variants clean,hard_v1 ile ayni ortalama kapida da alinabilir.
+QUERY_VARIANTS = ("clean", "hard_v1")
+
+
+def gate_groups(
+    variants: Sequence[str],
+    bidirectional: bool,
+) -> list[tuple[str, str, str]]:
+    """(grup adi, yon, varyant) listesi."""
+    directions = ("g2b", "b2g") if bidirectional else ("g2b",)
+    return [(f"{d}_{v}", d, v) for d in directions for v in variants]
+
+
+def group_chip_keys(direction: str, variant: str) -> tuple[str, str]:
+    """Grubun (sorgu, harita) kirpma kumesi anahtarlari.
+
+    Benchmark'taki gibi bozulma yalniz sorguya uygulanir; harita temizdir.
+    """
+    query_key, map_key = ("G", "B") if direction == "g2b" else ("B", "G")
+    if variant == "hard_v1":
+        query_key += "_hard_v1"
+    return query_key, map_key
+
+
+def hard_v1_chips(
+    chips: Sequence[np.ndarray],
+    *,
+    seed: int,
+    prefix: str,
+) -> list[np.ndarray]:
+    """Benchmark'in hard_v1 bozulmasi, merkez basina deterministik seed ile."""
+    from geospatial_model_benchmark import augment_hard_v1, hard_v1_seed
+
+    return [
+        augment_hard_v1(chip, seed=hard_v1_seed(seed, f"{prefix}{index:05d}"))[0]
+        for index, chip in enumerate(chips)
+    ]
+
+
+def build_chip_sets(
+    query_chips: Sequence[np.ndarray],
+    map_chips: Sequence[np.ndarray],
+    groups: Sequence[tuple[str, str, str]],
+    *,
+    seed: int,
+) -> dict[str, list[np.ndarray]]:
+    sets: dict[str, list[np.ndarray]] = {"G": list(query_chips), "B": list(map_chips)}
+    for _, direction, variant in groups:
+        query_key, _ = group_chip_keys(direction, variant)
+        if query_key not in sets:
+            source = query_key.split("_", 1)[0]
+            sets[query_key] = hard_v1_chips(sets[source], seed=seed, prefix=f"gate_{source}_")
+    return sets
+
+
+def combine_groups(group_scores: dict[str, dict[str, object]]) -> dict[str, object]:
+    """Tek grupta eski sonuc bicimi; cok grupta sayisal alanlarin ortalamasi."""
+    first = next(iter(group_scores.values()))
+    if len(group_scores) == 1:
+        return dict(first)
+    numeric = [
+        key
+        for key, value in first.items()
+        if isinstance(value, (int, float)) and not isinstance(value, bool)
+    ]
+    combined: dict[str, object] = {
+        key: float(np.mean([float(score[key]) for score in group_scores.values()]))
+        for key in numeric
+    }
+    combined["samples"] = int(first["samples"])
+    combined["groups"] = {name: dict(score) for name, score in group_scores.items()}
+    return combined
+
+
+def raw_group_scores(
+    chip_sets: dict[str, list[np.ndarray]],
+    groups: Sequence[tuple[str, str, str]],
+) -> dict[str, object]:
+    gray = {
+        key: [crop_border(cv2.cvtColor(c, cv2.COLOR_RGB2GRAY)) for c in chips]
+        for key, chips in chip_sets.items()
+    }
+    scores = {}
+    for name, direction, variant in groups:
+        query_key, map_key = group_chip_keys(direction, variant)
+        scores[name] = score_pairs(gray[query_key], gray[map_key])
+    return combine_groups(scores)
+
+
+def model_group_scores(
+    model_path: Path,
+    chip_sets: dict[str, list[np.ndarray]],
+    groups: Sequence[tuple[str, str, str]],
+    *,
+    normalization: str,
+    batch_size: int,
+    require_gpu: bool,
+    threads: int = 0,
+) -> dict[str, object]:
+    """Benchmark'in kendi runtime'i ile olc; cikarim yolu birebir ayni olsun."""
+    import goruntu_islemleri as gi
+
+    if threads > 0:
+        # CPU kapisi paralel benchmark isciliriyle yarismasin (TF varsayilani tum cekirdekler).
+        import tensorflow as tf
+
+        try:
+            tf.config.threading.set_intra_op_parallelism_threads(threads)
+            # inter_op=1, 12 dalli bir TTA toplulugunda Keras predict'i kilitledi
+            # (2026-09-25: 28 dk'da 9 sn CPU); en az 2.
+            tf.config.threading.set_inter_op_parallelism_threads(max(2, threads // 3))
+        except RuntimeError:
+            pass  # TF calisma zamani ilk modelde kuruldu; ayar zaten gecerli
+    runtime = gi.LoadedModelRuntime.load(
+        str(model_path),
+        normalization=normalization,
+        enhancement="none",
+        output_value_mode="auto",
+        require_gpu=require_gpu,
+    )
+    try:
+        needed = sorted({key for _, d, v in groups for key in group_chip_keys(d, v)})
+        outputs = {
+            key: crop_all(predict_batched(runtime, chip_sets[key], batch_size=batch_size))
+            for key in needed
+        }
+        scores = {}
+        for name, direction, variant in groups:
+            query_key, map_key = group_chip_keys(direction, variant)
+            scores[name] = score_pairs(outputs[query_key], outputs[map_key])
+        result = combine_groups(scores)
+        result["output_value_mode"] = runtime.output_value_mode
+        result["params"] = int(runtime.model.count_params())
+        result["layers"] = len(runtime.model.layers)
+        return result
+    finally:
+        import tensorflow as tf
+
+        del runtime
+        tf.keras.backend.clear_session()
+
+
 def raw_score(
     query_chips: Sequence[np.ndarray],
     map_chips: Sequence[np.ndarray],
 ) -> dict[str, object]:
-    left = [crop_border(cv2.cvtColor(c, cv2.COLOR_RGB2GRAY)) for c in query_chips]
-    right = [crop_border(cv2.cvtColor(c, cv2.COLOR_RGB2GRAY)) for c in map_chips]
-    return score_pairs(left, right)
+    groups = gate_groups(("clean",), False)
+    return raw_group_scores({"G": list(query_chips), "B": list(map_chips)}, groups)
 
 
 def model_score(
@@ -275,33 +432,15 @@ def model_score(
     batch_size: int,
     require_gpu: bool,
 ) -> dict[str, object]:
-    """Benchmark'in kendi runtime'i ile olc; cikarim yolu birebir ayni olsun."""
-    import goruntu_islemleri as gi
-
-    runtime = gi.LoadedModelRuntime.load(
-        str(model_path),
+    groups = gate_groups(("clean",), False)
+    return model_group_scores(
+        model_path,
+        {"G": list(query_chips), "B": list(map_chips)},
+        groups,
         normalization=normalization,
-        enhancement="none",
-        output_value_mode="auto",
+        batch_size=batch_size,
         require_gpu=require_gpu,
     )
-    try:
-        left = crop_all(
-            predict_batched(runtime, query_chips, batch_size=batch_size)
-        )
-        right = crop_all(
-            predict_batched(runtime, map_chips, batch_size=batch_size)
-        )
-        result = score_pairs(left, right)
-        result["output_value_mode"] = runtime.output_value_mode
-        result["params"] = int(runtime.model.count_params())
-        result["layers"] = len(runtime.model.layers)
-        return result
-    finally:
-        import tensorflow as tf
-
-        del runtime
-        tf.keras.backend.clear_session()
 
 
 def predict_batched(
@@ -381,8 +520,29 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--normalization", default="minus1_1")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--require-gpu", action="store_true")
+    parser.add_argument(
+        "--threads",
+        type=int,
+        default=0,
+        help="TF CPU is parcacigi siniri (0 = TF varsayilani, tum cekirdekler).",
+    )
+    parser.add_argument(
+        "--variants",
+        default="clean",
+        help="Sorgu varyantlari (virgulle): clean, hard_v1. Oran gruplarin ortalamasidir.",
+    )
+    parser.add_argument(
+        "--bidirectional",
+        action="store_true",
+        help="Bing->Google yonunu de olc (benchmark'in dort grubu icin hard_v1 ile birlikte).",
+    )
     parser.add_argument("--json-out", type=Path)
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    args.variants = tuple(v.strip() for v in str(args.variants).split(",") if v.strip())
+    unknown = [v for v in args.variants if v not in QUERY_VARIANTS]
+    if unknown or not args.variants:
+        parser.error(f"Gecersiz varyant: {unknown or args.variants}; gecerli: {QUERY_VARIANTS}")
+    return args
 
 
 TABLE_HEADER = (
@@ -407,10 +567,30 @@ def format_row(name: str, score: dict[str, object]) -> str:
     )
 
 
+def file_sha256(path: Path) -> str:
+    """Pano (sonuc_panosu.py) kapi olcumunu resmi sonuclarla bu kimlikle eslestirir."""
+    import hashlib
+
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def print_groups(score: dict[str, object]) -> None:
+    groups = score.get("groups")
+    if isinstance(groups, dict):
+        parts = [f"{name}={float(g['false_peak_ratio']):.3f}" for name, g in groups.items()]
+        print(f"{'':50} gruplar: {'  '.join(parts)}", flush=True)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     if not args.require_gpu:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+        # "" bu ortamda GPU'yu GIZLEMEZ (TF 2.10 yine gorur ve bellek ayirir,
+        # paralel benchmark'la cakisir); "-1" gizler (2026-09-25 olculdu).
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
     for raster in (QUERY_RASTER, MAP_RASTER):
         if not raster.is_file():
@@ -418,48 +598,80 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     models = [] if args.raw_only else collect_models(args)
 
+    groups = gate_groups(args.variants, args.bidirectional)
     print(
         f"Marj kapisi | ornek={args.samples} seed={args.seed} aoi={args.aoi} "
-        f"normalizasyon={args.normalization}"
+        f"normalizasyon={args.normalization} gruplar={','.join(g[0] for g in groups)}"
     )
     centers = sample_centers(args.samples, seed=args.seed, aoi=args.aoi)
     query_chips, map_chips = load_source_chips(centers)
+    chip_sets = build_chip_sets(query_chips, map_chips, groups, seed=args.seed)
 
     print()
     print(TABLE_HEADER)
     print("-" * len(TABLE_HEADER))
 
     results: dict[str, dict[str, object]] = {}
-    baseline = raw_score(query_chips, map_chips)
+    baseline = raw_group_scores(chip_sets, groups)
     results["RAW"] = baseline
     print(format_row("RAW (baraj)", baseline))
+    print_groups(baseline)
 
     # Birincil olcut: yanlis tepe / gercek tepe orani. Kucuk olan iyi.
     bar = float(baseline["false_peak_ratio"])
     passed: list[str] = []
     failed: list[str] = []
 
+    def write_json(complete: bool) -> None:
+        """Her modelden sonra yazilir: surec cokerse (bellek, surucu sifirlama)
+        olculmus modeller kaybolmaz; 'complete' yalniz sonda True olur."""
+        if not args.json_out:
+            return
+        payload = {
+            "samples": args.samples,
+            "seed": args.seed,
+            "aoi": args.aoi,
+            "normalization": args.normalization,
+            "groups": [name for name, _, _ in groups],
+            "primary_metric": "false_peak_ratio",
+            "raw_false_peak_ratio": bar,
+            "raw_margin": float(baseline["margin_mean"]),
+            "results": results,
+            "passed": passed,
+            "failed": failed,
+            "complete": complete,
+        }
+        args.json_out.parent.mkdir(parents=True, exist_ok=True)
+        temp = args.json_out.with_name(args.json_out.name + ".tmp")
+        temp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(temp, args.json_out)
+
     for model_path in models:
         try:
-            score = model_score(
+            score = model_group_scores(
                 model_path,
-                query_chips,
-                map_chips,
+                chip_sets,
+                groups,
                 normalization=args.normalization,
                 batch_size=args.batch_size,
                 require_gpu=args.require_gpu,
+                threads=args.threads,
             )
         except Exception as exc:  # noqa: BLE001 - aday elenir, kosu surer
             print(f"{model_path.name[:52]:52} HATA: {str(exc).splitlines()[0][:60]}")
             results[model_path.name] = {"error": str(exc)}
             failed.append(model_path.name)
             continue
+        score["model_path"] = str(model_path.resolve())
+        score["model_sha256"] = file_sha256(model_path)
         results[model_path.name] = score
-        print(format_row(model_path.name, score))
+        print(format_row(model_path.name, score), flush=True)
+        print_groups(score)
         if float(score["false_peak_ratio"]) < bar:
             passed.append(model_path.name)
         else:
             failed.append(model_path.name)
+        write_json(complete=False)
 
     print()
     print(
@@ -479,23 +691,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print("Elenen adaylar benchmark'a sokulmamali.")
 
     if args.json_out:
-        payload = {
-            "samples": args.samples,
-            "seed": args.seed,
-            "aoi": args.aoi,
-            "normalization": args.normalization,
-            "primary_metric": "false_peak_ratio",
-            "raw_false_peak_ratio": bar,
-            "raw_margin": float(baseline["margin_mean"]),
-            "results": results,
-            "passed": passed,
-            "failed": failed,
-        }
-        args.json_out.parent.mkdir(parents=True, exist_ok=True)
-        args.json_out.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        write_json(complete=True)
         print(f"JSON yazildi: {args.json_out}")
 
     return 0

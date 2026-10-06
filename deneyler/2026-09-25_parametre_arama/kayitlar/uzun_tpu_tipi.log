@@ -1,0 +1,22 @@
+2026-09-26 14:02:20 BASLA u1c
+2026-09-26 20:03:28 BITTI u1c CIKIS_KODU=0
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.58  U1c_model_f48_k4_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  U1c_ema_model_f48_k4_epoch_00025_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  U1c_model_f48_k4_epoch_00050_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.66  U1c_model_f48_k4_epoch_00025_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.67  U1c_model_f48_k4_epoch_00075_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.69  U1c_ema_model_f48_k4_epoch_00050_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.74  U1c_model_f48_k4_epoch_00100_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.77  U1c_ema_model_f48_k4_epoch_00075_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.83  U1c_ema_model_f48_k4_epoch_00100_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.85  U1c_ema_model_f48_k4_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.85  U1c_model_f48_k4_epoch_00150_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.96  U1c_ema_model_f48_k4_epoch_00150_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.96  U1c_model_f48_k4_epoch_00200_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.11  U1c_ema_model_f48_k4_epoch_00200_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.18  U1c_model_f48_k4_epoch_00250_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.20  U1c_ema_model_f48_k4_epoch_00250_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.24  U1c_model_f48_k4_epoch_00300_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 1.30  U1c_ema_model_f48_k4_epoch_00300_helu_osigmoid_(1, 1)_.h5
+2026-09-26 20:11:18 BITTI kapi u1c cikis=0

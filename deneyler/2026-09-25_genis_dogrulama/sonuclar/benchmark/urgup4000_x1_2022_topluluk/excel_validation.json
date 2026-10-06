@@ -1,0 +1,86 @@
+{
+  "validated_at_utc": "2026-09-26T10:57:35.325906+00:00",
+  "validation_mode": "deep",
+  "report_scope": "full",
+  "engine": "openpyxl",
+  "openpyxl_version": "3.1.5",
+  "requested_workbook": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\sonuclar\\benchmark\\urgup4000_x1_2022_topluluk\\benchmark_results.xlsx",
+  "workbook": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\sonuclar\\benchmark\\urgup4000_x1_2022_topluluk\\benchmark_results.xlsx",
+  "output_mode": "primary",
+  "size_bytes": 25537269,
+  "sha256": "844ba5fa53a8d8f2673b42c20425d1c2f8a18eae6305809fa1b9ee06eb12c81a",
+  "sheet_count": 8,
+  "sheets": [
+    {
+      "name": "Özet",
+      "rows": 24,
+      "columns": 10,
+      "tables": [],
+      "charts": 1
+    },
+    {
+      "name": "Model Özeti",
+      "rows": 25,
+      "columns": 16,
+      "tables": [
+        "ModelSummary_01"
+      ],
+      "charts": 0
+    },
+    {
+      "name": "Model Kataloğu",
+      "rows": 2,
+      "columns": 5,
+      "tables": [
+        "ModelCatalog_01"
+      ],
+      "charts": 0
+    },
+    {
+      "name": "Ham Sonuçlar",
+      "rows": 96001,
+      "columns": 41,
+      "tables": [
+        "RawResults_01"
+      ],
+      "charts": 0
+    },
+    {
+      "name": "Sorgu Manifesti",
+      "rows": 16001,
+      "columns": 14,
+      "tables": [
+        "QueryManifest_01"
+      ],
+      "charts": 0
+    },
+    {
+      "name": "Yapılandırma",
+      "rows": 65,
+      "columns": 2,
+      "tables": [
+        "RunConfig_01"
+      ],
+      "charts": 0
+    },
+    {
+      "name": "Hatalar",
+      "rows": 2,
+      "columns": 5,
+      "tables": [
+        "ModelErrors_01"
+      ],
+      "charts": 0
+    },
+    {
+      "name": "_ExcelState",
+      "rows": 2,
+      "columns": 1,
+      "tables": [],
+      "charts": 0
+    }
+  ],
+  "formula_count": 8,
+  "formula_error_literals": [],
+  "zip_integrity": "ok"
+}

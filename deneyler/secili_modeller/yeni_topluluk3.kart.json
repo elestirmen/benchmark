@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "yeni_topluluk3",
+  "aciklama": "3 yeni f32_k3 modelin sigmoid cikti ortalamasi (tam e5 + tam_s2 e7 + uzun e27). Urgup 1000 sorgu global 0.615 (RAW 0.461); Urgup 4000 sorgu (2022 ile ayni) 0.625 (RAW 0.477, TPU cb62 0.659, k_32_3 0.620). Karlik ucus (F1) 70 m 0.785 (RAW 0.801).",
+  "tarif": "zero_1, BCE, Adam 1e-3, batch 1, her epoch karistirma; PyTorch",
+  "kaynak_deney": "2026-09-24_zero1_tarif",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-24_zero1_tarif\\modeller\\adaylar\\topluluk3\\topluluk3_tame5_s2e7_uzune27.h5",
+  "raf_dosyasi": "yeni_topluluk3.h5",
+  "sha256": "2df6587fa2e9d6e40c2f40f3ec0345936eeca7da841083386b478ae59f6c2373",
+  "rafa_eklenme": "2026-09-25T11:17:42"
+}

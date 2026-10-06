@@ -1,0 +1,23 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-25 18:43:22 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\tta\tta4_2022_tpu_cb62.h5
+2026-09-25 18:43:22 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 18:43:27 - INFO - Model output mode inferred once: sigmoid
+tta4_2022_tpu_cb62.h5                                0.52  2.72 +0.3519 +0.1819  +0.1700 137.0/150 0.0/300.0   50.4/53.1  
+                                                   gruplar: g2b_clean=0.505  g2b_hard_v1=0.517  b2g_clean=0.505  b2g_hard_v1=0.544
+2026-09-25 18:56:51 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\tta\tta4_x1_2022_tpu_k323_d6.h5
+2026-09-25 18:56:51 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-25 18:57:03 - INFO - Model output mode inferred once: sigmoid
+tta4_x1_2022_tpu_k323_d6.h5                          0.47  3.42 +0.4086 +0.1913  +0.2173 141.0/150 0.0/300.0   34.6/37.5  
+                                                   gruplar: g2b_clean=0.457  g2b_hard_v1=0.467  b2g_clean=0.456  b2g_hard_v1=0.497
+
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 2/2
+  GECTI  oran= 0.47  tta4_x1_2022_tpu_k323_d6.h5
+  GECTI  oran= 0.52  tta4_2022_tpu_cb62.h5
+JSON yazildi: C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\sonuclar\kapi\kapi4_g8_tta_k4_150.json

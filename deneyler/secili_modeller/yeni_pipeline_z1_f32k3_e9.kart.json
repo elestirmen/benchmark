@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "yeni_pipeline_z1_f32k3_e9",
+  "aciklama": "end_to_end_pipeline.py (TF) ilk isi z1_f32_k3_b1, epoch 9 (en iyi val_loss = kapi secimi). Urgup 1000 sorgu global 0.569.",
+  "tarif": "zero_1, BCE, Adam 1e-3, batch 1, SHUFFLE_TRAIN; autoencoder_unified.py",
+  "kaynak_deney": "pipeline_20260924_065751",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\pipeline_20260924_065751\\modeller\\z1_f32_k3_b1\\_benchmark_adayi\\_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5",
+  "raf_dosyasi": "yeni_pipeline_z1_f32k3_e9.h5",
+  "sha256": "7815ed362b0c41a7e4ca658bf158d95506b49879036103741fedbeebbb303b73",
+  "rafa_eklenme": "2026-09-25T11:17:42"
+}

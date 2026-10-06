@@ -118,15 +118,25 @@ class EndToEndPipelineTests(unittest.TestCase):
             self.pipeline.TRAINING_JOBS = original
 
     def test_sweep_starts_from_the_known_winning_configuration(self):
-        """Ilk is, benchmark'ta 0.703 alan mimariyi birebir yeniden uretmeli."""
+        """Ilk is, 2022 deneme_6 f32_k3 serisinin mimarisini ve Kaggle tarifini
+        (zero_1, BCE, batch 1, her epoch karistirma) birebir uretmeli.
+
+        2026-09-24'te olculdu: ayni tarifle yalniz batch 8'e cikmak vekil
+        benchmark'i 0.75'ten 0.31'e dusurur; eski f48_k4 / batch 2 tabani
+        RAW'in altinda kalmisti.
+        """
         first = self.pipeline.TRAINING_JOBS[0]
         self.assertEqual("flat_bottleneck", first["MODEL_TYPE"])
-        self.assertEqual(48, first["FILTER_COUNT"])
-        self.assertEqual((4, 4), first["KERNEL_SIZE"])
+        self.assertEqual(32, first["FILTER_COUNT"])
+        self.assertEqual((3, 3), first["KERNEL_SIZE"])
         self.assertEqual((1, 1), first["STRIDES"])
         self.assertEqual(3, first["FLAT_DEPTH"])
         self.assertEqual("elu", first["HIDDEN_ACTIVATION"])
         self.assertEqual("sigmoid", first["OUTPUT_ACTIVATION"])
+        self.assertEqual("binary_crossentropy", first["LOSS_FUNCTION"])
+        self.assertEqual(1, first["BATCH_SIZE"])
+        self.assertEqual("zero_1", first["INPUT_NORMALIZATION"])
+        self.assertIs(True, first["SHUFFLE_TRAIN"])
 
     def test_each_job_differs_from_the_baseline_on_one_axis_only(self):
         """Tek eksende ayrilma, sonucun hangi degiskene bagli oldugunu korur."""
@@ -159,10 +169,10 @@ class EndToEndPipelineTests(unittest.TestCase):
 
     def test_hidden_activation_experiment_keeps_the_baseline_output(self):
         by_name = {job["name"]: job for job in self.pipeline.TRAINING_JOBS}
-        self.assertEqual("relu", by_name["flat_f48_relu"]["HIDDEN_ACTIVATION"])
-        self.assertEqual("sigmoid", by_name["flat_f48_relu"]["OUTPUT_ACTIVATION"])
-        self.assertEqual("tanh", by_name["flat_f48_tanh"]["OUTPUT_ACTIVATION"])
-        self.assertEqual("elu", by_name["flat_f48_tanh"]["HIDDEN_ACTIVATION"])
+        relu = by_name["z1_f32_k3_relu_b1"]
+        self.assertEqual("relu", relu["HIDDEN_ACTIVATION"])
+        self.assertEqual("sigmoid", relu["OUTPUT_ACTIVATION"])
+        self.assertEqual(1, relu["BATCH_SIZE"])
 
     def test_every_generated_training_script_is_valid_and_explicit(self):
         for job in self.pipeline.TRAINING_JOBS:
@@ -431,15 +441,25 @@ class EndToEndPipelineTests(unittest.TestCase):
             )
 
     def test_sweep_starts_from_the_known_winning_configuration(self):
-        """Ilk is, benchmark'ta 0.703 alan mimariyi birebir yeniden uretmeli."""
+        """Ilk is, 2022 deneme_6 f32_k3 serisinin mimarisini ve Kaggle tarifini
+        (zero_1, BCE, batch 1, her epoch karistirma) birebir uretmeli.
+
+        2026-09-24'te olculdu: ayni tarifle yalniz batch 8'e cikmak vekil
+        benchmark'i 0.75'ten 0.31'e dusurur; eski f48_k4 / batch 2 tabani
+        RAW'in altinda kalmisti.
+        """
         first = self.pipeline.TRAINING_JOBS[0]
         self.assertEqual("flat_bottleneck", first["MODEL_TYPE"])
-        self.assertEqual(48, first["FILTER_COUNT"])
-        self.assertEqual((4, 4), first["KERNEL_SIZE"])
+        self.assertEqual(32, first["FILTER_COUNT"])
+        self.assertEqual((3, 3), first["KERNEL_SIZE"])
         self.assertEqual((1, 1), first["STRIDES"])
         self.assertEqual(3, first["FLAT_DEPTH"])
         self.assertEqual("elu", first["HIDDEN_ACTIVATION"])
         self.assertEqual("sigmoid", first["OUTPUT_ACTIVATION"])
+        self.assertEqual("binary_crossentropy", first["LOSS_FUNCTION"])
+        self.assertEqual(1, first["BATCH_SIZE"])
+        self.assertEqual("zero_1", first["INPUT_NORMALIZATION"])
+        self.assertIs(True, first["SHUFFLE_TRAIN"])
 
     def test_each_job_differs_from_the_baseline_on_one_axis_only(self):
         """Tek eksende ayrilma, sonucun hangi degiskene bagli oldugunu korur."""
@@ -472,10 +492,10 @@ class EndToEndPipelineTests(unittest.TestCase):
 
     def test_hidden_activation_experiment_keeps_the_baseline_output(self):
         by_name = {job["name"]: job for job in self.pipeline.TRAINING_JOBS}
-        self.assertEqual("relu", by_name["flat_f48_relu"]["HIDDEN_ACTIVATION"])
-        self.assertEqual("sigmoid", by_name["flat_f48_relu"]["OUTPUT_ACTIVATION"])
-        self.assertEqual("tanh", by_name["flat_f48_tanh"]["OUTPUT_ACTIVATION"])
-        self.assertEqual("elu", by_name["flat_f48_tanh"]["HIDDEN_ACTIVATION"])
+        relu = by_name["z1_f32_k3_relu_b1"]
+        self.assertEqual("relu", relu["HIDDEN_ACTIVATION"])
+        self.assertEqual("sigmoid", relu["OUTPUT_ACTIVATION"])
+        self.assertEqual(1, relu["BATCH_SIZE"])
 
     def test_every_generated_training_script_is_valid_and_explicit(self):
         for job in self.pipeline.TRAINING_JOBS:
@@ -665,25 +685,142 @@ class EndToEndPipelineTests(unittest.TestCase):
         self.assertFalse(summary["passed"])
 
     def test_cost_estimate_scales_with_architecture(self):
-        """Tek olculen deger (f48/k4) her ise uygulanirsa f96 ve k7 gizlenir."""
+        """Tek olculen deger her ise uygulanirsa k5 ve genis isler gizlenir.
+
+        batch 1'de sure agirlikla TF adim yukudur: olculen f32/k3 suresinin
+        yalniz yarisi conv maliyetiyle olceklenir. batch > 1 isleri eski
+        f48/k4 batch 2 olcumunden olceklenir.
+        """
         by_name = {job["name"]: job for job in self.pipeline.TRAINING_JOBS}
-        baseline = self.pipeline.estimate_minutes_per_epoch(
-            by_name["flat_f48_k4_sigmoid_repro"]
+        baseline = self.pipeline.estimate_minutes_per_epoch(by_name["z1_f32_k3_b1"])
+        self.assertAlmostEqual(
+            self.pipeline.MEASURED_B1_MINUTES_PER_EPOCH, baseline, places=6
         )
         self.assertAlmostEqual(
-            4.0,
-            self.pipeline.estimate_minutes_per_epoch(by_name["flat_f96_k4"]) / baseline,
+            0.5 + 0.5 * (5 / 3) ** 2,
+            self.pipeline.estimate_minutes_per_epoch(by_name["z1_f32_k5_b1"]) / baseline,
             places=6,
         )
         self.assertAlmostEqual(
-            (7 / 4) ** 2,
-            self.pipeline.estimate_minutes_per_epoch(by_name["flat_f48_k7"]) / baseline,
+            0.5 + 0.5 * (40 / 32) ** 2,
+            self.pipeline.estimate_minutes_per_epoch(by_name["z1_f40_k3_b1"]) / baseline,
+            places=6,
+        )
+        self.assertAlmostEqual(
+            self.pipeline.MEASURED_MINUTES_PER_EPOCH * (32 / 48) ** 2 * (3 / 4) ** 2,
+            self.pipeline.estimate_minutes_per_epoch(by_name["z1_f32_k3_b8"]),
             places=6,
         )
         self.assertGreater(
-            self.pipeline.estimate_job_hours(by_name["flat_f96_k4"]),
-            self.pipeline.estimate_job_hours(by_name["flat_f24_k4"]),
+            self.pipeline.estimate_job_hours(by_name["z1_f32_k5_b1"]),
+            self.pipeline.estimate_job_hours(by_name["z1_f32_k3_b1"]),
         )
+
+    def test_margin_gate_uses_the_benchmark_normalization(self):
+        """Kapi egitimin degil benchmark'in normalizasyonunu kullanmali.
+
+        zero_1 ile egitilen bir aday benchmark'ta minus1_1 ile beslenir. Eski
+        kapi egitim normalizasyonunu geciriyordu; zero_1 isinde baska bir
+        modeli olcer ve sampiyonu yanlis secerdi (2022 TPU serisi zero_1
+        kapisinda 0.80-2.66, minus1_1'de 0.32-0.33).
+        """
+        job = dict(self.pipeline.TRAINING_JOBS[0])
+        self.assertEqual("zero_1", job["INPUT_NORMALIZATION"])
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_dir = Path(temp_dir)
+            with (
+                mock.patch.object(self.pipeline, "PIPELINE_BENCHMARK_ROOT", model_dir / "gate"),
+                mock.patch.object(self.pipeline.subprocess, "run") as subprocess_run,
+                mock.patch.object(
+                    self.pipeline, "margin_gate_candidates", return_value=[model_dir / "x.h5"]
+                ),
+                mock.patch.object(self.pipeline, "read_json", return_value={}),
+            ):
+                self.pipeline.run_margin_gate(job, model_dir)
+        command = subprocess_run.call_args.args[0]
+        index = command.index("--normalization")
+        self.assertEqual(self.pipeline.BENCHMARK_INPUT_NORMALIZATION, command[index + 1])
+        self.assertEqual("minus1_1", command[index + 1])
+
+    def test_margin_gate_measures_all_four_benchmark_groups(self):
+        """Resmi global skor G2B/B2G x clean/hard_v1 ortalamasidir; kapi da oyle olcmeli.
+
+        2026-09-25 kalibrasyonu: Urgup 1000 sorguda Spearman 4 grup -0.909,
+        eski tek grup (G2B clean) -0.718. Yeni modellerin en zayif grubu
+        B2G hard_v1 idi ve eski kapi onu hic gormuyordu.
+        """
+        job = dict(self.pipeline.TRAINING_JOBS[0])
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_dir = Path(temp_dir)
+            with (
+                mock.patch.object(self.pipeline, "PIPELINE_BENCHMARK_ROOT", model_dir / "gate"),
+                mock.patch.object(self.pipeline.subprocess, "run") as subprocess_run,
+                mock.patch.object(
+                    self.pipeline, "margin_gate_candidates", return_value=[model_dir / "x.h5"]
+                ),
+                mock.patch.object(self.pipeline, "read_json", return_value={}),
+            ):
+                self.pipeline.run_margin_gate(job, model_dir)
+        command = subprocess_run.call_args.args[0]
+        self.assertIn("--bidirectional", command)
+        self.assertEqual("clean,hard_v1", command[command.index("--variants") + 1])
+
+    def _run_tta_choice(self, tta_ratio=None, fail=False):
+        job = dict(self.pipeline.TRAINING_JOBS[0])
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_dir = Path(temp_dir)
+            champion = model_dir / "sampiyon.h5"
+            champion.write_bytes(b"x")
+            name = f"sampiyon_tta{len(self.pipeline.BENCHMARK_TTA_TRANSFORMS)}.h5"
+            report = {"results": {name: {"false_peak_ratio": tta_ratio}}} if tta_ratio is not None else {}
+            side_effect = self.pipeline.subprocess.CalledProcessError(1, "x") if fail else None
+            with (
+                mock.patch.object(self.pipeline, "PIPELINE_BENCHMARK_ROOT", model_dir / "gate"),
+                mock.patch.object(self.pipeline.subprocess, "run", side_effect=side_effect),
+                mock.patch.object(self.pipeline, "read_json", return_value=report),
+            ):
+                chosen, info = self.pipeline.consider_tta_champion(job, model_dir, champion, 0.517)
+            return Path(chosen).name, info
+
+    def test_tta_candidate_replaces_the_champion_only_when_the_gate_prefers_it(self):
+        """2026-09-26: TTA8 resmi global'i 0.564 -> 0.673 yapti, ama 2022 tipi doygun
+        modellerde bozar (0.440 -> 0.518); secim kapiya birakilir."""
+        name, info = self._run_tta_choice(tta_ratio=0.482)
+        self.assertTrue(name.endswith("_tta8.h5"))
+        self.assertTrue(info["chosen"])
+        name, info = self._run_tta_choice(tta_ratio=0.560)
+        self.assertEqual("sampiyon.h5", name)
+        self.assertFalse(info["chosen"])
+
+    def test_tta_failure_keeps_the_champion(self):
+        name, info = self._run_tta_choice(fail=True)
+        self.assertEqual("sampiyon.h5", name)
+        self.assertIn("error", info)
+        name, info = self._run_tta_choice(tta_ratio=None)
+        self.assertEqual("sampiyon.h5", name)
+
+    def test_every_epoch_of_the_budget_reaches_the_margin_gate(self):
+        """batch 1'de kalite epochtan epocha dalgalanir; ornekleme epoch atlamamali."""
+        for job in self.pipeline.TRAINING_JOBS:
+            with self.subTest(job=job["name"]):
+                self.assertLessEqual(
+                    int(job["EPOCHS"]), self.pipeline.MARGIN_GATE_MAX_EPOCH_CHECKPOINTS
+                )
+
+    def test_training_script_reshuffles_each_epoch(self):
+        """2022 tarifi her epoch karistirir; pipeline bunu acikca ayarlamali."""
+        self.assertIn("SHUFFLE_TRAIN", self.pipeline.CONFIG_KEYS)
+        self.assertIn("reshuffle_each_iteration=True", self.training_source)
+        by_name = {job["name"]: job for job in self.pipeline.TRAINING_JOBS}
+        for name, expected in (
+            ("z1_f32_k3_b1", True),
+            ("z1_f32_k3_b1_sabit_sira", False),
+        ):
+            with self.subTest(job=name):
+                code = self.pipeline.build_training_code(
+                    self.training_source, by_name[name], Path(r"C:\pipeline_test") / name
+                )
+                self.assertIn(f"    SHUFFLE_TRAIN = {expected!r}", code)
 
     def test_margin_gate_measures_the_training_region(self):
         """Kapi secim yaptigi icin test seridine bakarak secmemeli."""
@@ -828,14 +965,72 @@ class EndToEndPipelineTests(unittest.TestCase):
 
     def test_default_run_selection_resumes_latest_run(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            models_root = Path(temp_dir)
-            (models_root / "20260829_220232").mkdir()
+            models_root = Path(temp_dir) / "models_pipeline"
+            (models_root / "20260829_220232").mkdir(parents=True)
             (models_root / "20260830_021548").mkdir()
             args = self.pipeline.parse_args([])
-            with mock.patch.object(self.pipeline, "MODELS_PIPELINE_DIR", models_root):
+            with (
+                mock.patch.object(self.pipeline, "MODELS_PIPELINE_DIR", models_root),
+                mock.patch.object(self.pipeline, "DENEYLER_DIR", Path(temp_dir) / "deneyler"),
+            ):
                 self.assertEqual(
                     ("20260830_021548", "otomatik_resume"),
                     self.pipeline.choose_run_id(args),
+                )
+
+    def test_latest_run_is_found_in_both_layouts(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            models_root = Path(temp_dir) / "models_pipeline"
+            deneyler = Path(temp_dir) / "deneyler"
+            (models_root / "20260909_223425").mkdir(parents=True)
+            (deneyler / "pipeline_20260924_065751").mkdir(parents=True)
+            (deneyler / "2026-09-25_parametre_arama").mkdir()
+            with (
+                mock.patch.object(self.pipeline, "MODELS_PIPELINE_DIR", models_root),
+                mock.patch.object(self.pipeline, "DENEYLER_DIR", deneyler),
+            ):
+                self.assertEqual("20260924_065751", self.pipeline.latest_pipeline_run_id())
+
+    def test_new_run_keeps_models_and_results_in_one_folder(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            with (
+                mock.patch.object(self.pipeline, "BENCHMARK_CWD", str(root)),
+                mock.patch.object(self.pipeline, "MODELS_PIPELINE_DIR", root / "models_pipeline"),
+                mock.patch.object(self.pipeline, "DENEYLER_DIR", root / "deneyler"),
+                mock.patch.object(self.pipeline, "PIPELINE_RUN_ID", None),
+                mock.patch.object(self.pipeline, "PIPELINE_RUN_DIR", None),
+                mock.patch.object(self.pipeline, "PIPELINE_MODELS_ROOT", None),
+                mock.patch.object(self.pipeline, "PIPELINE_BENCHMARK_ROOT", None),
+            ):
+                self.pipeline.configure_run_paths("20260925_120000")
+                run_dir = root / "deneyler" / "pipeline_20260925_120000"
+                self.assertEqual(run_dir, self.pipeline.PIPELINE_RUN_DIR)
+                self.assertEqual(run_dir / "modeller", self.pipeline.PIPELINE_MODELS_ROOT)
+                self.assertEqual(run_dir / "sonuclar", self.pipeline.PIPELINE_BENCHMARK_ROOT)
+
+    def test_legacy_run_resumes_in_its_old_folders(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "models_pipeline" / "20260909_223425").mkdir(parents=True)
+            with (
+                mock.patch.object(self.pipeline, "BENCHMARK_CWD", str(root)),
+                mock.patch.object(self.pipeline, "MODELS_PIPELINE_DIR", root / "models_pipeline"),
+                mock.patch.object(self.pipeline, "DENEYLER_DIR", root / "deneyler"),
+                mock.patch.object(self.pipeline, "PIPELINE_RUN_ID", None),
+                mock.patch.object(self.pipeline, "PIPELINE_RUN_DIR", None),
+                mock.patch.object(self.pipeline, "PIPELINE_MODELS_ROOT", None),
+                mock.patch.object(self.pipeline, "PIPELINE_BENCHMARK_ROOT", None),
+            ):
+                self.pipeline.configure_run_paths("20260909_223425")
+                self.assertIsNone(self.pipeline.PIPELINE_RUN_DIR)
+                self.assertEqual(
+                    root / "models_pipeline" / "20260909_223425",
+                    self.pipeline.PIPELINE_MODELS_ROOT,
+                )
+                self.assertEqual(
+                    root / "outputs" / "end_to_end_pipeline_20260909_223425",
+                    self.pipeline.PIPELINE_BENCHMARK_ROOT,
                 )
 
     def test_oom_skips_the_job_without_changing_the_batch(self):

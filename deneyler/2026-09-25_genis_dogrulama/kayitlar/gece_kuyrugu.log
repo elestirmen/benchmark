@@ -1,0 +1,54 @@
+2026-09-25 21:55:27 benchmark bitti: CIKIS_KODU=0
+2026-09-25 21:55:27 BASLA ucus tamamlama + F2
+2026-09-25 22:15:51 BITTI ucus
+2026-09-25 22:15:51 BASLA piyango s12
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.54  P12_model_f32_k3_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.57  P12_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.58  P12_model_f32_k3_epoch_00011_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  P12_model_f32_k3_epoch_00012_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  P12_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.61  P12_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.62  P12_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.64  P12_model_f32_k3_epoch_00009_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.65  P12_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.66  P12_model_f32_k3_epoch_00008_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.70  P12_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 4.44  P12_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+2026-09-25 22:58:12 BITTI piyango s12 kapi_cikis=0
+2026-09-25 22:58:13 BASLA piyango s13
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.56  P13_model_f32_k3_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.57  P13_model_f32_k3_epoch_00012_helu_osigmoid_(1, 1)_.h5
+  GECTI  oran= 0.58  P13_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.62  P13_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  P13_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.68  P13_model_f32_k3_epoch_00009_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.69  P13_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.74  P13_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.75  P13_model_f32_k3_epoch_00011_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.76  P13_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.77  P13_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.93  P13_model_f32_k3_epoch_00008_helu_osigmoid_(1, 1)_.h5
+2026-09-25 23:40:44 BITTI piyango s13 kapi_cikis=0
+2026-09-25 23:40:44 BASLA piyango s14
+2026-09-26 00:05:22 BITTI egitim s14 CIKIS_KODU=0
+2026-09-26 00:05:22 BASLA adana
+2026-09-26 00:59:45 BITTI adana CIKIS_KODU=0
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+  GECTI  oran= 0.57  P14_model_f32_k3_epoch_00004_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  P14_model_f32_k3_epoch_00012_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.59  P14_model_f32_k3_epoch_00003_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.60  P14_model_f32_k3_epoch_00009_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.62  P14_model_f32_k3_epoch_00008_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.63  P14_model_f32_k3_epoch_00002_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.65  P14_model_f32_k3_epoch_00005_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.65  P14_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.66  P14_model_f32_k3_epoch_00011_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.68  P14_model_f32_k3_epoch_00010_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.75  P14_model_f32_k3_epoch_00001_helu_osigmoid_(1, 1)_.h5
+  ELENDI oran= 0.84  P14_model_f32_k3_epoch_00007_helu_osigmoid_(1, 1)_.h5
+2026-09-26 01:25:37 BITTI piyango s14 kapi_cikis=0
+2026-09-26 01:25:37 BASLA u1b (TPU tipi uzun)
+2026-09-26 01:47:25 BITTI u1b CIKIS_KODU=127
+2026-09-26 01:47:25 GECE KUYRUGU BITTI

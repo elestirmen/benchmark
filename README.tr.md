@@ -39,10 +39,23 @@ benchmark/
 ├── PROVENANCE.md                   # kod/model kökeni
 ├── models/                         # .h5 / .keras / .hdf5 (Git dışı)
 ├── tests/
-└── outputs/<run_id>/               # koşu çıktıları
+├── outputs/<run_id>/               # doğrudan geospatial_model_benchmark.py koşularının çıktıları
+├── end_to_end_pipeline.py          # eğit → marj kapısı → benchmark hattı
+├── sonuc_panosu.py                 # TÜM sonuçları tek panoda toplar (deneyler/PANO.md, PANO.xlsx)
+├── deney_araclari/                 # elle yürütülen deneylerin araçları (PyTorch eğitim, dönüştürme, kapı, TTA, uçuş testi)
+└── deneyler/                       # 2026-09-25'ten itibaren modeller ve sonuçlar için tek kök
+    ├── PANO.md, PANO.xlsx          # otomatik pano: protokol başına sıralama, RAW farkı, kapı, uçuş testi
+    ├── secili_modeller/            # öne çıkan modeller (kısa ad + *.kart.json)
+    ├── <tarih>_<deney>/            # modeller/, sonuclar/, kayitlar/, BENIOKU.md
+    └── pipeline_<run_id>/          # end_to_end_pipeline.py koşuları (modeller/, sonuclar/, kayitlar/)
 ```
 
 Varsayılan rasterlar (Git dışı): `urgup_30_cm_yeni_gmaps_utm.tif`, `urgup_bingmap_utm_30_cm.tif`.
+
+Sonuçlara tek yerden bakmak için `python sonuc_panosu.py` (pipeline her iş bitince bunu
+kendisi çalıştırır). Pano `deneyler/` ve `outputs/` altını tarar; aynı model (sha256)
+birden çok kopyada görünse de tek satırdır ve yalnız aynı protokoldeki (aynı sorgu kümesi)
+sonuçlar ile o protokolün RAW'ı kıyaslanır. Düzenin ayrıntısı: `deneyler/BENIOKU.md`.
 
 ## Ortam
 

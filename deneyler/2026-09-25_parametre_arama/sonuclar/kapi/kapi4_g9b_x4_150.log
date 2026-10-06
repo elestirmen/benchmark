@@ -1,0 +1,17 @@
+Warning 3: Cannot find header.dxf (GDAL_DATA is not defined)
+Marj kapisi | ornek=150 seed=42 aoi=train normalizasyon=minus1_1 gruplar=g2b_clean,g2b_hard_v1,b2g_clean,b2g_hard_v1
+
+aday                                                 ORAN     z  gercek  yanlis     marj  kazanc     red       std q/m
+----------------------------------------------------------------------------------------------------------------------
+RAW (baraj)                                          0.58  1.84 +0.3521 +0.2057  +0.1464 127.5/150 0.0/300.0   33.3/36.0  
+                                                   gruplar: g2b_clean=0.531  g2b_hard_v1=0.559  b2g_clean=0.622  b2g_hard_v1=0.626
+2026-09-26 05:21:59 - INFO - Model loaded (standard): C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\modeller\topluluklar\x4_cb62_bdb7_k323_d6.h5
+2026-09-26 05:21:59 - INFO - Loaded runtime | input=(None, 544, 544, 1) output=(None, 544, 544, 1) channels=1 output_mode=infer-once
+2026-09-26 05:22:02 - INFO - Model output mode inferred once: sigmoid
+x4_cb62_bdb7_k323_d6.h5                              0.41  4.40 +0.3092 +0.1253  +0.1839 141.25/150 0.0/300.0   48.5/52.4  
+                                                   gruplar: g2b_clean=0.395  g2b_hard_v1=0.406  b2g_clean=0.391  b2g_hard_v1=0.432
+
+RAW baraji: ORAN < 0.58  (yanlis tepe / gercek tepe; kucuk olan daha ayirt edici)
+Gecen: 1/1
+  GECTI  oran= 0.41  x4_cb62_bdb7_k323_d6.h5
+JSON yazildi: C:\d_surucusu\visual_navigation\benchmark\deneyler\2026-09-25_parametre_arama\sonuclar\kapi\kapi4_g9b_x4_150.json

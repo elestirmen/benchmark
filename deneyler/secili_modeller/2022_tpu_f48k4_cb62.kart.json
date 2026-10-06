@@ -1,0 +1,10 @@
+{
+  "kisa_ad": "2022_tpu_f48k4_cb62",
+  "aciklama": "2022 TPU f48_k4 serisinin en iyi checkpoint'i. Urgup 4000 sorgu global 0.659 (RAW 0.477).",
+  "tarif": "",
+  "kaynak_deney": "2022",
+  "kaynak_dosya": "C:\\d_surucusu\\visual_navigation\\benchmark\\models\\03_model_tpu_f48_k4_s1_elu__tpu_model_f48_k4_epoch__epoch__sigmoid__1__7__cb62bfb86ad0.h5",
+  "raf_dosyasi": "2022_tpu_f48k4_cb62.h5",
+  "sha256": "cb62bfb86ad05abb0e29ce0a84ae4b98916953f1e6ac0e93967e6136603c0229",
+  "rafa_eklenme": "2026-09-25T11:17:42"
+}

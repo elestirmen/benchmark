@@ -1,0 +1,14 @@
+veri: egitim=1039 dogrulama=306 (8s)
+  1_tezde_ucus_5: {'etiketli': 211, 'yakalanan': 216, 'kaynak': {'x1': 190, '1_tezde_ucus_5_RAW_kimlik': 14, '1_tezde_ucus_5_2022_tpu_f48k4_cb62': 1, '1_tezde_ucus_5_2022_k32_3_e1900': 1, '1_tezde_ucus_5_2022_deneme6_f32k5': 5}}
+  2_tezde_ucus_6: {'etiketli': 118, 'yakalanan': 146, 'kaynak': {'x1': 112, '2_tezde_ucus_6_2022_tpu_f48k4_cb62': 2, '2_tezde_ucus_6_2022_k32_3_e1900': 1, '2_tezde_ucus_6_2022_deneme6_f32k5': 2, '2_tezde_ucus_6_RAW_kimlik': 1}}
+  3_tezde_ucus_7: {'etiketli': 110, 'yakalanan': 135, 'kaynak': {'x1': 93, '3_tezde_ucus_7_2022_deneme6_f32k5': 4, '3_tezde_ucus_7_RAW_kimlik': 7, '3_tezde_ucus_7_2022_k32_3_e1900': 4, '3_tezde_ucus_7_2022_tpu_f48k4_cb62': 2}}
+  4_tezde_ucus_8: {'etiketli': 62, 'yakalanan': 115, 'kaynak': {'x1': 41, '4_tezde_ucus_8_2022_tpu_f48k4_cb62': 6, '4_tezde_ucus_8_2022_k32_3_e1900': 8, '4_tezde_ucus_8_2022_deneme6_f32k5': 4, '4_tezde_ucus_8_RAW_kimlik': 3}}
+  5_tezde_ucus_9: {'etiketli': 105, 'yakalanan': 110, 'kaynak': {'x1': 95, '5_tezde_ucus_9_2022_tpu_f48k4_cb62': 2, '5_tezde_ucus_9_2022_k32_3_e1900': 5, '5_tezde_ucus_9_RAW_kimlik': 3}}
+  guzergah_1: {'etiketli': 68, 'yakalanan': 81, 'kaynak': {'x1': 59, 'guzergah_1_2022_deneme6_f32k5': 4, 'guzergah_1_2022_k32_3_e1900': 3, 'guzergah_1_2022_tpu_f48k4_cb62': 1, 'guzergah_1_RAW_kimlik': 1}}
+  guzergah_1_donus: {'etiketli': 48, 'yakalanan': 54, 'kaynak': {'x1': 41, 'guzergah_1_donus_2022_deneme6_f32k5': 2, 'guzergah_1_donus_RAW_kimlik': 4, 'guzergah_1_donus_2022_k32_3_e1900': 1}}
+  guzergah_2_tezde_ucus_1: {'etiketli': 131, 'yakalanan': 145, 'kaynak': {'x1': 112, 'guzergah_2_tezde_ucus_1_2022_k32_3_e1900': 9, 'guzergah_2_tezde_ucus_1_2022_deneme6_f32k5': 7, 'guzergah_2_tezde_ucus_1_RAW_kimlik': 1, 'guzergah_2_tezde_ucus_1_2022_tpu_f48k4_cb62': 2}}
+  guzergah_3_tezde_ucus_2: {'etiketli': 186, 'yakalanan': 200, 'kaynak': {'x1': 177, 'guzergah_3_tezde_ucus_2_2022_deneme6_f32k5': 3, 'guzergah_3_tezde_ucus_2_2022_k32_3_e1900': 3, 'guzergah_3_tezde_ucus_2_2022_tpu_f48k4_cb62': 2, 'guzergah_3_tezde_ucus_2_RAW_kimlik': 1}}
+  6_tezde_ucus_4: {'etiketli': 155, 'yakalanan': 167, 'kaynak': {'x1': 139, '6_tezde_ucus_4_2022_tpu_f48k4_cb62': 4, '6_tezde_ucus_4_RAW_kimlik': 4, '6_tezde_ucus_4_2022_deneme6_f32k5': 8}}
+  guzergah_4_tezde_ucus_3: {'etiketli': 151, 'yakalanan': 210, 'kaynak': {'guzergah_4_tezde_ucus_3_2022_deneme6_f32k5': 15, 'x1': 112, 'guzergah_4_tezde_ucus_3_RAW_kimlik': 14, 'guzergah_4_tezde_ucus_3_2022_tpu_f48k4_cb62': 3, 'guzergah_4_tezde_ucus_3_2022_k32_3_e1900': 7}}
+epoch 0 (ogretmen) val_basari=0.882 oran=0.933 ncc=0.310 | egt_basari=0.933 oran=0.910
+  adim 250 val_basari=0.833 oran=0.941 ncc=0.345 | egt_basari=0.893 oran=0.926

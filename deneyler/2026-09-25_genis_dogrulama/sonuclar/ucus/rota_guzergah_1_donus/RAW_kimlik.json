@@ -1,0 +1,343 @@
+{
+  "model": "RAW_kimlik.h5",
+  "model_sha256": "e3240b0f9ec6ebb9543c705b9632d86d83c2347ae7d77ed125c4e772582c26f5",
+  "harita": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_genis_dogrulama\\modeller\\ucus_haritalari\\RAW_kimlik_urgup_geo.tif",
+  "anlik": "C:\\d_surucusu\\visual_navigation\\template-matching\\guzergahlar\\guzergah_1_donus",
+  "protokol": "F1: minus1_1 + none, kesisimsiz kare = tekil sablon",
+  "kare": 54,
+  "max_frames": 0,
+  "success_25m": 0.018518518518518517,
+  "success_50m": 0.48148148148148145,
+  "success_70m": 0.5370370370370371,
+  "tm_basari_yuzde": 53.7,
+  "kesisim_yok_kare": 27,
+  "medyan_m": 65.0,
+  "ortalama_m": 285.037037037037,
+  "sure_s": 31.66102409362793,
+  "kareler": [
+    {
+      "frame": 1,
+      "err_m": 36.0,
+      "tm_score": 0.197,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 2,
+      "err_m": 37.0,
+      "tm_score": 0.219,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 3,
+      "err_m": 37.0,
+      "tm_score": 0.207,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 4,
+      "err_m": 35.0,
+      "tm_score": 0.21,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 5,
+      "err_m": 620.0,
+      "tm_score": 0.258,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 6,
+      "err_m": 519.0,
+      "tm_score": 0.292,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 7,
+      "err_m": 646.0,
+      "tm_score": 0.343,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 8,
+      "err_m": 660.0,
+      "tm_score": 0.318,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 9,
+      "err_m": 703.0,
+      "tm_score": 0.304,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 10,
+      "err_m": 710.0,
+      "tm_score": 0.323,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 11,
+      "err_m": 675.0,
+      "tm_score": 0.297,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 12,
+      "err_m": 677.0,
+      "tm_score": 0.28,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 13,
+      "err_m": 37.0,
+      "tm_score": 0.312,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 14,
+      "err_m": 30.0,
+      "tm_score": 0.298,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 15,
+      "err_m": 30.0,
+      "tm_score": 0.326,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 16,
+      "err_m": 30.0,
+      "tm_score": 0.313,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 17,
+      "err_m": 31.0,
+      "tm_score": 0.376,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 18,
+      "err_m": 39.0,
+      "tm_score": 0.415,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 19,
+      "err_m": 27.0,
+      "tm_score": 0.345,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 20,
+      "err_m": 26.0,
+      "tm_score": 0.27,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 21,
+      "err_m": 22.0,
+      "tm_score": 0.304,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 22,
+      "err_m": 40.0,
+      "tm_score": 0.31,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 23,
+      "err_m": 579.0,
+      "tm_score": 0.307,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 24,
+      "err_m": 786.0,
+      "tm_score": 0.313,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 25,
+      "err_m": 574.0,
+      "tm_score": 0.331,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 26,
+      "err_m": 580.0,
+      "tm_score": 0.362,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 27,
+      "err_m": 580.0,
+      "tm_score": 0.363,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 28,
+      "err_m": 524.0,
+      "tm_score": 0.322,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 29,
+      "err_m": 47.0,
+      "tm_score": 0.345,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 30,
+      "err_m": 36.0,
+      "tm_score": 0.28,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 31,
+      "err_m": 62.0,
+      "tm_score": 0.28,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 32,
+      "err_m": 34.0,
+      "tm_score": 0.401,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 33,
+      "err_m": 618.0,
+      "tm_score": 0.463,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 34,
+      "err_m": 38.0,
+      "tm_score": 0.482,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 35,
+      "err_m": 704.0,
+      "tm_score": 0.453,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 36,
+      "err_m": 314.0,
+      "tm_score": 0.354,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 37,
+      "err_m": 66.0,
+      "tm_score": 0.331,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 38,
+      "err_m": 28.0,
+      "tm_score": 0.3,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 39,
+      "err_m": 27.0,
+      "tm_score": 0.319,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 40,
+      "err_m": 35.0,
+      "tm_score": 0.293,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 41,
+      "err_m": 36.0,
+      "tm_score": 0.252,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 42,
+      "err_m": 637.0,
+      "tm_score": 0.206,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 43,
+      "err_m": 65.0,
+      "tm_score": 0.163,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 44,
+      "err_m": 30.0,
+      "tm_score": 0.186,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 45,
+      "err_m": 606.0,
+      "tm_score": 0.16,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 46,
+      "err_m": 95.0,
+      "tm_score": 0.142,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 47,
+      "err_m": 32.0,
+      "tm_score": 0.109,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 48,
+      "err_m": 30.0,
+      "tm_score": 0.098,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 49,
+      "err_m": 29.0,
+      "tm_score": 0.099,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 50,
+      "err_m": 309.0,
+      "tm_score": 0.139,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 51,
+      "err_m": 777.0,
+      "tm_score": 0.179,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 52,
+      "err_m": 469.0,
+      "tm_score": 0.253,
+      "kesisim_yok": true
+    },
+    {
+      "frame": 53,
+      "err_m": 268.0,
+      "tm_score": 0.294,
+      "kesisim_yok": false
+    },
+    {
+      "frame": 54,
+      "err_m": 710.0,
+      "tm_score": 0.223,
+      "kesisim_yok": true
+    }
+  ]
+}

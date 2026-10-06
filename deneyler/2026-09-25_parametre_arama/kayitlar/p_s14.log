@@ -1,0 +1,15 @@
+veri: egitim=5230 dogrulama=672 (14s)
+epoch 1 lr=0.001 loss=0.4642 val_loss=0.4088 (72s)
+epoch 2 lr=0.001 loss=0.4440 val_loss=0.3876 (80s)
+epoch 3 lr=0.001 loss=0.4297 val_loss=0.3788 (130s)
+epoch 4 lr=0.001 loss=0.4232 val_loss=0.3741 (129s)
+epoch 5 lr=0.001 loss=0.4211 val_loss=0.3700 (129s)
+epoch 6 lr=0.001 loss=0.4172 val_loss=0.3679 (128s)
+epoch 7 lr=0.001 loss=0.4155 val_loss=0.3675 (128s)
+epoch 8 lr=0.001 loss=0.4140 val_loss=0.3749 (128s)
+epoch 9 lr=0.001 loss=0.4125 val_loss=0.3666 (128s)
+epoch 10 lr=0.001 loss=0.4108 val_loss=0.3664 (128s)
+epoch 11 lr=0.001 loss=0.4103 val_loss=0.3647 (128s)
+epoch 12 lr=0.001 loss=0.4088 val_loss=0.3708 (128s)
+bitti
+CIKIS_KODU=0

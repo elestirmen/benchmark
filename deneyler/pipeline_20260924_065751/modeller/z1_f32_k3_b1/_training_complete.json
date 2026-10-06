@@ -1,0 +1,36 @@
+{
+  "status": "complete",
+  "completed_at": "2026-09-24T08:05:58.807308",
+  "job": {
+    "name": "z1_f32_k3_b1",
+    "MODEL_TYPE": "flat_bottleneck",
+    "FILTER_COUNT": 32,
+    "KERNEL_SIZE": [
+      3,
+      3
+    ],
+    "STRIDES": [
+      1,
+      1
+    ],
+    "FLAT_DEPTH": 3,
+    "HIDDEN_ACTIVATION": "elu",
+    "OUTPUT_ACTIVATION": "sigmoid",
+    "INPUT_NORMALIZATION": "zero_1",
+    "BATCH_SIZE": 1,
+    "SHUFFLE_TRAIN": true,
+    "EPOCHS": 12,
+    "LEARNING_RATE": 0.001,
+    "OPTIMIZER": "adam",
+    "LOSS_FUNCTION": "binary_crossentropy",
+    "PRETRAINED_MODEL": null,
+    "EARLY_STOPPING_PATIENCE": 0,
+    "REDUCE_LR_PATIENCE": 0
+  },
+  "model_files": [
+    "_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_mae_model_f32_k3.h5",
+    "_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_ssim_model_f32_k3.h5",
+    "_JOB_z1_f32_k3_b1_24_09_2026__06_58_best_val_loss_model_f32_k3.h5",
+    "_JOB_z1_f32_k3_b1_24_09_2026__08_05_son_model.h5"
+  ]
+}

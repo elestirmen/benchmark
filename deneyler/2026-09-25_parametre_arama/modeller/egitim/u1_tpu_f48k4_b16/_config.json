@@ -1,0 +1,23 @@
+{
+  "out_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\2026-09-25_parametre_arama\\modeller\\egitim\\u1_tpu_f48k4_b16",
+  "data_dir": "E:\\temp\\tez__ayna\\python_calismalar\\larger-google-sat2maps-dataset\\islenmis\\sonuclar_19",
+  "filters": 48,
+  "kernel": 4,
+  "outer_kernel": 0,
+  "depth": 3,
+  "hidden": "elu",
+  "norm": "zero_1",
+  "batch": 16,
+  "lr": 0.001,
+  "epochs": 1500,
+  "save_epochs": "10,25,50,75,100,150,200,250,300,400,500,600,700,800,900,1000,1200,1500",
+  "seed": 21,
+  "amp": true,
+  "max_train": 0,
+  "max_files": 0,
+  "no_filter": false,
+  "lr_schedule": "",
+  "ema": 0.999,
+  "aug": 0.0,
+  "init_npz": ""
+}

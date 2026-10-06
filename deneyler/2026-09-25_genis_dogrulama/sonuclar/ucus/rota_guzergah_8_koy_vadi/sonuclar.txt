@@ -1,0 +1,3 @@
+Empty DataFrame
+Columns: [goruntu, sonuc, gercek_latitude, gercek_longitude, tahmini_latitude, tahmini_longitude, ucus_yuksekligi]
+Index: []
