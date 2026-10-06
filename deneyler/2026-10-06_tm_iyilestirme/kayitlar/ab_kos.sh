@@ -2,7 +2,7 @@
 # TM iyilestirme A/B kosusu (2026-10-06). Ayrinti ve karar kurali: ../BENIOKU.md
 # Kullanim (Git Bash):
 #   bash /c/d_surucusu/visual_navigation/benchmark/deneyler/2026-10-06_tm_iyilestirme/kayitlar/ab_kos.sh [kol ...]
-# Kollar (varsayilan: hepsi, bu sirayla): kontrol gsd_area coklu5 gsd_area_coklu5
+# Kollar (varsayilan: hepsi, bu sirayla): kontrol gimbal_yaw gsd_area coklu5 birlesik
 #   referans: mevcut varsayilani 14 rotada bastan kosar (kontrol GPU belirsizligi yuzunden
 #   tutmazsa); sonra A_KOK=.../sonuclar/ucus/referans ile A/B'yi buna karsi yapin.
 # Devam ettirilebilir: sonucu olan isler atlanir. Baska bir benchmark ile ayni anda kosturmayin.
@@ -36,9 +36,10 @@ KONTROL_ROUTES=(6_tezde_ucus_4 guzergah_6_to_tagar)
 kol_args() {
   case $1 in
     kontrol|referans) echo "" ;;
+    gimbal_yaw) echo "--yaw-kaynagi GIMBAL" ;;
     gsd_area) echo "--gsd-interp AREA" ;;
     coklu5) echo "--coklu-aday 5" ;;
-    gsd_area_coklu5) echo "--gsd-interp AREA --coklu-aday 5" ;;
+    birlesik) echo "--yaw-kaynagi GIMBAL --gsd-interp AREA --coklu-aday 5" ;;
     *) return 1 ;;
   esac
 }
@@ -65,7 +66,7 @@ run_one() {  # $1 kol, $2 rota
 }
 
 KOLLAR=("$@")
-[ ${#KOLLAR[@]} -eq 0 ] && KOLLAR=(kontrol gsd_area coklu5 gsd_area_coklu5)
+[ ${#KOLLAR[@]} -eq 0 ] && KOLLAR=(kontrol gimbal_yaw gsd_area coklu5 birlesik)
 echo "$(date '+%F %T') AB BASLADI: ${KOLLAR[*]} | TM $(git -C "$TM" rev-parse --short HEAD) | benchmark $(git -C "$BENCH" rev-parse --short HEAD)" >> "$L"
 for kol in "${KOLLAR[@]}"; do
   kol_args "$kol" > /dev/null || { echo "bilinmeyen kol: $kol" | tee -a "$L"; exit 2; }

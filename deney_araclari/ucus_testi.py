@@ -21,6 +21,8 @@ test:   template-matching ana betiginin run_pipeline'i BENCHMARK=True ile (her k
                               (varsayilan NEAREST; TM RUN_CFG GSD_RESIZE_INTERP)
           --coklu-aday K      kaba aramada TOP-K aday + NMS (varsayilan 0 = kapali;
                               TM RUN_CFG PYRAMID_MULTI_CANDIDATE / PYRAMID_TOP_K)
+          --yaw-kaynagi GIMBAL  kareyi gimbal (kamera) yawiyla dondur (varsayilan
+                              FLIGHT = govde yawi; TM RUN_CFG YAW_SOURCE)
         Varsayilan disi bir secenek protokol etiketine eklenir; pano bu kosulari
         ayri tabloda gosterir.
 kimlik: sigmoid(1.5 x) tek 1x1 conv; RAW'a (modelsiz eslestirme) monoton bir yakinsama.
@@ -228,6 +230,9 @@ def cmd_test(args):
     if args.coklu_aday > 0:
         overrides.update(PYRAMID_MULTI_CANDIDATE=True, PYRAMID_TOP_K=int(args.coklu_aday))
         ab_etiket.append(f"coklu aday {int(args.coklu_aday)}")
+    if args.yaw_kaynagi != "FLIGHT":
+        overrides["YAW_SOURCE"] = args.yaw_kaynagi
+        ab_etiket.append(f"yaw {args.yaw_kaynagi}")
     os.environ["TM_RUN_CFG_JSON"] = json.dumps(overrides)
     os.chdir(out.parent)  # sonuclar.csv / modele_gore_sonuclar.txt buraya
     sys.path.insert(0, str(TM_ROOT))
@@ -280,7 +285,7 @@ def cmd_test(args):
         "protokol": ("eski (sozlesmeler acik)" if args.eski_protokol else (
             f"{args.protokol}: {PROTOCOLS[args.protokol]['input_normalization']} + none, kesisimsiz kare = tekil sablon"))
             + "".join(f", {e}" for e in ab_etiket),
-        "ayarlar": {"gsd_interp": args.gsd_interp, "coklu_aday": int(args.coklu_aday)},
+        "ayarlar": {"gsd_interp": args.gsd_interp, "coklu_aday": int(args.coklu_aday), "yaw_kaynagi": args.yaw_kaynagi},
         "kare": n,
         "max_frames": int(args.max_frames),
         "success_25m": rate(25), "success_50m": rate(50), "success_70m": rate(70),
@@ -321,6 +326,8 @@ def main():
                    default="NEAREST", help="kare -> harita cozunurlugu interpolasyonu (varsayilan NEAREST = onceki)")
     t.add_argument("--coklu-aday", type=int, default=0,
                    help="kaba aramada TOP-K aday + NMS; 0 = kapali (onceki davranis)")
+    t.add_argument("--yaw-kaynagi", type=str.upper, choices=["FLIGHT", "GIMBAL"], default="FLIGHT",
+                   help="kare dondurme yawi: FLIGHT = govde (onceki), GIMBAL = kamera")
     k = sub.add_parser("kimlik")
     k.add_argument("--out", required=True)
     args = ap.parse_args()

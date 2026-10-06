@@ -16,8 +16,9 @@ altında durur (bkz. `deneyler/BENIOKU.md`). Tüm sonuçların tek görünümü:
 | `kapi_ozet.py` | Kapı JSON'larını tek sıralı tabloda gösterir (4 grubun ayrı oranlarıyla). | herhangi |
 | `kapi_kalibrasyon.py` | Kapı oranlarının resmi sonuçları protokol başına ne kadar iyi sıraladığını (Spearman) ölçer; 4 grup vs eski tek grup. | `visual_navigation_cuda` |
 | `sicaklik.py` | Sigmoid çıkışını T ile ölçekler (deney aracı; iyileştirme vermedi). | `visual_navigation_cuda` |
-| `ucus_testi.py` | Gerçek İHA uçuş testi (template-matching BENCHMARK modu): `harita` (benchmark karo planıyla model haritası), `test` (kare başına hata; **GPS merkezi yedeği kapalı**), `kimlik` (RAW karşılığı). `--protokol F1/F2`. A/B: `--gsd-interp AREA`, `--coklu-aday K` (varsayılanlar önceki davranış). | `visual_navigation_cuda` |
+| `ucus_testi.py` | Gerçek İHA uçuş testi (template-matching BENCHMARK modu): `harita` (benchmark karo planıyla model haritası), `test` (kare başına hata; **GPS merkezi yedeği kapalı**), `kimlik` (RAW karşılığı). `--protokol F1/F2`. A/B: `--yaw-kaynagi GIMBAL`, `--gsd-interp AREA`, `--coklu-aday K` (varsayılanlar önceki davranış). | `visual_navigation_cuda` |
 | `ab_karsilastir.py` | Uçuş testi A/B kararı: iki ayar kolunu kare bazında eşleştirir (McNemar), önceden yazılmış KABUL/RED/BELİRSİZ kuralını uygular; `--birebir` varsayılan davranışın değişmediğini kanıtlar. | herhangi |
+| `exif_tani.py` | Rota karelerinin EXIF/XMP tanısı: gimbal ve uçuş yawı farkı, irtifa tutarlılığı (GPU ve DEM gerekmez). | herhangi (PIL) |
 | `raster_utm.py` | RGB raster'ı benchmark ızgarasına (UTM, 0.298582 m/px, alfa bandı) yeniden örnekler; `--referans` ile iki kaynağı aynı ızgaraya oturtur. | `visual_navigation_cuda` |
 | `hizli_vekil.py` | 2 × 6×6 km hızlı vekil benchmark. **Yeni (kenar çizen) modelleri iyimser ölçer**; seçimde kapıyı kullanın. | `visual_navigation_cuda` (GPU) |
 | `degerlendir.sh` | Dönüştür + vekil. | Git Bash |
