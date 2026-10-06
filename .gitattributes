@@ -1,0 +1,2 @@
+# Git Bash betikleri Windows checkout sonrasi da LF kalsin (CRLF bash'i bozar)
+*.sh text eol=lf

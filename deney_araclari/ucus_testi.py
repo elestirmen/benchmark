@@ -16,6 +16,13 @@ test:   template-matching ana betiginin run_pipeline'i BENCHMARK=True ile (her k
         ve TM skoru (max_val2) 2026-09-12 karlik_top_modeller testindeki geri cagri
         alanlaridir. --eski-protokol ile harita/model sozlesmeleri acik kalir (o testin
         birebir tekrari icin).
+        A/B secenekleri (varsayilanlar onceki davranisin aynisi):
+          --gsd-interp AREA   kareyi harita cozunurlugune indirirken interpolasyon
+                              (varsayilan NEAREST; TM RUN_CFG GSD_RESIZE_INTERP)
+          --coklu-aday K      kaba aramada TOP-K aday + NMS (varsayilan 0 = kapali;
+                              TM RUN_CFG PYRAMID_MULTI_CANDIDATE / PYRAMID_TOP_K)
+        Varsayilan disi bir secenek protokol etiketine eklenir; pano bu kosulari
+        ayri tabloda gosterir.
 kimlik: sigmoid(1.5 x) tek 1x1 conv; RAW'a (modelsiz eslestirme) monoton bir yakinsama.
 
 Sonuc dosyalari (sonuclar.csv vb.) template-matching klasorune degil, --out'un
@@ -210,6 +217,17 @@ def cmd_test(args):
         # merkez EXIF GPS'in kendisidir, hata 0 m cikar (2026-09-25: RAW'da 191 karenin
         # 32'si boyle "basarili" sayildi). False -> tekil sablonun gercek eslesmesi.
         overrides["NO_INTERSECTION_USE_SEARCH_CENTER"] = False
+    else:
+        # Eski protokol, TM'nin BENCHMARK'taki GPS merkezi yedegiyle olculmustu; birebir
+        # tekrar icin (TM 2026-10-06'dan beri bu yedegi BENCHMARK'ta kendiliginden kapatir).
+        overrides["BENCHMARK_ALLOW_SEARCH_CENTER_FALLBACK"] = True
+    ab_etiket = []
+    if args.gsd_interp != "NEAREST":
+        overrides["GSD_RESIZE_INTERP"] = args.gsd_interp
+        ab_etiket.append(f"gsd {args.gsd_interp}")
+    if args.coklu_aday > 0:
+        overrides.update(PYRAMID_MULTI_CANDIDATE=True, PYRAMID_TOP_K=int(args.coklu_aday))
+        ab_etiket.append(f"coklu aday {int(args.coklu_aday)}")
     os.environ["TM_RUN_CFG_JSON"] = json.dumps(overrides)
     os.chdir(out.parent)  # sonuclar.csv / modele_gore_sonuclar.txt buraya
     sys.path.insert(0, str(TM_ROOT))
@@ -259,8 +277,10 @@ def cmd_test(args):
         "model_sha256": sha256(model),
         "harita": str(harita),
         "anlik": str(Path(args.anlik).resolve()),
-        "protokol": "eski (sozlesmeler acik)" if args.eski_protokol else (
-            f"{args.protokol}: {PROTOCOLS[args.protokol]['input_normalization']} + none, kesisimsiz kare = tekil sablon"),
+        "protokol": ("eski (sozlesmeler acik)" if args.eski_protokol else (
+            f"{args.protokol}: {PROTOCOLS[args.protokol]['input_normalization']} + none, kesisimsiz kare = tekil sablon"))
+            + "".join(f", {e}" for e in ab_etiket),
+        "ayarlar": {"gsd_interp": args.gsd_interp, "coklu_aday": int(args.coklu_aday)},
         "kare": n,
         "max_frames": int(args.max_frames),
         "success_25m": rate(25), "success_50m": rate(50), "success_70m": rate(70),
@@ -297,6 +317,10 @@ def main():
     t.add_argument("--protokol", choices=sorted(PROTOCOLS), default="F1")
     t.add_argument("--yakala", default="", help="kare basina egitim verisi (.npz) bu klasore (bkz. _Yakalayici)")
     t.add_argument("--yakala-pay", type=int, default=384, help="harita kesitinin sablon cevresindeki payi (px)")
+    t.add_argument("--gsd-interp", type=str.upper, choices=["NEAREST", "AREA", "LINEAR", "CUBIC", "AUTO"],
+                   default="NEAREST", help="kare -> harita cozunurlugu interpolasyonu (varsayilan NEAREST = onceki)")
+    t.add_argument("--coklu-aday", type=int, default=0,
+                   help="kaba aramada TOP-K aday + NMS; 0 = kapali (onceki davranis)")
     k = sub.add_parser("kimlik")
     k.add_argument("--out", required=True)
     args = ap.parse_args()

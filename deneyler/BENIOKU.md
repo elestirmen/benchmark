@@ -38,6 +38,7 @@ Kodlar burada değil: deney araçları `benchmark/deney_araclari/`, pipeline
 | `2026-09-25_genis_dogrulama/` | Başarılı modellerin 2022 kazananlarıyla aynı 4000 sorguda doğrulanması |
 | `2026-09-25_parametre_arama/` | Başarıyı artırma denemeleri (EMA/SWA, lr takvimi, augmentasyon, kapasite, TTA) |
 | `2026-10-02_ucus_uyarlama/` | Gerçek İHA kareleriyle kare modeli uyarlaması (harita = x1 sabit, öğrenci x1'den başlar); Ürgüp'te eğit, Karlık'ta test |
+| `2026-10-06_tm_iyilestirme/` | TM uçuş hattı iyileştirmelerinin (GSD interpolasyonu, çok adaylı kaba arama) A/B testi; önceden yazılmış karar kuralı ve geri dönüş planı |
 
 ## Eski düzen (taşınmadı, pano yerinde okur)
 
