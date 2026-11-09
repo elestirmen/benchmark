@@ -1,6 +1,6 @@
 # Cross-Source Map Benchmark for GNSS-Denied UAV Localization
 
-Reference code for the article *"Cross-Autoencoder Structural Representations for GNSS-Denied UAV Localization by Template Matching: Flight Evaluation and a Large-Scale Cross-Source Map Benchmark"* (A. E. Arık and N. Emrahoğlu, submitted to *Drones*).
+Reference code for the article *"Learned versus Classical Structural Representations for GNSS-Denied UAV Localization by Template Matching: A Cross-Source Map Benchmark and Flight Replay"* (A. E. Arık and N. Emrahoğlu, submitted to the *International Journal of Engineering and Geosciences*, IJEG).
 
 The benchmark applies the same neural network to both a query tile and a search map, then measures localization success in metres:
 
@@ -92,4 +92,4 @@ Dual-licensed under the **MIT License** ([LICENSE-MIT](LICENSE-MIT)) or the **Ap
 
 ## Citation
 
-See [CITATION.cff](CITATION.cff). Please cite the *Drones* article once published.
+See [CITATION.cff](CITATION.cff). Please cite the IJEG article once published.

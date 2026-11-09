@@ -24,9 +24,9 @@ keywords:
 preferred-citation:
   type: article
   title: >-
-    Cross-Autoencoder Structural Representations for GNSS-Denied UAV
-    Localization by Template Matching: Flight Evaluation and a Large-Scale
-    Cross-Source Map Benchmark
+    Learned versus Classical Structural Representations for GNSS-Denied UAV
+    Localization by Template Matching: A Cross-Source Map Benchmark and
+    Flight Replay
   authors:
     - family-names: "Arık"
       given-names: "Ahmet Ertuğrul"
@@ -34,6 +34,6 @@ preferred-citation:
     - family-names: "Emrahoğlu"
       given-names: "Nuri"
       affiliation: "Çukurova University, Adana, Türkiye"
-  journal: "Drones"
+  journal: "International Journal of Engineering and Geosciences"
   year: 2026
   notes: "Submitted; citation details will be updated upon publication."

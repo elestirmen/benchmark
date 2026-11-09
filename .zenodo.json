@@ -1,6 +1,6 @@
 {
   "title": "Cross-Source Map Benchmark for GNSS-Denied UAV Localization",
-  "description": "Reproducible cross-source (Google vs. Bing) map-matching benchmark and analysis code accompanying the article 'Cross-Autoencoder Structural Representations for GNSS-Denied UAV Localization by Template Matching: Flight Evaluation and a Large-Scale Cross-Source Map Benchmark' (submitted to Drones). Includes spatially blocked query sampling with fixed seeds, the deterministic hard_v1 photometric degradation profile, coarse-to-fine NCC matching, checkpoint screening with SHA-256 cataloguing, epoch sweep tooling and spatial block-bootstrap confidence intervals. Dual-licensed MIT / Apache-2.0.",
+  "description": "Reproducible cross-source (Google vs. Bing) map-matching benchmark and analysis code accompanying the article 'Learned versus Classical Structural Representations for GNSS-Denied UAV Localization by Template Matching: A Cross-Source Map Benchmark and Flight Replay' (submitted to the International Journal of Engineering and Geosciences). Includes spatially blocked query sampling with fixed seeds, the deterministic hard_v1 photometric degradation profile, coarse-to-fine NCC matching, checkpoint screening with SHA-256 cataloguing, epoch sweep tooling and spatial block-bootstrap confidence intervals. Dual-licensed MIT / Apache-2.0.",
   "upload_type": "software",
   "license": "mit",
   "creators": [

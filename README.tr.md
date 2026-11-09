@@ -1,5 +1,7 @@
 # Jeoreferanslı Ortak-Temsil Benchmarkı
 
+> **Makale:** A. E. Arık ve N. Emrahoğlu, *Learned versus Classical Structural Representations for GNSS-Denied UAV Localization by Template Matching: A Cross-Source Map Benchmark and Flight Replay*, *International Journal of Engineering and Geosciences* (IJEG) dergisine gönderildi, 2026. Atıf için [CITATION.cff](CITATION.cff) dosyasına bakın.
+
 Aynı sinir ağını hem sorgu parçasına hem arama haritasına uygulayıp, metre cinsinden konum başarısını ölçer:
 
 ```text
