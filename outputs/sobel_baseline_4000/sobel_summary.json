@@ -1,0 +1,161 @@
+{
+ "n_per_direction_variant": 4000,
+ "bootstrap": {
+  "iterations": 1000,
+  "seed": 42,
+  "block": "1 km"
+ },
+ "raw_differs_from_table6": 0,
+ "raw_max_abs_error_diff_m": 0.0,
+ "sobel_rejected": 11,
+ "sobel_rejected_reasons": {
+  "low_model_template_variance": 11
+ },
+ "by_direction": {
+  "bg|clean": {
+   "raw": 36.73,
+   "cae": 70.28,
+   "sobel": 77.7
+  },
+  "bg|hard_v1": {
+   "raw": 34.17,
+   "cae": 59.8,
+   "sobel": 75.4
+  },
+  "gb|clean": {
+   "raw": 61.55,
+   "cae": 67.77,
+   "sobel": 79.47
+  },
+  "gb|hard_v1": {
+   "raw": 58.33,
+   "cae": 65.65,
+   "sobel": 79.47
+  }
+ },
+ "mean": {
+  "clean": {
+   "raw": 49.14,
+   "cae": 69.03,
+   "sobel": 78.59
+  },
+  "hard_v1": {
+   "raw": 46.25,
+   "cae": 62.72,
+   "sobel": 77.44
+  }
+ },
+ "paired": {
+  "clean": {
+   "sobel_only": 1212,
+   "cae_only": 447,
+   "both": 5075,
+   "neither": 1266,
+   "sobel_minus_cae": {
+    "pp": 9.56,
+    "ci95": [
+     8.14,
+     11.04
+    ]
+   },
+   "sobel_minus_raw": {
+    "pp": 29.45,
+    "ci95": [
+     27.64,
+     31.22
+    ]
+   },
+   "cae_minus_raw": {
+    "pp": 19.89,
+    "ci95": [
+     18.09,
+     21.67
+    ]
+   }
+  },
+  "hard_v1": {
+   "sobel_only": 1560,
+   "cae_only": 383,
+   "both": 4635,
+   "neither": 1422,
+   "sobel_minus_cae": {
+    "pp": 14.71,
+    "ci95": [
+     13.2,
+     16.31
+    ]
+   },
+   "sobel_minus_raw": {
+    "pp": 31.19,
+    "ci95": [
+     29.18,
+     32.99
+    ]
+   },
+   "cae_minus_raw": {
+    "pp": 16.47,
+    "ci95": [
+     14.44,
+     18.21
+    ]
+   }
+  }
+ },
+ "halves": {
+  "north": {
+   "blocks": 259,
+   "clean|raw": 61.94,
+   "clean|cae": 81.19,
+   "clean|sobel": 84.12,
+   "hard_v1|raw": 59.04,
+   "hard_v1|cae": 73.73,
+   "hard_v1|sobel": 82.82
+  },
+  "south": {
+   "blocks": 239,
+   "clean|raw": 35.22,
+   "clean|cae": 55.89,
+   "clean|sobel": 72.83,
+   "hard_v1|raw": 32.32,
+   "hard_v1|cae": 50.72,
+   "hard_v1|sobel": 71.93
+  }
+ },
+ "entropy_tertiles": {
+  "low|clean": {
+   "raw": 33.91,
+   "cae": 62.62,
+   "sobel": 74.81
+  },
+  "low|hard_v1": {
+   "raw": 32.48,
+   "cae": 55.42,
+   "sobel": 73.72
+  },
+  "mid|clean": {
+   "raw": 41.47,
+   "cae": 62.98,
+   "sobel": 73.77
+  },
+  "mid|hard_v1": {
+   "raw": 45.88,
+   "cae": 61.93,
+   "sobel": 76.84
+  },
+  "high|clean": {
+   "raw": 65.77,
+   "cae": 78.32,
+   "sobel": 85.09
+  },
+  "high|hard_v1": {
+   "raw": 67.06,
+   "cae": 74.53,
+   "sobel": 83.69
+  }
+ },
+ "median_error_of_successes_m": {
+  "raw": 3.34,
+  "cae": 3.23,
+  "sobel": 3.4
+ }
+}

@@ -1,6 +1,6 @@
 # Sonuç panosu
 
-Otomatik üretildi: `python sonuc_panosu.py` (2026-10-02 22:33). Elle düzenlemeyin; ayrıntılı tüm satırlar `PANO.xlsx` içindedir.
+Otomatik üretildi: `python sonuc_panosu.py` (2026-11-09 05:31). Elle düzenlemeyin; ayrıntılı tüm satırlar `PANO.xlsx` içindedir.
 
 Ölçüt: global arama `success_25m`, dört grubun ortalaması (G2B/B2G × temiz/hard_v1). Δ RAW: aynı protokolün (aynı sorgu kümesi) RAW'ına göre fark. Kapı: `margin_gate.py` yanlış tepe oranı (150 örnek, eğitim bölgesi; küçük iyi).
 
@@ -35,7 +35,7 @@ RAW global: **0.477** · 22 sonuç
 
 ## urgup_cevresi 1000 sorgu
 
-RAW global: **0.461** · 35 sonuç
+RAW global: **0.461** · 36 sonuç
 
 | # | Model | Global | Δ RAW | G2B temiz | G2B hard | B2G temiz | B2G hard | roi 500 m | roi 2000 m | Kapı 4 grup | Konum |
 |---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -48,24 +48,24 @@ RAW global: **0.461** · 35 sonuç
 | 7 | **RAW (model yok)** | 0.461 | — | 0.581 | 0.553 | 0.363 | 0.346 | 0.682 | 0.581 | — | — |
 | 8 | _JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_e…igmoid_(1, 1)_ | 0.378 | -0.083 | 0.380 | 0.481 | 0.369 | 0.282 | 0.615 | 0.513 | 0.716 | `models_pipeline/20260909_223425/flat_f24_k4/_JOB_flat_f24_k4_10_09_2026__14_37_model_f24_k4_epoch_00008_helu_osigmoid_(1, 1)_.h5` |
 | 9 | _JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_…igmoid_(1, 1)_ | 0.355 | -0.106 | 0.390 | 0.445 | 0.318 | 0.265 | 0.606 | 0.490 | 0.723 | `models_pipeline/20260909_223425/flat_f48_k4_sigmoid_repro/_JOB_flat_f48_k4_sigmoid_repro_09_09_2026__22_37_model_f48_k4_epoch_00003_helu_osigmoid_(1, 1)_.h5` |
-| 10 | _JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_e…igmoid_(1, 1)_ | 0.275 | -0.186 | 0.295 | 0.377 | 0.276 | 0.151 | 0.514 | 0.391 | 0.858 | `models_pipeline/20260909_223425/flat_f64_k4/_JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5` |
-| 11 | _JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4 | 0.255 | -0.206 | 0.327 | 0.369 | 0.182 | 0.143 | 0.496 | 0.379 | 0.771 | `models_pipeline/20260909_223425/bce_b16/_JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4.h5` |
-| 12 | _JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4 | 0.253 | -0.208 | 0.347 | 0.320 | 0.201 | 0.143 | 0.489 | 0.382 | 0.757 | `models_pipeline/20260909_223425/bce_b8/_JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4.h5` |
-| 13 | _JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4 | 0.244 | -0.217 | 0.340 | 0.357 | 0.149 | 0.128 | 0.471 | 0.356 | 0.758 | `models_pipeline/20260909_223425/bce_b32/_JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4.h5` |
-| 14 | _JOB_flat_f32_k4_10_09_2026__19_36_son_model | 0.199 | -0.262 | 0.208 | 0.300 | 0.194 | 0.094 | 0.424 | 0.316 | 1.013 | `models_pipeline/20260909_223425/flat_f32_k4/_JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5` |
-| 15 | _JOB_flat_f24_k4_03_09_2026__04_30_best_val_loss_model_f24_k4 | 0.178 | -0.283 | 0.195 | 0.205 | 0.189 | 0.122 | 0.396 | 0.286 | — | `models_pipeline/20260830_021548/flat_f24_k4/_JOB_flat_f24_k4_03_09_2026__04_30_best_val_loss_model_f24_k4.h5` |
-| 16 | _JOB_flat_f24_k4_03_09_2026__08_53_son_model | 0.178 | -0.283 | 0.195 | 0.205 | 0.189 | 0.122 | 0.396 | 0.286 | — | `models_pipeline/20260830_021548/flat_f24_k4/_JOB_flat_f24_k4_03_09_2026__08_53_son_model.h5` |
-| 17 | _JOB_flat_f24_k4_03_09_2026__04_30_best_mae_model_f24_k4 | 0.167 | -0.294 | 0.198 | 0.194 | 0.165 | 0.110 | 0.381 | 0.275 | — | `models_pipeline/20260830_021548/flat_f24_k4/_JOB_flat_f24_k4_03_09_2026__04_30_best_mae_model_f24_k4.h5` |
-| 18 | _JOB_flat_f32_k4_03_09_2026__13_33_best_val_loss_model_f32_k4 | 0.121 | -0.339 | 0.151 | 0.137 | 0.134 | 0.063 | 0.324 | 0.214 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__13_33_best_val_loss_model_f32_k4.h5` |
-| 19 | _JOB_flat_f32_k4_03_09_2026__19_56_son_model | 0.121 | -0.339 | 0.151 | 0.137 | 0.134 | 0.063 | 0.324 | 0.214 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__19_56_son_model.h5` |
-| 20 | _JOB_flat_f32_k4_03_09_2026__13_33_best_mae_model_f32_k4 | 0.100 | -0.361 | 0.136 | 0.118 | 0.097 | 0.049 | 0.283 | 0.184 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__13_33_best_mae_model_f32_k4.h5` |
-| 21 | _JOB_flat_f32_k4_03_09_2026__13_33_best_ssim_model_f32_k4 | 0.084 | -0.377 | 0.109 | 0.101 | 0.080 | 0.045 | 0.248 | 0.156 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__13_33_best_ssim_model_f32_k4.h5` |
-| 22 | _JOB_classic_f64_k3_baseline_30_08_2026__12_29_be…s_model_f64_k3 | 0.011 | -0.450 | 0.014 | 0.013 | 0.014 | 0.002 | 0.042 | 0.022 | — | `models_pipeline/20260830_021548/classic_f64_k3_baseline/_JOB_classic_f64_k3_baseline_30_08_2026__12_29_best_val_loss_model_f64_k3.h5` |
-| 23 | _JOB_classic_f32_k3_baseline_30_08_2026__05_29_son_model | 0.010 | -0.451 | 0.011 | 0.014 | 0.011 | 0.004 | 0.043 | 0.020 | — | `models_pipeline/20260830_021548/classic_f32_k3_baseline/_JOB_classic_f32_k3_baseline_30_08_2026__05_29_son_model.h5` |
-| 24 | _JOB_classic_f16_k3_31_08_2026__00_25_best_mae_model_f16_k3 | 0.007 | -0.454 | 0.011 | 0.009 | 0.004 | 0.003 | 0.033 | 0.017 | — | `models_pipeline/20260830_021548/classic_f16_k3/_JOB_classic_f16_k3_31_08_2026__00_25_best_mae_model_f16_k3.h5` |
-| 25 | _JOB_classic_f32_k3_baseline_30_08_2026__02_18_be…s_model_f32_k3 | 0.006 | -0.455 | 0.009 | 0.011 | 0.003 | 0.002 | 0.045 | 0.021 | — | `models_pipeline/20260830_021548/classic_f32_k3_baseline/_JOB_classic_f32_k3_baseline_30_08_2026__02_18_best_val_loss_model_f32_k3.h5` |
+| 10 | _JOB_z1_f32_k3_b1_recon_08_11_2026__22_22_model_f…igmoid_(1, 1)_ | 0.317 | -0.144 | 0.401 | 0.355 | 0.269 | 0.242 | 0.566 | 0.432 | 0.675 | `deneyler/pipeline_20261108_222031/modeller/z1_f32_k3_b1_recon/_JOB_z1_f32_k3_b1_recon_08_11_2026__22_22_model_f32_k3_epoch_00006_helu_osigmoid_(1, 1)_.h5` |
+| 11 | _JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_e…igmoid_(1, 1)_ | 0.275 | -0.186 | 0.295 | 0.377 | 0.276 | 0.151 | 0.514 | 0.391 | 0.858 | `models_pipeline/20260909_223425/flat_f64_k4/_JOB_flat_f64_k4_10_09_2026__21_28_model_f64_k4_epoch_00006_helu_osigmoid_(1, 1)_.h5` |
+| 12 | _JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4 | 0.255 | -0.206 | 0.327 | 0.369 | 0.182 | 0.143 | 0.496 | 0.379 | 0.771 | `models_pipeline/20260909_223425/bce_b16/_JOB_bce_b16_10_09_2026__07_13_best_ssim_model_f48_k4.h5` |
+| 13 | _JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4 | 0.253 | -0.208 | 0.347 | 0.320 | 0.201 | 0.143 | 0.489 | 0.382 | 0.757 | `models_pipeline/20260909_223425/bce_b8/_JOB_bce_b8_10_09_2026__03_50_best_ssim_model_f48_k4.h5` |
+| 14 | _JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4 | 0.244 | -0.217 | 0.340 | 0.357 | 0.149 | 0.128 | 0.471 | 0.356 | 0.758 | `models_pipeline/20260909_223425/bce_b32/_JOB_bce_b32_10_09_2026__11_08_best_ssim_model_f48_k4.h5` |
+| 15 | _JOB_flat_f32_k4_10_09_2026__19_36_son_model | 0.199 | -0.262 | 0.208 | 0.300 | 0.194 | 0.094 | 0.424 | 0.316 | 1.013 | `models_pipeline/20260909_223425/flat_f32_k4/_JOB_flat_f32_k4_10_09_2026__19_36_son_model.h5` |
+| 16 | _JOB_flat_f24_k4_03_09_2026__04_30_best_val_loss_model_f24_k4 | 0.178 | -0.283 | 0.195 | 0.205 | 0.189 | 0.122 | 0.396 | 0.286 | — | `models_pipeline/20260830_021548/flat_f24_k4/_JOB_flat_f24_k4_03_09_2026__04_30_best_val_loss_model_f24_k4.h5` |
+| 17 | _JOB_flat_f24_k4_03_09_2026__08_53_son_model | 0.178 | -0.283 | 0.195 | 0.205 | 0.189 | 0.122 | 0.396 | 0.286 | — | `models_pipeline/20260830_021548/flat_f24_k4/_JOB_flat_f24_k4_03_09_2026__08_53_son_model.h5` |
+| 18 | _JOB_flat_f24_k4_03_09_2026__04_30_best_mae_model_f24_k4 | 0.167 | -0.294 | 0.198 | 0.194 | 0.165 | 0.110 | 0.381 | 0.275 | — | `models_pipeline/20260830_021548/flat_f24_k4/_JOB_flat_f24_k4_03_09_2026__04_30_best_mae_model_f24_k4.h5` |
+| 19 | _JOB_flat_f32_k4_03_09_2026__13_33_best_val_loss_model_f32_k4 | 0.121 | -0.339 | 0.151 | 0.137 | 0.134 | 0.063 | 0.324 | 0.214 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__13_33_best_val_loss_model_f32_k4.h5` |
+| 20 | _JOB_flat_f32_k4_03_09_2026__19_56_son_model | 0.121 | -0.339 | 0.151 | 0.137 | 0.134 | 0.063 | 0.324 | 0.214 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__19_56_son_model.h5` |
+| 21 | _JOB_flat_f32_k4_03_09_2026__13_33_best_mae_model_f32_k4 | 0.100 | -0.361 | 0.136 | 0.118 | 0.097 | 0.049 | 0.283 | 0.184 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__13_33_best_mae_model_f32_k4.h5` |
+| 22 | _JOB_flat_f32_k4_03_09_2026__13_33_best_ssim_model_f32_k4 | 0.084 | -0.377 | 0.109 | 0.101 | 0.080 | 0.045 | 0.248 | 0.156 | — | `models_pipeline/20260830_021548/flat_f32_k4/_JOB_flat_f32_k4_03_09_2026__13_33_best_ssim_model_f32_k4.h5` |
+| 23 | _JOB_classic_f64_k3_baseline_30_08_2026__12_29_be…s_model_f64_k3 | 0.011 | -0.450 | 0.014 | 0.013 | 0.014 | 0.002 | 0.042 | 0.022 | — | `models_pipeline/20260830_021548/classic_f64_k3_baseline/_JOB_classic_f64_k3_baseline_30_08_2026__12_29_best_val_loss_model_f64_k3.h5` |
+| 24 | _JOB_classic_f32_k3_baseline_30_08_2026__05_29_son_model | 0.010 | -0.451 | 0.011 | 0.014 | 0.011 | 0.004 | 0.043 | 0.020 | — | `models_pipeline/20260830_021548/classic_f32_k3_baseline/_JOB_classic_f32_k3_baseline_30_08_2026__05_29_son_model.h5` |
+| 25 | _JOB_classic_f16_k3_31_08_2026__00_25_best_mae_model_f16_k3 | 0.007 | -0.454 | 0.011 | 0.009 | 0.004 | 0.003 | 0.033 | 0.017 | — | `models_pipeline/20260830_021548/classic_f16_k3/_JOB_classic_f16_k3_31_08_2026__00_25_best_mae_model_f16_k3.h5` |
 
-… ve 10 sonuç daha (PANO.xlsx → Resmi).
+… ve 11 sonuç daha (PANO.xlsx → Resmi).
 
 ## urgup_30_cm_yeni 300 sorgu · protokol b932f7
 
@@ -138,7 +138,7 @@ RAW global: **0.972** · 9 sonuç
 
 … ve 1 sonuç daha (PANO.xlsx → Resmi).
 
-## Kapı: kapı 150 örnek, 4 grup, train (en iyi 25 / 197)
+## Kapı: kapı 150 örnek, 4 grup, train (en iyi 25 / 210)
 
 RAW barajı: **0.584** (küçük olan iyi)
 
@@ -367,4 +367,4 @@ RAW barajı: **0.584** (küçük olan iyi)
 - `deneyler/secili_modeller/` öne çıkan modellerin kopyaları ve `*.kart.json` kartları.
 - Eski düzen (yerinde okunur): `models_pipeline/<run_id>/`, `outputs/end_to_end_pipeline_<run_id>/`, `outputs/urgup_cevresi_models_4000/`, `models/`.
 
-Taranan resmi koşu klasörü: 34
+Taranan resmi koşu klasörü: 35

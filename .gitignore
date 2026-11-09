@@ -44,3 +44,6 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Gradyan buyuklugu taban cizgisi: .pre.json izlenir, .h5 sobel_benchmark.py build ile yeniden uretilir
+models_sobel/*.h5

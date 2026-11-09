@@ -1,0 +1,9 @@
+{
+  "input_normalization": "minus1_1",
+  "enhancement": "none",
+  "color_mode": "grayscale",
+  "image_size": 544,
+  "output_activation": "linear [0, 1]",
+  "note": "gradient magnitude baseline, fixed weights, identical to flight_replay SobelTransform (Gaussian sigma 1.5, 3x3 Sobel, x0.5, clip 255)",
+  "max_abs_diff_opencv": 3.4985122680664062
+}

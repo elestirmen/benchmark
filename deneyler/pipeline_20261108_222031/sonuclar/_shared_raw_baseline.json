@@ -1,0 +1,20 @@
+{
+  "status": "complete",
+  "run_id": "20261108_222031",
+  "source_output_dir": "C:\\d_surucusu\\visual_navigation\\benchmark\\deneyler\\pipeline_20261108_222031\\sonuclar\\z1_f32_k3_b1_recon",
+  "max_queries": 1000,
+  "directions": 2,
+  "query_variants": [
+    "clean",
+    "hard_v1"
+  ],
+  "search_modes": [
+    "roi_500m",
+    "roi_1000m",
+    "roi_2000m",
+    "roi_4000m",
+    "roi_8000m",
+    "global"
+  ],
+  "registered_at": "2026-11-09T05:31:40.332765"
+}
