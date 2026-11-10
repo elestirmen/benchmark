@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Gradient-magnitude baseline on the wider Urgup district benchmark (Reviewer 1, item 5).
+"""Gradient-magnitude baseline on the wider Urgup district benchmark.
 
 The flight replay uses a classical structural representation as a baseline (flight_replay/cae_infer.py,
 SobelTransform): gradient magnitude of the Gaussian-smoothed (sigma 1.5) grayscale tile, 3 x 3 Sobel,

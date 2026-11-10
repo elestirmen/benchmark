@@ -1,6 +1,6 @@
 """Kontrollu karsilastirma: harita hedefi yerine girdinin kendisini yeniden kuran (reconstruction) model.
 
-Hakem istegi (Unmanned Systems, US-D-26-00277, Hakem 1 madde 5): kartografik denetimin katkisini,
+Amac: kartografik denetimin katkisini,
 ayni mimari / veri / tarif / secim (marj kapisi) / benchmark ile egitilmis bir girdi-yeniden-kurma
 modeline karsi olcmek.
 
